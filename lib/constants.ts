@@ -83,6 +83,16 @@ export const TIERS = ['Initiate', 'Contributor', 'Architect', 'Vanguard'] as con
 export const AUTH_COOKIE = 'pb_auth'
 export const ROLE_COOKIE = 'pb_role'
 export const OAUTH_STATE_COOKIE = 'oauth_state'
+export const OAUTH_REDIRECT_COOKIE = 'oauth_redirect'
+
+/**
+ * Guards post-login redirects. Only same-origin absolute paths are allowed —
+ * `//evil.test` and `https://evil.test` are both rejected, so a crafted
+ * `?next=` cannot turn the OAuth callback into an open redirect.
+ */
+export function isSafeRedirect(target: string): boolean {
+  return target.startsWith('/') && !target.startsWith('//')
+}
 
 /** 14 days, in seconds. */
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 14
