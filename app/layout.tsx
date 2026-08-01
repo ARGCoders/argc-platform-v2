@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
+import { ViewTransition } from "react";
 import { AuthProvider } from "@/lib/auth-context";
+import { Navbar } from "@/components/shared/navbar";
 import "./globals.css";
 
-// Fonts, Navbar and ViewTransition land in Phase 4 alongside the design tokens.
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Weights are enumerated deliberately: V1 loaded 600 as well, which nothing used.
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,16 +28,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full`}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <Navbar />
+          <ViewTransition>{children}</ViewTransition>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -2,13 +2,72 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Tailwind cannot see class usage inside node_modules by default, and the
+   BlockNote shadcn adapter ships its own utility classes. */
+@source "../node_modules/@blocknote/shadcn";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ARGC brand tokens
+
+   Tailwind v4 has no config file: these ARE the design system. Values are
+   OKLCH so lightness stays perceptually even across the ramp.
+
+   `static` is required. A plain @theme block is tree-shaken — Tailwind only
+   emits variables that a generated utility references, so tokens read through
+   var() from an inline style or from third-party CSS (BlockNote) resolve to
+   nothing. Verified: without it, 8 of these 15 were absent at runtime.
+   ───────────────────────────────────────────────────────────────────────── */
+@theme static {
+  /* Brand */
+  --color-argc-maroon:    oklch(0.34 0.14 21);   /* #7A1D22 — primary */
+  --color-argc-maroon-dk: oklch(0.26 0.12 21);   /* #421016 */
+  --color-argc-maroon-lt: oklch(0.44 0.14 21);   /* #9E2A32 */
+  --color-eng-navy:       oklch(0.18 0.03 240);  /* #0F1720 — dashboard bg */
+  --color-steel-blue:     oklch(0.42 0.07 225);  /* #3C5F77 */
+  --color-steel-blue-dk:  oklch(0.28 0.06 225);
+  --color-mist:           oklch(0.85 0.025 225); /* #CBD4DF */
+  --color-coral:          oklch(0.68 0.18 15);   /* #E8635A — accent */
+  --color-paper:          oklch(0.97 0.013 75);  /* #FAF8F2 — page bg */
+  --color-warm-stone:     oklch(0.92 0.025 75);  /* #EBE3D6 — section bg */
+
+  /* Text on maroon/navy surfaces */
+  --color-hero-ink:       oklch(1 0 0);
+  --color-hero-ink-muted: oklch(0.78 0.04 25);
+  --color-hero-ink-dim:   oklch(0.60 0.05 25);
+
+  /* Text on paper/mist surfaces */
+  --color-ink:            oklch(0.18 0.03 240);
+  --color-ink-muted:      oklch(0.35 0.04 225);
+
+  /* Typography — variables are supplied by next/font in app/layout.tsx */
+  --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), "Courier New", monospace;
+
+  --spacing-nav: 4rem;
+
+  --z-index-sticky:  100;
+  --z-index-overlay: 200;
+
+  --ease-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --animate-hero-rise:    hero-rise 0.9s var(--ease-expo) forwards;
+  --animate-scroll-pulse: scroll-pulse 2s var(--ease-expo) infinite;
+  --animate-row-rise:     row-rise 0.6s var(--ease-expo) forwards;
+}
+
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Shadcn bridge
+
+   Shadcn components reference these semantic names. Mapping them onto the
+   ARGC palette below is what keeps the library from looking like stock
+   shadcn — PRODUCT.md explicitly rejects the generic SaaS aesthetic.
+   ───────────────────────────────────────────────────────────────────────── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -39,92 +98,152 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  /* Every radius resolves to 0 — hard edges are a brand rule, not a default. */
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --radius: 0rem;
+
+  --background: oklch(0.97 0.013 75);  /* paper */
+  --foreground: oklch(0.18 0.03 240);  /* eng-navy */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.18 0.03 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.18 0.03 240);
+  --primary: oklch(0.34 0.14 21);      /* argc-maroon */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --secondary: oklch(0.42 0.07 225);   /* steel-blue */
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.92 0.025 75);       /* warm-stone */
+  --muted-foreground: oklch(0.35 0.04 225);
+  --accent: oklch(0.68 0.18 15);       /* coral */
+  --accent-foreground: oklch(0.12 0.02 240);
+  --destructive: oklch(0.50 0.20 25);
+  --border: oklch(0.70 0.04 225);
+  --input: oklch(0.70 0.04 225);
+  --ring: oklch(0.34 0.14 21);
+  --chart-1: oklch(0.68 0.18 15);
+  --chart-2: oklch(0.42 0.07 225);
+  --chart-3: oklch(0.34 0.14 21);
+  --chart-4: oklch(0.60 0.15 80);
+  --chart-5: oklch(0.50 0.15 280);
+
+  --sidebar: oklch(0.18 0.03 240);     /* eng-navy — dashboard rail */
+  --sidebar-foreground: oklch(0.85 0.025 225);
+  --sidebar-primary: oklch(0.34 0.14 21);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.28 0.06 225);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.34 0.14 21);
 }
 
+/* Navy-surface variant. The dashboard renders on eng-navy, so shadcn
+   primitives used there need a matching set rather than stock neutral grays. */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.18 0.03 240);
+  --foreground: oklch(0.85 0.025 225);
+  --card: oklch(0.22 0.03 240);
+  --card-foreground: oklch(0.85 0.025 225);
+  --popover: oklch(0.22 0.03 240);
+  --popover-foreground: oklch(0.85 0.025 225);
+  --primary: oklch(0.44 0.14 21);      /* argc-maroon-lt reads better on navy */
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.28 0.06 225);
+  --secondary-foreground: oklch(0.85 0.025 225);
+  --muted: oklch(0.24 0.03 240);
+  --muted-foreground: oklch(0.65 0.03 225);
+  --accent: oklch(0.68 0.18 15);
+  --accent-foreground: oklch(0.12 0.02 240);
+  --destructive: oklch(0.60 0.20 25);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.44 0.14 21);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
-  html {
-    @apply font-sans;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────────────────── */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scroll-pulse {
+  0%   { transform: scaleY(0.1); transform-origin: top;    opacity: 0; }
+  40%  { transform: scaleY(1);   transform-origin: top;    opacity: 1; }
+  80%  { transform: scaleY(1);   transform-origin: bottom; opacity: 0; }
+  100% { transform: scaleY(0.1); transform-origin: bottom; opacity: 0; }
+}
+
+@keyframes row-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page transitions (View Transitions API) ────────────────────────────── */
+::view-transition-old(root) {
+  animation: 140ms cubic-bezier(0.4, 0, 1, 1) both page-exit;
+}
+::view-transition-new(root) {
+  animation: 220ms cubic-bezier(0.16, 1, 0.3, 1) 140ms both page-enter;
+}
+
+@keyframes page-exit {
+  from { opacity: 1; transform: translateY(0);    }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* The navbar is fixed — animating it during a transition makes it visibly
+   detach and slide. Pin it instead. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) { display: none; }
+::view-transition-new(site-header) { animation: none; }
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay:    0s !important;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
