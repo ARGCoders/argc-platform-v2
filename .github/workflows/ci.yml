@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Lets a future deploy workflow depend on this one.
+  workflow_call:
+
+# A new push to the same branch cancels the previous run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test:run
+
+      # Env vars are read lazily at request time (see lib/env.ts), so the build
+      # does not need real credentials — only values that satisfy the getters
+      # if any module is evaluated during prerendering.
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_42_CLIENT_ID: ci
+          FORTYTWO_CLIENT_SECRET: ci
+          FORTYTWO_REDIRECT_URI: http://localhost:3000/api/auth/callback
+          NEXT_PUBLIC_POCKETBASE_URL: http://localhost:8090
+          POCKETBASE_ADMIN_EMAIL: ci@example.com
+          POCKETBASE_ADMIN_PASSWORD: ci
+          NEXT_PUBLIC_APP_URL: http://localhost:3000

@@ -1,0 +1,22 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Markdown uses two trailing spaces as a hard line break.
+[*.md]
+trim_trailing_whitespace = false
+
+# Trailing whitespace in the ASCII frames sets the <pre> box width. Stripping it
+# narrows the canvas from 533 to 411 columns and shifts the art off-centre.
+[public/ascii/*.txt]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+[Makefile]
+indent_style = tab

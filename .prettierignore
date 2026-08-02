@@ -1,0 +1,30 @@
+# Generated
+.next/
+out/
+coverage/
+next-env.d.ts
+*.tsbuildinfo
+
+# Lockfile — pnpm owns the formatting
+pnpm-lock.yaml
+
+# 18 MB of ASCII frames. Formatting it would rewrite every line and, worse,
+# trailing whitespace is load-bearing here: it sets the <pre> box width.
+public/ascii/frames.txt
+
+# Large generated ASCII art data
+lib/shape-1.ts
+lib/shape-2.ts
+
+# PocketBase runtime data and binary
+pb_data/
+tools/
+
+# Carried over verbatim from V1. Reformatting rewrote ~600 lines across these
+# and destroys the ability to diff them against the originals. They are
+# reference material, not source.
+AGENTS.md
+docs/PLATFORM.md
+docs/SYSTEM_ARCHITECTURE.md
+docs/V2_MASTER_PLAN.md
+docs/tracker-handbook.md

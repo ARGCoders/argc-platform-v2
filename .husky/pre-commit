@@ -1,0 +1,4 @@
+# Formats and lints only the staged files. Deliberately does not run the test
+# suite or a build — a slow hook is a hook people bypass with --no-verify.
+# Full verification lives in CI.
+pnpm lint-staged
