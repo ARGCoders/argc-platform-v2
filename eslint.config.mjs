@@ -13,9 +13,6 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
-    // Generated ASCII art data — thousands of lines, nothing to lint.
-    'lib/shape-1.ts',
-    'lib/shape-2.ts',
     'coverage/**',
   ]),
   // MUST be last: turns off every stylistic rule that would fight Prettier.

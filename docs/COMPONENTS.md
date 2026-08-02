@@ -49,17 +49,16 @@ others with `npx shadcn@latest add <name>` rather than hand-writing a primitive.
 
 ## Library modules
 
-| Module                             | Purpose                                                                                                                                                                                                    |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `lib/auth.ts`                      | `authenticate()`, `requireRole()`, `requireSuperPeer()`, `requireSuperAdminPeer()`, and `AuthError` carrying a 401/403 status. Use `authErrorResponse()` in route handlers so internal errors do not leak. |
-| `lib/auth-context.tsx`             | `AuthProvider` + `useAuth()`. One `/api/auth/me` call per page load — components must not fetch it themselves.                                                                                             |
-| `lib/sanitize.ts`                  | `sanitizeHtml()` and `stripHtml()`. Call at fetch time, never during render. Covered by `lib/sanitize.test.ts`.                                                                                            |
-| `lib/constants.ts`                 | Role hierarchy, `roleAtLeast()`, route prefixes, `isSafeRedirect()`, XP categories, tiers, cookie names.                                                                                                   |
-| `lib/content.ts`                   | Typed accessors for `content/*.json`. Import from here, never the JSON directly.                                                                                                                           |
-| `lib/cookies.ts`                   | Shared auth cookie options so they cannot drift between routes.                                                                                                                                            |
-| `lib/pocketbase-server.ts`         | `getAdminClient()` (cached + HMR-safe) and `getPocketBaseClient()`.                                                                                                                                        |
-| `lib/api/42-api.ts`                | 42 Intra OAuth URL, code exchange, profile fetch.                                                                                                                                                          |
-| `lib/shape-1.ts`, `lib/shape-2.ts` | Static ASCII art used by the landing page. Data, not logic.                                                                                                                                                |
+| Module                     | Purpose                                                                                                                                                                                                    |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lib/auth.ts`              | `authenticate()`, `requireRole()`, `requireSuperPeer()`, `requireSuperAdminPeer()`, and `AuthError` carrying a 401/403 status. Use `authErrorResponse()` in route handlers so internal errors do not leak. |
+| `lib/auth-context.tsx`     | `AuthProvider` + `useAuth()`. One `/api/auth/me` call per page load — components must not fetch it themselves.                                                                                             |
+| `lib/sanitize.ts`          | `sanitizeHtml()` and `stripHtml()`. Call at fetch time, never during render. Covered by `lib/sanitize.test.ts`.                                                                                            |
+| `lib/constants.ts`         | Role hierarchy, `roleAtLeast()`, route prefixes, `isSafeRedirect()`, XP categories, tiers, cookie names.                                                                                                   |
+| `lib/content.ts`           | Typed accessors for `content/*.json`. Import from here, never the JSON directly.                                                                                                                           |
+| `lib/cookies.ts`           | Shared auth cookie options so they cannot drift between routes.                                                                                                                                            |
+| `lib/pocketbase-server.ts` | `getAdminClient()` (cached + HMR-safe) and `getPocketBaseClient()`.                                                                                                                                        |
+| `lib/api/42-api.ts`        | 42 Intra OAuth URL, code exchange, profile fetch.                                                                                                                                                          |
 
 ---
 

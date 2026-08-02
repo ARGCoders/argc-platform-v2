@@ -69,16 +69,19 @@ assumed.
 | **Cool neutral base, not warm cream**             | V1's `#FAF8F2` cast a sepia tint over every page.                                                                                                                                                    |
 | **Dashboard is admin-only**                       | `PLATFORM.md` specifies member routes too, but those depend on ten unanswered product questions (`PLATFORM.md` §6).                                                                                  |
 
-### Three claims in the old docs are wrong
+### Three claims in the old planning docs were wrong
 
-`V2_MASTER_PLAN.md`, `SYSTEM_ARCHITECTURE.md` and `PLATFORM.md` predate this repo. Three
-of their assertions were checked and are false — full detail in `ARCHITECTURE.md`:
+The V1 planning documents predate this repo. Three of their technical assertions were
+checked and are false — full detail in `ARCHITECTURE.md`:
 
 1. Pin Next 15 "not 16" — the stack is 16.
 2. `proxy.ts` is broken and route gating does not work — it works.
 3. `pb_role` goes stale after a role change — V1 already refreshed it.
 
-Treat those documents as **product intent, not technical instruction**.
+`V2_MASTER_PLAN.md` and `SYSTEM_ARCHITECTURE.md` were deleted for that reason; they are
+in git history if ever needed. `PLATFORM.md` is kept because it holds the dashboard
+product spec and the ten open questions, but read it as **product intent, not technical
+instruction** — its preliminary notes repeat the `proxy.ts` error.
 
 ---
 
@@ -146,6 +149,8 @@ In rough order.
 
 ### Good first tasks
 
+- Replace `app/favicon.ico`. It is still the Next.js default — the site currently ships
+  the Next logo as its icon. `public/logo_no_text.svg` is the obvious source.
 - Add tests for `lib/auth.ts` — currently the least covered security-sensitive module.
 - Fill in `COMPONENTS.md` props for anything you use and find under-documented.
 - Answer any of the ten open questions in `PLATFORM.md` §6; each unblocks dashboard work.

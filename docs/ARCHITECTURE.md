@@ -111,8 +111,13 @@ temporarily breaking the code it protects.
 
 ## Corrections to the carried-over docs
 
-`docs/{V2_MASTER_PLAN,SYSTEM_ARCHITECTURE,PLATFORM}.md` were written before this repo
-existed. Three of their claims are wrong and were verified as such:
+The V1 planning documents were written before this repo existed and three of their
+technical claims are wrong. `V2_MASTER_PLAN.md` and `SYSTEM_ARCHITECTURE.md` have been
+deleted for that reason — they are in git history if ever needed. `PLATFORM.md` is kept,
+because it is the only record of the dashboard product spec, but its "Preliminary Notes"
+repeat the `proxy.ts` error below.
+
+The corrections are recorded here so the decisions are not re-opened:
 
 | Claim                                                                | Reality                                                                                                                                                                                                      |
 | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -120,6 +125,7 @@ existed. Three of their claims are wrong and were verified as such:
 | `proxy.ts` is a bug; rename to `middleware.ts` with a default export | Backwards. `proxy` is the Next 16 convention; `middleware` is deprecated. Verified registered — the build reports `Proxy (Middleware)` and all three redirect rules were exercised against a running server. |
 | `pb_role` goes stale after a role change                             | V1's `/api/auth/me` already re-set it. The bug did not exist.                                                                                                                                                |
 
-Also: the master plan's C6 snippet hard-codes `secure: true` on auth cookies, which makes
-the browser drop them on `http://localhost` and breaks the entire flow in development.
-`lib/cookies.ts` makes it conditional on `NODE_ENV`.
+One more, for the record: the master plan's session-cookie snippet hard-coded
+`secure: true`, which makes the browser drop every auth cookie on `http://localhost` and
+breaks the whole flow in development. `lib/cookies.ts` makes it conditional on
+`NODE_ENV`.

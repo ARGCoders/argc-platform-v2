@@ -93,16 +93,16 @@ writing a new component.
 
 ## Documentation
 
-| File                          | Contents                                                     |
-| ----------------------------- | ------------------------------------------------------------ |
-| `docs/PROJECT_STATUS.md`      | **Start here** — state, decisions, blockers, what is next    |
-| `docs/ARCHITECTURE.md`        | Folder layout, conventions, the rules that are easy to break |
-| `docs/COMPONENTS.md`          | Inventory of the existing component library                  |
-| `docs/V2_MASTER_PLAN.md`      | Original rebuild specification                               |
-| `docs/SYSTEM_ARCHITECTURE.md` | Pre-rebuild audit of V1                                      |
-| `docs/PLATFORM.md`            | Product specification for the dashboard                      |
-| `docs/tracker-handbook.md`    | Handbook content tracker                                     |
+| File                       | Contents                                                     |
+| -------------------------- | ------------------------------------------------------------ |
+| `docs/PROJECT_STATUS.md`   | **Start here** — state, decisions, blockers, what is next    |
+| `docs/ARCHITECTURE.md`     | Folder layout, conventions, the rules that are easy to break |
+| `docs/COMPONENTS.md`       | Inventory of the existing component library                  |
+| `docs/PLATFORM.md`         | Product specification for the dashboard                      |
+| `docs/tracker-handbook.md` | Handbook content tracker                                     |
 
-> The four carried-over documents predate this repo and contain claims later found to be
-> wrong — see "Corrections to the carried-over docs" in `docs/ARCHITECTURE.md` before
-> treating any of them as authoritative.
+> `PLATFORM.md` and `tracker-handbook.md` were carried over from V1 and predate this
+> repo. `PLATFORM.md` is the product specification and is still the reference for
+> dashboard work, but some of its technical claims were verified wrong — see
+> "Corrections to the carried-over docs" in `docs/ARCHITECTURE.md`. Read it as product
+> intent, not as instruction.

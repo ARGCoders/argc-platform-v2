@@ -12,10 +12,6 @@ pnpm-lock.yaml
 # trailing whitespace is load-bearing here: it sets the <pre> box width.
 public/ascii/frames.txt
 
-# Large generated ASCII art data
-lib/shape-1.ts
-lib/shape-2.ts
-
 # PocketBase runtime data and binary
 pb_data/
 tools/
@@ -25,6 +21,4 @@ tools/
 # reference material, not source.
 AGENTS.md
 docs/PLATFORM.md
-docs/SYSTEM_ARCHITECTURE.md
-docs/V2_MASTER_PLAN.md
 docs/tracker-handbook.md

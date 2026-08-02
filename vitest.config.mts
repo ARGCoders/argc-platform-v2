@@ -33,7 +33,7 @@ export default defineConfig({
       reporter: ['text', 'html'],
       // Only measure code we author; generated and config files add noise.
       include: ['app/**', 'components/**', 'lib/**', 'proxy.ts'],
-      exclude: ['components/ui/**', 'lib/shape-1.ts', 'lib/shape-2.ts', '**/*.d.ts'],
+      exclude: ['components/ui/**', '**/*.d.ts'],
     },
   },
 })
