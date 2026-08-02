@@ -1,9 +1,5 @@
 export type Role =
-  | 'guest'
-  | 'node_peer'
-  | 'node_leader'
-  | 'super_peer'
-  | 'super_admin_peer'
+  'guest' | 'node_peer' | 'node_leader' | 'super_peer' | 'super_admin_peer'
 
 export const DEFAULT_ROLE: Role = 'guest'
 
@@ -204,8 +200,10 @@ export interface EvaluationRecord {
 
 // ─── Events ───────────────────────────────────────────────────────────────
 
-export type EventType = 'knowledge_session' | 'hackathon' | 'workshop' | 'community' | 'cross_node'
-export type EventStatus = 'proposed' | 'approved' | 'scheduled' | 'completed' | 'cancelled'
+export type EventType =
+  'knowledge_session' | 'hackathon' | 'workshop' | 'community' | 'cross_node'
+export type EventStatus =
+  'proposed' | 'approved' | 'scheduled' | 'completed' | 'cancelled'
 
 export interface EventRecord {
   id: string

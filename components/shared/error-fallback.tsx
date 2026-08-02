@@ -1,14 +1,14 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface ErrorFallbackProps {
-  error: Error & { digest?: string };
+  error: Error & { digest?: string }
   /** Next.js passes this from an error.tsx boundary — re-renders the segment. */
-  reset?: () => void;
-  title?: string;
-  className?: string;
+  reset?: () => void
+  title?: string
+  className?: string
 }
 
 /**
@@ -20,16 +20,16 @@ interface ErrorFallbackProps {
 export function ErrorFallback({
   error,
   reset,
-  title = "Something went wrong",
+  title = 'Something went wrong',
   className,
 }: ErrorFallbackProps) {
-  const isDev = process.env.NODE_ENV !== "production";
+  const isDev = process.env.NODE_ENV !== 'production'
 
   return (
     <div
       role="alert"
       className={cn(
-        "flex flex-col items-center justify-center gap-5 px-6 py-20 text-center",
+        'flex flex-col items-center justify-center gap-5 px-6 py-20 text-center',
         className,
       )}
     >
@@ -57,5 +57,5 @@ export function ErrorFallback({
         </Button>
       )}
     </div>
-  );
+  )
 }

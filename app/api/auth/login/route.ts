@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getFortyTwoAuthUrl } from '@/lib/api/42-api'
 import { oauthStateCookieOptions } from '@/lib/cookies'
-import { OAUTH_STATE_COOKIE, OAUTH_REDIRECT_COOKIE, isSafeRedirect } from '@/lib/constants'
+import {
+  OAUTH_STATE_COOKIE,
+  OAUTH_REDIRECT_COOKIE,
+  isSafeRedirect,
+} from '@/lib/constants'
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const state = crypto.randomUUID()

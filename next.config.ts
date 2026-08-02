@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -8,18 +8,18 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       // 42 Intra CDN — user profile photos
       {
-        protocol: "https",
-        hostname: "cdn.intra.42.fr",
-        pathname: "/**",
+        protocol: 'https',
+        hostname: 'cdn.intra.42.fr',
+        pathname: '/**',
       },
       // PocketBase Railway instance — banner images, avatars stored in PB
       {
-        protocol: "https",
-        hostname: "pocketbase-production-59e1.up.railway.app",
-        pathname: "/api/files/**",
+        protocol: 'https',
+        hostname: 'pocketbase-production-59e1.up.railway.app',
+        pathname: '/api/files/**',
       },
     ],
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

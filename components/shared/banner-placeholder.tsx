@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 
 /**
  * Stands in for a blog banner when `posts.banner` is empty. Deterministic:
@@ -6,22 +6,22 @@ import { cn } from "@/lib/utils";
  * appearance between renders.
  */
 export function BannerPlaceholder({
-  seed = "",
+  seed = '',
   className,
 }: {
-  seed?: string;
-  className?: string;
+  seed?: string
+  className?: string
 }) {
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < seed.length; i++) {
-    hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+    hash = (hash * 31 + seed.charCodeAt(i)) | 0
   }
-  const angle = Math.abs(hash) % 360;
+  const angle = Math.abs(hash) % 360
 
   return (
     <div
       aria-hidden="true"
-      className={cn("relative w-full overflow-hidden bg-eng-navy", className)}
+      className={cn('relative w-full overflow-hidden bg-eng-navy', className)}
       style={{
         backgroundImage: `linear-gradient(${angle}deg, var(--color-argc-maroon-dk), var(--color-eng-navy) 60%, var(--color-steel-blue-dk))`,
       }}
@@ -30,5 +30,5 @@ export function BannerPlaceholder({
         ARGC
       </span>
     </div>
-  );
+  )
 }

@@ -76,7 +76,12 @@ export const ENDORSEMENT_XP_AWARD = 25
  * open question Q1 in docs/PLATFORM.md §6 and are only needed by the member
  * dashboard, which is out of scope for this build.
  */
-export const TIERS = ['Initiate', 'Contributor', 'Architect', 'Vanguard'] as const satisfies readonly Tier[]
+export const TIERS = [
+  'Initiate',
+  'Contributor',
+  'Architect',
+  'Vanguard',
+] as const satisfies readonly Tier[]
 
 // ─── Auth cookies ─────────────────────────────────────────────────────────
 

@@ -1,16 +1,16 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 interface EmptyStateProps {
   /** Short mono label, e.g. "No members found". */
-  title: string;
+  title: string
   /** One line of context. Optional — do not pad it out. */
-  description?: string;
+  description?: string
   /** Small glyph or icon. Deliberately optional; ARGC tone avoids decoration. */
-  icon?: ReactNode;
+  icon?: ReactNode
   /** A single call to action, when there is a genuine next step. */
-  action?: ReactNode;
-  className?: string;
+  action?: ReactNode
+  className?: string
 }
 
 /**
@@ -27,9 +27,9 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center text-center",
-        "border border-border border-dashed",
-        "px-6 py-14",
+        'flex flex-col items-center justify-center text-center',
+        'border border-border border-dashed',
+        'px-6 py-14',
         className,
       )}
     >
@@ -45,5 +45,5 @@ export function EmptyState({
 
       {action && <div className="mt-6">{action}</div>}
     </div>
-  );
+  )
 }
