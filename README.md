@@ -85,7 +85,9 @@ every deploy. See [`pocketbase/README.md`](pocketbase/README.md).
 - **The frontend never talks to PocketBase directly.** Everything goes through a Next.js
   route handler or a server component using the admin client.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for how the code is organised and
+New to the project? Read [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) first — it
+covers where things stand, which decisions are already settled, and what to pick up.
+Then [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for how the code is organised and
 [`docs/COMPONENTS.md`](docs/COMPONENTS.md) for what already exists — check it before
 writing a new component.
 
@@ -93,6 +95,7 @@ writing a new component.
 
 | File                          | Contents                                                     |
 | ----------------------------- | ------------------------------------------------------------ |
+| `docs/PROJECT_STATUS.md`      | **Start here** — state, decisions, blockers, what is next    |
 | `docs/ARCHITECTURE.md`        | Folder layout, conventions, the rules that are easy to break |
 | `docs/COMPONENTS.md`          | Inventory of the existing component library                  |
 | `docs/V2_MASTER_PLAN.md`      | Original rebuild specification                               |
