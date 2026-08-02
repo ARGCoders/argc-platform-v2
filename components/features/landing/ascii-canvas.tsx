@@ -116,9 +116,15 @@ export default function AsciiCanvas() {
       aria-hidden="true"
       className={[
         'font-mono select-none pointer-events-none',
-        // Scales the ~533-column art to fill the viewport. These exact values
-        // are ported from V1 — the art is tuned to them.
-        'text-[clamp(3px,0.58vw,6.5px)] leading-[1.2]',
+        // The art is 533 columns of ink edge to edge, so the <pre> is always
+        // wider than the viewport and the parent crops it. Bigger type means a
+        // tighter crop, not more art — at 8px the form stops reading.
+        //
+        // On desktop the ceiling binds, not the vw term, so the ceiling is the
+        // number that matters. V1 used clamp(3px,0.58vw,6.5px); this is a
+        // deliberate ~15% increase, measured at 1.66x viewport width on a
+        // 1440px screen.
+        'text-[clamp(3.4px,0.66vw,7.5px)] leading-[1.2]',
         'whitespace-pre will-change-contents',
         'text-hero-ink/100',
       ].join(' ')}
