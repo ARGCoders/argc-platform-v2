@@ -11,10 +11,16 @@ FROM alpine:3.20
 
 ARG PB_VERSION=0.30.0
 
+# Supplied automatically by the builder — amd64 on Railway, arm64 when someone
+# runs `make pb-image` on an Apple Silicon Mac. Hardcoding amd64 produced an
+# image that built fine and then died with "exec format error" on arm.
+ARG TARGETARCH
+
 RUN apk add --no-cache ca-certificates unzip wget
 
-RUN wget -q -O /tmp/pb.zip \
-      "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip" \
+RUN ARCH="${TARGETARCH:-amd64}" \
+ && wget -q -O /tmp/pb.zip \
+      "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${ARCH}.zip" \
  && unzip -q /tmp/pb.zip -d /usr/local/bin pocketbase \
  && chmod +x /usr/local/bin/pocketbase \
  && rm /tmp/pb.zip

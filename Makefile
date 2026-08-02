@@ -4,6 +4,33 @@ PB_PORT    = 8090
 PB_DIR     = pb_data
 DEV_PORT   = 3000
 
+# PocketBase auto-writes a JS migration for every schema change, defaulting to
+# <parent-of-data-dir>/pb_migrations — i.e. the repo root. Those files would be
+# committed by accident and become a second, competing source of schema truth
+# alongside scripts/setup-collections.mjs. Keeping them inside pb_data, which is
+# gitignored, means local experiments never leak into the repo.
+PB_MIGRATIONS = $(PB_DIR)/migrations
+
+# ── Portability ─────────────────────────────────────────────────────────────
+# Detected, not assumed. Hardcoding linux/amd64 meant `make db` downloaded an
+# unrunnable binary on macOS and on ARM.
+#
+# PocketBase publishes: linux|darwin|windows × amd64|arm64
+PB_OS   := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+PB_ARCH := $(shell uname -m | sed -e 's/^x86_64$$/amd64/' -e 's/^aarch64$$/arm64/' -e 's/^arm64$$/arm64/')
+PB_TMP  := $(if $(TMPDIR),$(TMPDIR:/=),/tmp)
+PB_LOG   = $(PB_TMP)/argc-pocketbase.log
+NEXT_LOG = $(PB_TMP)/argc-next.log
+
+# Is a TCP port in use? lsof is not installed everywhere, so fall back to a
+# connection attempt. Used as $(call port_busy,PORT) inside a shell `if`.
+port_busy = { command -v lsof >/dev/null 2>&1 && lsof -i :$(1) >/dev/null 2>&1; } \
+            || curl -s -o /dev/null -m 2 http://127.0.0.1:$(1)/ 2>/dev/null
+
+# Kill whatever holds a port. `xargs -r` is GNU-only and errors on macOS.
+kill_port = PIDS=$$(lsof -t -i :$(1) 2>/dev/null); \
+            if [ -n "$$PIDS" ]; then kill $$PIDS 2>/dev/null || true; fi
+
 # PocketBase superuser for LOCAL development only. Never reuse a real password.
 PB_ADMIN_EMAIL    = admin@argc.local
 PB_ADMIN_PASSWORD = argc-local-dev
@@ -16,6 +43,10 @@ PB_IMAGE      = argc-pocketbase
 PB_IMAGE_PORT = 9099
 BACKUP_DIR    = backups
 CONTAINER    := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
+
+# `:Z` relabels the bind mount for SELinux. Required on Fedora/RHEL with
+# podman, and rejected outright by Docker Desktop on macOS.
+VOL_OPT := $(if $(filter linux,$(PB_OS)),:Z,)
 
 .PHONY: help install db db-setup dev run stop clean test check \
         pb-image pb-image-run pb-image-stop \
@@ -55,22 +86,26 @@ install:
 	pnpm install
 
 $(PB_BIN):
-	@echo "Downloading PocketBase $(PB_VERSION)..."
+	@command -v curl >/dev/null 2>&1 || { echo "curl is required."; exit 1; }
+	@command -v unzip >/dev/null 2>&1 || { echo "unzip is required."; exit 1; }
+	@echo "Downloading PocketBase $(PB_VERSION) for $(PB_OS)/$(PB_ARCH)..."
 	@mkdir -p tools
-	@curl -sL "https://github.com/pocketbase/pocketbase/releases/download/v$(PB_VERSION)/pocketbase_$(PB_VERSION)_linux_amd64.zip" -o /tmp/pb.zip
-	@unzip -o -q /tmp/pb.zip -d tools pocketbase
-	@rm -f /tmp/pb.zip
+	@curl -fsSL "https://github.com/pocketbase/pocketbase/releases/download/v$(PB_VERSION)/pocketbase_$(PB_VERSION)_$(PB_OS)_$(PB_ARCH).zip" -o "$(PB_TMP)/pb.zip" \
+		|| { echo "Download failed. No PocketBase build for $(PB_OS)/$(PB_ARCH)?"; exit 1; }
+	@unzip -o -q "$(PB_TMP)/pb.zip" -d tools pocketbase
+	@rm -f "$(PB_TMP)/pb.zip"
 	@chmod +x $(PB_BIN)
 	@echo "  -> $(PB_BIN)"
 
 db: $(PB_BIN)
 	@mkdir -p $(PB_DIR)
-	@if lsof -i :$(PB_PORT) >/dev/null 2>&1; then \
+	@if $(call port_busy,$(PB_PORT)); then \
 		echo "PocketBase already running on :$(PB_PORT)"; \
 	else \
 		echo "Starting PocketBase on :$(PB_PORT)..."; \
-		$(PB_BIN) superuser upsert $(PB_ADMIN_EMAIL) $(PB_ADMIN_PASSWORD) --dir="$(PB_DIR)" >/dev/null 2>&1 || true; \
-		$(PB_BIN) serve --http="127.0.0.1:$(PB_PORT)" --dir="$(PB_DIR)" > /tmp/argc-pocketbase.log 2>&1 & \
+		mkdir -p "$(PB_MIGRATIONS)"; \
+		$(PB_BIN) superuser upsert $(PB_ADMIN_EMAIL) $(PB_ADMIN_PASSWORD) --dir="$(PB_DIR)" --migrationsDir="$(PB_MIGRATIONS)" >/dev/null 2>&1 || true; \
+		$(PB_BIN) serve --http="127.0.0.1:$(PB_PORT)" --dir="$(PB_DIR)" --migrationsDir="$(PB_MIGRATIONS)" > "$(PB_LOG)" 2>&1 & \
 		sleep 2; \
 		echo "  admin UI: http://127.0.0.1:$(PB_PORT)/_/"; \
 		echo "  login:    $(PB_ADMIN_EMAIL) / $(PB_ADMIN_PASSWORD)"; \
@@ -80,17 +115,17 @@ db-setup:
 	@pnpm db:setup
 
 dev:
-	@if lsof -i :$(DEV_PORT) >/dev/null 2>&1; then \
+	@if $(call port_busy,$(DEV_PORT)); then \
 		echo "Next.js already running on :$(DEV_PORT)"; \
 	else \
-		pnpm dev > /tmp/argc-next.log 2>&1 & \
+		pnpm dev > "$(NEXT_LOG)" 2>&1 & \
 		sleep 3; \
 		echo "  http://localhost:$(DEV_PORT)"; \
 	fi
 
 run: db db-setup dev
 	@echo ""
-	@echo "Ready. Logs: /tmp/argc-pocketbase.log  /tmp/argc-next.log"
+	@echo "Ready. Logs: $(PB_LOG)  $(NEXT_LOG)"
 
 check:
 	pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:run && pnpm build
@@ -99,8 +134,9 @@ test:
 	pnpm test:run
 
 stop:
-	@-lsof -t -i :$(PB_PORT) 2>/dev/null | xargs -r kill 2>/dev/null || true
-	@-lsof -t -i :$(DEV_PORT) 2>/dev/null | xargs -r kill 2>/dev/null || true
+	@command -v lsof >/dev/null 2>&1 || { echo "lsof not found — stop the servers manually."; exit 0; }
+	@-$(call kill_port,$(PB_PORT))
+	@-$(call kill_port,$(DEV_PORT))
 	@echo "Stopped."
 
 clean: stop
@@ -121,12 +157,12 @@ pb-image:
 
 pb-image-run: pb-image
 	@$(CONTAINER) rm -f $(PB_IMAGE) >/dev/null 2>&1 || true
-	@mkdir -p /tmp/$(PB_IMAGE)-vol
+	@mkdir -p $(PB_TMP)/$(PB_IMAGE)-vol
 	@$(CONTAINER) run -d --name $(PB_IMAGE) \
 		-e PORT=$(PB_IMAGE_PORT) \
 		-e PB_ADMIN_EMAIL=$(PB_ADMIN_EMAIL) \
 		-e PB_ADMIN_PASSWORD=$(PB_ADMIN_PASSWORD) \
-		-v /tmp/$(PB_IMAGE)-vol:$(PB_MOUNT):Z \
+		-v $(PB_TMP)/$(PB_IMAGE)-vol:$(PB_MOUNT)$(VOL_OPT) \
 		-p $(PB_IMAGE_PORT):$(PB_IMAGE_PORT) $(PB_IMAGE) >/dev/null
 	@sleep 4
 	@printf "  health: "; curl -s -m 10 http://127.0.0.1:$(PB_IMAGE_PORT)/api/health || echo "NO RESPONSE"
@@ -136,7 +172,7 @@ pb-image-run: pb-image
 
 pb-image-stop:
 	@-$(CONTAINER) rm -f $(PB_IMAGE) >/dev/null 2>&1 || true
-	@rm -rf /tmp/$(PB_IMAGE)-vol
+	@rm -rf $(PB_TMP)/$(PB_IMAGE)-vol
 	@echo "Test container removed."
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -170,3 +170,25 @@ make check                # confirm your machine matches CI
 
 If `make check` fails on a clean clone, that is a real bug — say so rather than working
 around it.
+
+### What your machine needs
+
+Node and pnpm come from `.node-version` and the `packageManager` field, so they are
+pinned for you. Beyond that the Makefile needs `curl`, `unzip` and `lsof`, all of which
+ship with macOS and every mainstream Linux. `podman` or `docker` is needed only for the
+`pb-image*` targets.
+
+macOS and Linux are both supported, Intel and ARM. The PocketBase binary is selected from
+`uname`, so `make db` downloads the right build rather than assuming linux/amd64.
+Windows is not supported directly — use WSL.
+
+### PocketBase migrations do not belong in the repo
+
+PocketBase writes a JS migration for every schema change made through the admin UI, and
+by default puts them next to the data directory — which would be the repo root. The
+Makefile redirects them into `pb_data/`, which is gitignored, and `pb_migrations/` is
+ignored as a backstop.
+
+This is deliberate: **`scripts/setup-collections.mjs` is the schema, and auto-generated
+migrations must not become a second source of truth.** If you change schema in the admin
+UI while exploring, port the change into that script — do not commit migration files.

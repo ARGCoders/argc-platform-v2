@@ -38,6 +38,11 @@ yarn-error.log*
 /pb_data
 /tools
 
+# PocketBase auto-generates a JS migration per schema change. The Makefile keeps
+# them inside pb_data; this catches any written here by a bare `pocketbase serve`.
+# scripts/setup-collections.mjs is the source of truth, not these.
+/pb_migrations
+
 # test output
 /coverage
 
