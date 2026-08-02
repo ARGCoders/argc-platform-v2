@@ -34,8 +34,18 @@ yarn-error.log*
 .env*
 !.env.example
 
-# pocketbase local data
+# pocketbase local data and the downloaded binary (make db fetches it)
 /pb_data
+/tools
+
+# test output
+/coverage
+
+# database backups pulled from the deployed volume — real data, never commit
+/backups
+
+# railway CLI link state — per-machine, contains project and service ids
+.railway
 
 # vercel
 .vercel
