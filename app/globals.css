@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 /* Tailwind cannot see class usage inside node_modules by default, and the
    BlockNote shadcn adapter ships its own utility classes. */
@@ -19,41 +19,45 @@
    ───────────────────────────────────────────────────────────────────────── */
 @theme static {
   /* Brand */
-  --color-argc-maroon:    oklch(0.34 0.14 21);   /* #7A1D22 — primary */
-  --color-argc-maroon-dk: oklch(0.26 0.12 21);   /* #421016 */
-  --color-argc-maroon-lt: oklch(0.44 0.14 21);   /* #9E2A32 */
-  --color-eng-navy:       oklch(0.18 0.03 240);  /* #0F1720 — dashboard bg */
-  --color-steel-blue:     oklch(0.42 0.07 225);  /* #3C5F77 */
-  --color-steel-blue-dk:  oklch(0.28 0.06 225);
-  --color-mist:           oklch(0.85 0.025 225); /* #CBD4DF */
-  --color-coral:          oklch(0.68 0.18 15);   /* #E8635A — accent */
-  --color-paper:          oklch(0.97 0.013 75);  /* #FAF8F2 — page bg */
-  --color-warm-stone:     oklch(0.92 0.025 75);  /* #EBE3D6 — section bg */
+  --color-argc-maroon: oklch(0.34 0.14 21); /* #7A1D22 — primary */
+  --color-argc-maroon-dk: oklch(0.26 0.12 21); /* #421016 */
+  --color-argc-maroon-lt: oklch(0.44 0.14 21); /* #9E2A32 */
+  --color-eng-navy: oklch(0.18 0.03 240); /* #0F1720 — dashboard bg */
+  --color-steel-blue: oklch(0.42 0.07 225); /* #3C5F77 */
+  --color-steel-blue-dk: oklch(0.28 0.06 225);
+  --color-mist: oklch(0.85 0.025 225); /* #CBD4DF */
+  --color-coral: oklch(0.68 0.18 15); /* #E8635A — accent */
+
+  /* Neutrals sit on the same cool axis as eng-navy (hue 240) rather than the
+     warm hue-75 cream V1 used, which cast a sepia tint over every page.
+     Chroma is near-zero: enough to read as cool, not enough to read as blue. */
+  --color-paper: oklch(0.98 0.003 240); /* page background */
+  --color-stone: oklch(0.94 0.005 240); /* alternating section bg */
 
   /* Text on maroon/navy surfaces */
-  --color-hero-ink:       oklch(1 0 0);
+  --color-hero-ink: oklch(1 0 0);
   --color-hero-ink-muted: oklch(0.78 0.04 25);
-  --color-hero-ink-dim:   oklch(0.60 0.05 25);
+  --color-hero-ink-dim: oklch(0.6 0.05 25);
 
-  /* Text on paper/mist surfaces */
-  --color-ink:            oklch(0.18 0.03 240);
-  --color-ink-muted:      oklch(0.35 0.04 225);
+  /* Text on paper/stone surfaces */
+  --color-ink: oklch(0.18 0.03 240);
+  --color-ink-muted: oklch(0.42 0.015 240);
 
   /* Typography — variables are supplied by next/font in app/layout.tsx */
   --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
-  --font-mono: var(--font-ibm-plex-mono), "Courier New", monospace;
+  --font-mono: var(--font-ibm-plex-mono), 'Courier New', monospace;
 
   --spacing-nav: 4rem;
 
-  --z-index-sticky:  100;
+  --z-index-sticky: 100;
   --z-index-overlay: 200;
 
-  --ease-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
 
-  --animate-hero-rise:    hero-rise 0.9s var(--ease-expo) forwards;
+  --animate-hero-rise: hero-rise 0.9s var(--ease-expo) forwards;
   --animate-scroll-pulse: scroll-pulse 2s var(--ease-expo) infinite;
-  --animate-row-rise:     row-rise 0.6s var(--ease-expo) forwards;
+  --animate-row-rise: row-rise 0.6s var(--ease-expo) forwards;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -111,31 +115,35 @@
 :root {
   --radius: 0rem;
 
-  --background: oklch(0.97 0.013 75);  /* paper */
-  --foreground: oklch(0.18 0.03 240);  /* eng-navy */
+  --background: oklch(0.98 0.003 240); /* paper */
+  --foreground: oklch(0.18 0.03 240); /* eng-navy */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.03 240);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.03 240);
-  --primary: oklch(0.34 0.14 21);      /* argc-maroon */
+  --primary: oklch(0.34 0.14 21); /* argc-maroon */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.42 0.07 225);   /* steel-blue */
+  --secondary: oklch(0.42 0.07 225); /* steel-blue */
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.92 0.025 75);       /* warm-stone */
-  --muted-foreground: oklch(0.35 0.04 225);
-  --accent: oklch(0.68 0.18 15);       /* coral */
+  --muted: oklch(0.94 0.005 240); /* stone */
+  --muted-foreground: oklch(0.42 0.015 240);
+  --accent: oklch(0.68 0.18 15); /* coral */
   --accent-foreground: oklch(0.12 0.02 240);
-  --destructive: oklch(0.50 0.20 25);
-  --border: oklch(0.70 0.04 225);
-  --input: oklch(0.70 0.04 225);
+  --destructive: oklch(0.5 0.2 25);
+  /* --border is decorative: card outlines and row dividers. --input is the
+     boundary that identifies a form control, which WCAG 2.1 SC 1.4.11 requires
+     to reach 3:1 against its background. Measured: 3.74:1 on paper,
+     3.32:1 on stone. They are deliberately different values. */
+  --border: oklch(0.84 0.006 240);
+  --input: oklch(0.6 0.012 240);
   --ring: oklch(0.34 0.14 21);
   --chart-1: oklch(0.68 0.18 15);
   --chart-2: oklch(0.42 0.07 225);
   --chart-3: oklch(0.34 0.14 21);
-  --chart-4: oklch(0.60 0.15 80);
-  --chart-5: oklch(0.50 0.15 280);
+  --chart-4: oklch(0.6 0.15 80);
+  --chart-5: oklch(0.5 0.15 280);
 
-  --sidebar: oklch(0.18 0.03 240);     /* eng-navy — dashboard rail */
+  --sidebar: oklch(0.18 0.03 240); /* eng-navy — dashboard rail */
   --sidebar-foreground: oklch(0.85 0.025 225);
   --sidebar-primary: oklch(0.34 0.14 21);
   --sidebar-primary-foreground: oklch(1 0 0);
@@ -154,7 +162,7 @@
   --card-foreground: oklch(0.85 0.025 225);
   --popover: oklch(0.22 0.03 240);
   --popover-foreground: oklch(0.85 0.025 225);
-  --primary: oklch(0.44 0.14 21);      /* argc-maroon-lt reads better on navy */
+  --primary: oklch(0.44 0.14 21); /* argc-maroon-lt reads better on navy */
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.28 0.06 225);
   --secondary-foreground: oklch(0.85 0.025 225);
@@ -162,7 +170,7 @@
   --muted-foreground: oklch(0.65 0.03 225);
   --accent: oklch(0.68 0.18 15);
   --accent-foreground: oklch(0.12 0.02 240);
-  --destructive: oklch(0.60 0.20 25);
+  --destructive: oklch(0.6 0.2 25);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.44 0.14 21);
@@ -187,20 +195,48 @@
 
 /* ── Keyframes ──────────────────────────────────────────────────────────── */
 @keyframes hero-rise {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes scroll-pulse {
-  0%   { transform: scaleY(0.1); transform-origin: top;    opacity: 0; }
-  40%  { transform: scaleY(1);   transform-origin: top;    opacity: 1; }
-  80%  { transform: scaleY(1);   transform-origin: bottom; opacity: 0; }
-  100% { transform: scaleY(0.1); transform-origin: bottom; opacity: 0; }
+  0% {
+    transform: scaleY(0.1);
+    transform-origin: top;
+    opacity: 0;
+  }
+  40% {
+    transform: scaleY(1);
+    transform-origin: top;
+    opacity: 1;
+  }
+  80% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(0.1);
+    transform-origin: bottom;
+    opacity: 0;
+  }
 }
 
 @keyframes row-rise {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Page transitions (View Transitions API) ────────────────────────────── */
@@ -212,13 +248,25 @@
 }
 
 @keyframes page-exit {
-  from { opacity: 1; transform: translateY(0);    }
-  to   { opacity: 0; transform: translateY(-8px); }
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* The navbar is fixed — animating it during a transition makes it visibly
@@ -227,21 +275,29 @@
   animation: none;
   z-index: 100;
 }
-::view-transition-old(site-header) { display: none; }
-::view-transition-new(site-header) { animation: none; }
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
 
 /* ── Reduced motion ─────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html {
+    scroll-behavior: auto;
+  }
 
   ::view-transition-old(*),
   ::view-transition-new(*),
   ::view-transition-group(*) {
     animation-duration: 0s !important;
-    animation-delay:    0s !important;
+    animation-delay: 0s !important;
   }
 
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

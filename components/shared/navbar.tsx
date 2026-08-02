@@ -1,105 +1,100 @@
-"use client";
+'use client'
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
+import { site } from '@/lib/content'
 
-const NAV_LINKS = [
-  { label: "Home", href: "/" },
-  { label: "Our Vision", href: "/#vision" },
-  { label: "About Us", href: "/#about" },
-  { label: "Events", href: "/events" },
-  { label: "Blog", href: "/blog" },
-  { label: "Handbook", href: "/handbook" },
-  { label: "Contact Us", href: "/#contact" },
-];
+// Nav is editable in content/site.json — no code change to add or reorder links.
+const NAV_LINKS = site.nav
 
 export function Navbar() {
-  const pathname = usePathname();
+  const pathname = usePathname()
   // Auth comes from the provider — V1 fetched /api/auth/me here directly, which
   // was one of several duplicate session checks per page load.
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout } = useAuth()
 
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
 
   // Pages whose hero is maroon need an opaque maroon bar, not a translucent one.
-  const variant: "default" | "maroon" =
-    pathname.startsWith("/events") || pathname.startsWith("/register")
-      ? "maroon"
-      : "default";
+  const variant: 'default' | 'maroon' =
+    pathname.startsWith('/events') || pathname.startsWith('/register')
+      ? 'maroon'
+      : 'default'
 
-  const isGuest = !user || user.role === "guest";
-  const showRegister = isLoading || isGuest;
+  const isGuest = !user || user.role === 'guest'
+  const showRegister = isLoading || isGuest
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Prevent the page scrolling behind the full-screen mobile menu.
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
+      document.body.style.overflow = ''
+    }
+  }, [menuOpen])
 
   // Close both menus on navigation, including browser back/forward. Adjusting
   // state during render is React's documented pattern for reacting to a
   // changed value; an effect here would cause a second render pass.
-  const [lastPath, setLastPath] = useState(pathname);
+  const [lastPath, setLastPath] = useState(pathname)
   if (lastPath !== pathname) {
-    setLastPath(pathname);
-    setMenuOpen(false);
-    setProfileOpen(false);
+    setLastPath(pathname)
+    setMenuOpen(false)
+    setProfileOpen(false)
   }
 
   // Dismiss the profile dropdown on outside click or Escape.
   useEffect(() => {
-    if (!profileOpen) return;
+    if (!profileOpen) return
     const handler = (e: MouseEvent | KeyboardEvent) => {
-      if (e instanceof KeyboardEvent && e.key !== "Escape") return;
-      if (e instanceof MouseEvent && profileRef.current?.contains(e.target as Node)) return;
-      setProfileOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    document.addEventListener("keydown", handler);
+      if (e instanceof KeyboardEvent && e.key !== 'Escape') return
+      if (e instanceof MouseEvent && profileRef.current?.contains(e.target as Node))
+        return
+      setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    document.addEventListener('keydown', handler)
     return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keydown", handler);
-    };
-  }, [profileOpen]);
+      document.removeEventListener('mousedown', handler)
+      document.removeEventListener('keydown', handler)
+    }
+  }, [profileOpen])
 
   async function handleLogout() {
-    await logout();
-    setProfileOpen(false);
-    setMenuOpen(false);
-    window.location.href = "/";
+    await logout()
+    setProfileOpen(false)
+    setMenuOpen(false)
+    window.location.href = '/'
   }
 
   return (
     <>
       <header
-        style={{ viewTransitionName: "site-header" }}
+        style={{ viewTransitionName: 'site-header' }}
         className={[
-          "fixed top-0 left-0 right-0 z-sticky",
-          "flex items-center gap-8",
-          "px-[clamp(1.5rem,4vw,3rem)]",
-          "transition-[background,backdrop-filter] duration-400",
-          variant === "maroon"
+          'fixed top-0 left-0 right-0 z-sticky',
+          'flex items-center gap-8',
+          'px-[clamp(1.5rem,4vw,3rem)]',
+          'transition-[background,backdrop-filter] duration-400',
+          variant === 'maroon'
             ? scrolled
-              ? "bg-argc-maroon-dk"
-              : "bg-argc-maroon"
+              ? 'bg-argc-maroon-dk'
+              : 'bg-argc-maroon'
             : scrolled
-              ? "bg-eng-navy/88 backdrop-blur-md saturate-150"
-              : "bg-black/10",
-        ].join(" ")}
+              ? 'bg-eng-navy/88 backdrop-blur-md saturate-150'
+              : 'bg-black/10',
+        ].join(' ')}
       >
         <Link
           href="/"
@@ -168,11 +163,11 @@ export function Navbar() {
                       {user.display_name || user.intra_login}
                     </p>
                     <p className="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-hero-ink/40">
-                      {user.role.replace(/_/g, " ")}
+                      {user.role.replace(/_/g, ' ')}
                     </p>
                   </div>
 
-                  {user.role !== "guest" && (
+                  {user.role !== 'guest' && (
                     <Link
                       href="/dashboard"
                       role="menuitem"
@@ -207,15 +202,15 @@ export function Navbar() {
         >
           <span
             className={[
-              "block w-[22px] h-px bg-hero-ink transition-transform duration-300",
-              menuOpen ? "translate-y-[3.25px] rotate-45" : "",
-            ].join(" ")}
+              'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
+              menuOpen ? 'translate-y-[3.25px] rotate-45' : '',
+            ].join(' ')}
           />
           <span
             className={[
-              "block w-[22px] h-px bg-hero-ink transition-transform duration-300",
-              menuOpen ? "-translate-y-[3.25px] -rotate-45" : "",
-            ].join(" ")}
+              'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
+              menuOpen ? '-translate-y-[3.25px] -rotate-45' : '',
+            ].join(' ')}
           />
         </button>
       </header>
@@ -224,13 +219,13 @@ export function Navbar() {
         id="mobile-menu"
         aria-hidden={!menuOpen}
         className={[
-          "fixed inset-0 z-overlay bg-eng-navy",
-          "flex flex-col justify-center px-[clamp(2rem,8vw,4rem)]",
-          "transition-[opacity,transform,visibility] duration-350",
+          'fixed inset-0 z-overlay bg-eng-navy',
+          'flex flex-col justify-center px-[clamp(2rem,8vw,4rem)]',
+          'transition-[opacity,transform,visibility] duration-350',
           menuOpen
-            ? "opacity-100 visible translate-y-0"
-            : "opacity-0 invisible -translate-y-2",
-        ].join(" ")}
+            ? 'opacity-100 visible translate-y-0'
+            : 'opacity-0 invisible -translate-y-2',
+        ].join(' ')}
       >
         <nav className="flex flex-col gap-1" aria-label="Mobile">
           {NAV_LINKS.map(({ label, href }) => (
@@ -245,7 +240,7 @@ export function Navbar() {
             </a>
           ))}
 
-          {user && user.role !== "guest" && (
+          {user && user.role !== 'guest' && (
             <a
               href="/dashboard"
               tabIndex={menuOpen ? undefined : -1}
@@ -280,7 +275,7 @@ export function Navbar() {
         </nav>
       </div>
     </>
-  );
+  )
 }
 
 /** 42 avatars come from cdn.intra.42.fr, which is allow-listed in next.config. */
@@ -288,9 +283,9 @@ function Avatar({ src, name }: { src: string; name: string }) {
   if (!src) {
     return (
       <span className="w-full h-full flex items-center justify-center bg-white/10 text-hero-ink text-xs font-bold">
-        {(name || "?").charAt(0).toUpperCase()}
+        {(name || '?').charAt(0).toUpperCase()}
       </span>
-    );
+    )
   }
   return (
     <Image
@@ -300,5 +295,5 @@ function Avatar({ src, name }: { src: string; name: string }) {
       height={40}
       className="w-full h-full object-cover"
     />
-  );
+  )
 }

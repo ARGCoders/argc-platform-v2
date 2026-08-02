@@ -1,0 +1,19 @@
+{
+  "name": "ARGC",
+  "title": "ARGC — Alliance of Resilient Giveback Coders",
+  "description": "A production-oriented engineering collective at 42 Amman. We build, ship, and sustain the infrastructure that raises the standard of engineering.",
+  "nav": [
+    { "label": "Home", "href": "/" },
+    { "label": "Our Vision", "href": "/#vision" },
+    { "label": "About Us", "href": "/#about" },
+    { "label": "Events", "href": "/events" },
+    { "label": "Blog", "href": "/blog" },
+    { "label": "Handbook", "href": "/handbook" },
+    { "label": "Contact Us", "href": "/#contact" }
+  ],
+  "handbookRepo": {
+    "owner": "ARGCoders",
+    "repo": "argc-handbook",
+    "branch": "main"
+  }
+}

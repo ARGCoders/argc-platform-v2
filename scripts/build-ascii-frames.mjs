@@ -11,13 +11,13 @@ const raw = readFileSync(SRC, 'utf8')
 // The module is exactly: export const ASCII_FRAMES = [ `...`, `...` ];
 // No ${} interpolation (verified), so evaluating the literal is safe.
 const literal = raw.replace(/^\s*export\s+const\s+ASCII_FRAMES\s*=\s*/, '')
-const parsed = new Function(`return ${literal}`)()
-
-// Strip trailing whitespace per line: invisible inside <pre>, halves the payload
-// (18.4 MB -> 9.5 MB). Leading whitespace is load-bearing and is preserved.
-const frames = parsed.map((f) =>
-  typeof f === 'string' ? f.split('\n').map((l) => l.replace(/\s+$/, '')).join('\n') : f,
-)
+// Frames are copied verbatim.
+//
+// Trailing whitespace looks strippable — it is invisible inside a <pre> — and
+// removing it halves the file. Do not. It sets the width of the <pre> box, and
+// the parent centres that box: stripping narrowed the canvas from 533 to 411
+// columns and shifted the art off-centre.
+const frames = new Function(`return ${literal}`)()
 
 if (!Array.isArray(frames)) throw new Error('parsed value is not an array')
 if (frames.some((f) => typeof f !== 'string')) throw new Error('non-string frame found')
