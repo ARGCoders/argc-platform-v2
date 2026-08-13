@@ -23,7 +23,9 @@ export function Navbar() {
 
   // Pages whose hero is maroon need an opaque maroon bar, not a translucent one.
   const variant: 'default' | 'maroon' =
-    pathname.startsWith('/events') || pathname.startsWith('/register')
+    pathname.startsWith('/events') ||
+    pathname.startsWith('/register') ||
+    pathname.startsWith('/blog')
       ? 'maroon'
       : 'default'
 
