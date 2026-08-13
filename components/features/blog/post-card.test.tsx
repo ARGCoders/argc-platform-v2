@@ -28,10 +28,10 @@ describe('PostCard', () => {
     expect(link).toHaveAttribute('href', '/blog/hello-world')
   })
 
-  it('renders tags, the formatted date and the read time', () => {
+  it('renders bracket tags, the formatted date and the read time', () => {
     renderWithProviders(<PostCard post={makePost()} />)
-    expect(screen.getByText('career')).toBeInTheDocument()
-    expect(screen.getByText('42 amman')).toBeInTheDocument()
+    expect(screen.getByText('[CAREER]')).toBeInTheDocument()
+    expect(screen.getByText('[42 AMMAN]')).toBeInTheDocument()
     expect(screen.getByText('13 AUG 2026')).toBeInTheDocument()
     expect(screen.getByText('· 4 min read')).toBeInTheDocument()
   })

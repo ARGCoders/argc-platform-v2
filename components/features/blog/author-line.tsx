@@ -21,11 +21,13 @@ export function AuthorLine({ author }: { author: PostAuthor | null }) {
           className="h-6 w-6 object-cover"
         />
       ) : (
-        <span className="flex h-6 w-6 items-center justify-center bg-muted text-[0.6rem] font-bold text-muted-foreground">
+        <span className="flex h-6 w-6 items-center justify-center bg-eng-navy text-[0.6rem] font-bold text-hero-ink">
           {name.charAt(0).toUpperCase()}
         </span>
       )}
-      <span className="text-sm font-medium text-foreground">{name}</span>
+      <span className="font-mono text-[0.7rem] tracking-[0.08em] uppercase text-ink-muted">
+        {name}
+      </span>
     </span>
   )
 }

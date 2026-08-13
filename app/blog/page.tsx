@@ -19,23 +19,23 @@ export default async function BlogPage() {
 
   return (
     <main className="pt-nav">
-      <section className="bg-argc-maroon px-[clamp(1.5rem,4vw,3rem)] py-16 md:py-24">
-        <p className="font-mono text-[0.7rem] tracking-[0.2em] uppercase text-hero-ink/60">
+      <section className="px-[clamp(1.5rem,4vw,3rem)] pt-16 pb-14 md:pt-24 md:pb-16">
+        <p className="font-mono text-[0.7rem] tracking-[0.2em] uppercase text-ink-muted">
           {blog.header.eyebrow}
         </p>
-        <h1 className="mt-4 font-sans text-[clamp(2.25rem,5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.025em] text-hero-ink">
+        <h1 className="mt-5 font-sans text-[clamp(2.75rem,8vw,6rem)] font-bold leading-[0.95] tracking-[-0.035em] text-ink">
           {blog.header.title.map((line, i) => (
             <span key={i} className="block">
               {line}
             </span>
           ))}
         </h1>
-        <p className="mt-5 max-w-[54ch] leading-relaxed text-hero-ink-muted">
+        <p className="mt-6 max-w-[58ch] text-base leading-relaxed text-ink-muted md:text-lg">
           {blog.header.tagline}
         </p>
       </section>
 
-      <section className="px-[clamp(1.5rem,4vw,3rem)] py-14">
+      <section className="px-[clamp(1.5rem,4vw,3rem)] pb-20">
         {posts.length === 0 ? (
           <EmptyState
             title="No posts yet"
