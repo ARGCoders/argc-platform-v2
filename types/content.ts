@@ -8,9 +8,6 @@
  *
  * Multi-line headlines are arrays: one entry per rendered line. This keeps
  * markup out of the JSON while preserving the intended line breaks.
- *
- * Only the hero is defined for now; the rest of the landing page is being
- * redesigned, and its content shape will be added alongside it.
  */
 
 export interface NavLink {
@@ -37,6 +34,15 @@ export interface SiteContent {
 export interface LandingContent {
   hero: {
     headline: string[]
+    tagline: string
+  }
+}
+
+/** Copy for the /blog page header. */
+export interface BlogContent {
+  header: {
+    eyebrow: string
+    title: string[]
     tagline: string
   }
 }
