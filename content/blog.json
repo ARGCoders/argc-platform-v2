@@ -1,7 +1,7 @@
 {
   "header": {
     "eyebrow": "The Blog",
-    "title": ["Notes from the", "collective."],
-    "tagline": "Field notes, retrospectives, and engineering lessons from the builders at 42 Amman."
+    "title": ["From the", "collective."],
+    "tagline": "Announcements, news, events, and articles from the builders at ARGC."
   }
 }
