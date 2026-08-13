@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '@/test/render'
-import { PostCard } from './post-card'
+import { PostRow } from './post-row'
 import type { PostView } from '@/lib/blog'
 
 function makePost(overrides: Partial<PostView> = {}): PostView {
@@ -21,15 +21,15 @@ function makePost(overrides: Partial<PostView> = {}): PostView {
   }
 }
 
-describe('PostCard', () => {
-  it('links the whole card to the post', () => {
-    renderWithProviders(<PostCard post={makePost()} />)
+describe('PostRow', () => {
+  it('links the whole row to the post', () => {
+    renderWithProviders(<PostRow post={makePost()} />)
     const link = screen.getByRole('link', { name: /hello world/i })
     expect(link).toHaveAttribute('href', '/blog/hello-world')
   })
 
   it('renders bracket tags, the formatted date and the read time', () => {
-    renderWithProviders(<PostCard post={makePost()} />)
+    renderWithProviders(<PostRow post={makePost()} />)
     expect(screen.getByText('[CAREER]')).toBeInTheDocument()
     expect(screen.getByText('[42 AMMAN]')).toBeInTheDocument()
     expect(screen.getByText('13 AUG 2026')).toBeInTheDocument()
@@ -38,7 +38,7 @@ describe('PostCard', () => {
 
   it('shows the author name when the relation is expanded', () => {
     renderWithProviders(
-      <PostCard
+      <PostRow
         post={makePost({
           author: { id: 'u1', intra_login: 'anashwan', avatar_url: '' },
         })}

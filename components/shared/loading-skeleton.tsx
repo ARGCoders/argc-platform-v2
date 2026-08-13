@@ -6,26 +6,48 @@ import { cn } from '@/lib/utils'
  * Built on the shadcn Skeleton primitive rather than re-declaring the pulse.
  */
 
-export function CardSkeleton({ className }: { className?: string }) {
+/** One /blog row: thumbnail, then title lines and a meta block. */
+export function PostRowSkeleton() {
   return (
-    <div className={cn('border border-border', className)}>
-      <Skeleton className="aspect-[16/7] w-full" />
-      <div className="flex flex-col gap-3 p-5">
+    <div className="flex flex-col gap-6 border-b border-border py-6 md:flex-row md:items-center md:gap-8">
+      <Skeleton className="aspect-[16/9] w-full shrink-0 md:w-80" />
+      <div className="min-w-0 flex-1">
         <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-5 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="mt-3 h-7 w-3/4" />
+        <Skeleton className="mt-2 h-4 w-full" />
+        <Skeleton className="mt-2 h-4 w-1/2" />
+        <Skeleton className="mt-4 h-3 w-40" />
       </div>
+      <Skeleton className="hidden h-4 w-16 shrink-0 md:block" />
     </div>
   )
 }
 
-export function CardGridSkeleton({ count = 6 }: { count?: number }) {
+/** The /blog row list below the index bar. */
+export function PostListSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div>
       {Array.from({ length: count }, (_, i) => (
-        <CardSkeleton key={i} />
+        <PostRowSkeleton key={i} />
       ))}
+    </div>
+  )
+}
+
+/** Full /blog index shape: header, index bar, then the row list. */
+export function BlogIndexSkeleton() {
+  return (
+    <div className="flex flex-col gap-8">
+      <div>
+        <Skeleton className="h-3 w-32" />
+        <Skeleton className="mt-5 h-12 w-2/3" />
+        <Skeleton className="mt-4 h-5 w-1/2" />
+      </div>
+      <div className="flex items-baseline justify-between gap-4 border-y border-border py-3">
+        <Skeleton className="h-3 w-14" />
+        <Skeleton className="h-3 w-16" />
+      </div>
+      <PostListSkeleton />
     </div>
   )
 }

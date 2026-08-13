@@ -1,10 +1,10 @@
-import { CardGridSkeleton } from '@/components/shared/loading-skeleton'
+import { BlogIndexSkeleton } from '@/components/shared/loading-skeleton'
 
-/** Shown while the blog grid streams in. */
+/** Shown while the blog grid streams in. Matches the /blog index layout. */
 export default function BlogLoading() {
   return (
-    <main className="px-[clamp(1.5rem,4vw,3rem)] py-14 pt-nav">
-      <CardGridSkeleton />
+    <main className="mx-auto w-full max-w-[90rem] px-[clamp(1.5rem,4vw,3rem)] py-14 pt-nav">
+      <BlogIndexSkeleton />
     </main>
   )
 }
