@@ -34,7 +34,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           <Navbar />
-          <ViewTransition>{children}</ViewTransition>
+          <ViewTransition name="page">
+            <div className="contents">{children}</div>
+          </ViewTransition>
         </AuthProvider>
       </body>
     </html>
