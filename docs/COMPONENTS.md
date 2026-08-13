@@ -7,8 +7,8 @@ for pages that are being redesigned, not abandoned.
 Surfaces referenced below:
 
 - **paper** — the light page background (`--background`)
-- **navy** — `eng-navy`, used for the dashboard and mobile menu
-- **maroon** — `argc-maroon`, the hero and registration background
+- **navy** — `eng-navy`, used for the dashboard and code/technical surfaces
+- **maroon** — `argc-maroon`, the top navbar, hero, registration, and mobile overlay backgrounds
 
 ---
 
