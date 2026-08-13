@@ -22,14 +22,14 @@ export function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null)
 
   // Pages whose hero is maroon need an opaque maroon bar, not a translucent
-  // one. /blog is paper, so it gets the light variant (ink text on paper).
-  const variant: 'default' | 'maroon' | 'light' = pathname.startsWith('/blog')
-    ? 'light'
-    : pathname.startsWith('/events') || pathname.startsWith('/register')
+  // one. /blog is paper, so it always gets the scrolled navy state — the same
+  // look as the landing navbar once scrolled, and readable over the light page.
+  const variant: 'default' | 'maroon' =
+    pathname.startsWith('/events') || pathname.startsWith('/register')
       ? 'maroon'
       : 'default'
 
-  const isDark = variant !== 'light'
+  const isBlog = pathname.startsWith('/blog')
 
   const isGuest = !user || user.role === 'guest'
   const showRegister = isLoading || isGuest
@@ -95,22 +95,15 @@ export function Navbar() {
             ? scrolled
               ? 'bg-argc-maroon-dk'
               : 'bg-argc-maroon'
-            : variant === 'light'
-              ? scrolled
-                ? 'bg-paper/88 backdrop-blur-md'
-                : 'bg-transparent'
-              : scrolled
-                ? 'bg-eng-navy/88 backdrop-blur-md saturate-150'
-                : 'bg-black/10',
+            : isBlog || scrolled
+              ? 'bg-eng-navy/88 backdrop-blur-md saturate-150'
+              : 'bg-black/10',
         ].join(' ')}
       >
         <Link
           href="/"
           aria-label="ARGC home"
-          className={[
-            'shrink-0 py-[0.625rem] px-3',
-            variant === 'light' ? 'bg-argc-maroon' : 'bg-black/20',
-          ].join(' ')}
+          className="shrink-0 bg-black/20 py-[0.625rem] px-3"
         >
           <Image
             src="/logo_argc.svg"
@@ -130,12 +123,7 @@ export function Navbar() {
             <a
               key={href}
               href={href}
-              className={[
-                'text-sm font-medium tracking-wide transition-colors whitespace-nowrap',
-                isDark
-                  ? 'text-hero-ink/75 hover:text-hero-ink'
-                  : 'text-ink/75 hover:text-ink',
-              ].join(' ')}
+              className="text-sm font-medium tracking-wide text-hero-ink/75 hover:text-hero-ink transition-colors whitespace-nowrap"
             >
               {label}
             </a>
@@ -146,12 +134,7 @@ export function Navbar() {
           {showRegister && (
             <a
               href="/register"
-              className={[
-                'inline-flex items-center text-[0.8rem] font-semibold tracking-[0.06em] uppercase transition-colors px-4 py-3',
-                isDark
-                  ? 'text-hero-ink bg-black/20 hover:bg-black/30'
-                  : 'text-paper bg-ink hover:bg-eng-navy',
-              ].join(' ')}
+              className="inline-flex items-center text-[0.8rem] font-semibold tracking-[0.06em] uppercase text-hero-ink bg-black/20 hover:bg-black/30 transition-colors px-4 py-3"
             >
               Register
             </a>
@@ -165,12 +148,7 @@ export function Navbar() {
                 aria-label="Open profile menu"
                 aria-expanded={profileOpen}
                 aria-controls="profile-dropdown"
-                className={[
-                  'shrink-0 overflow-hidden border transition-all cursor-pointer bg-transparent p-0 w-10 h-10',
-                  isDark
-                    ? 'border-white/20 hover:border-white/60'
-                    : 'border-ink/20 hover:border-ink/50',
-                ].join(' ')}
+                className="shrink-0 overflow-hidden border border-white/20 hover:border-white/60 transition-all cursor-pointer bg-transparent p-0 w-10 h-10"
               >
                 <Avatar
                   src={user.avatar_url}
@@ -228,15 +206,13 @@ export function Navbar() {
         >
           <span
             className={[
-              'block w-[22px] h-px transition-transform duration-300',
-              isDark ? 'bg-hero-ink' : 'bg-ink',
+              'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
               menuOpen ? 'translate-y-[3.25px] rotate-45' : '',
             ].join(' ')}
           />
           <span
             className={[
-              'block w-[22px] h-px transition-transform duration-300',
-              isDark ? 'bg-hero-ink' : 'bg-ink',
+              'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
               menuOpen ? '-translate-y-[3.25px] -rotate-45' : '',
             ].join(' ')}
           />

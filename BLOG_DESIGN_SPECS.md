@@ -38,7 +38,7 @@ Rely strictly on the tokens defined in `global.css`[cite: 1].
   - **Geometry:** Sharp corners (0rem radius)[cite: 1].
   - **Image:** Aspect ratio 16:9, grayscale by default, revealing full color on hover to maintain a subdued resting state.
   - **Metadata:** Use `IBM Plex Mono` for the date and tags (e.g., `[ANNOUNCEMENTS]`, `[WELCOME]`) set in small uppercase text, colored with `--color-ink-muted`.
-  - **Hover State:** Apply the `--animate-row-rise` transition[cite: 1] and a 2px bottom border highlight using `--color-argc-maroon`.
+  - **Hover State:** Lift the card with a smooth transition (the `--animate-row-rise` keyframe is entry-only — replaying it on hover flickers the card out from `opacity: 0`) and a 2px bottom border highlight using `--color-argc-maroon`.
 
 ### 3.2. Article Page
 

@@ -10,12 +10,13 @@ import type { PostView } from '@/lib/blog'
  * One post in the /blog grid. The whole card is a single link so the click
  * target is the full row, not just the title. Card styling follows
  * BLOG_DESIGN_SPECS §3.1: stone fill, 1px border, sharp corners, a 16:9
- * grayscale image that turns to colour on hover, and a `--animate-row-rise`
- * lift with a 2px maroon bottom highlight.
+ * grayscale image that turns to colour on hover, and a smooth transition lift
+ * with a 2px maroon bottom highlight. (`row-rise` stays entry-only — replaying
+ * it on hover makes the card flicker out from opacity 0.)
  */
 export function PostCard({ post }: { post: PostView }) {
   return (
-    <article className="group flex flex-col border border-border bg-stone transition-shadow duration-300 hover:animate-row-rise hover:shadow-[inset_0_-2px_0_var(--color-argc-maroon)]">
+    <article className="group flex flex-col border border-border bg-stone transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[inset_0_-2px_0_var(--color-argc-maroon)]">
       <Link
         href={`/blog/${post.slug}`}
         aria-label={post.title}
