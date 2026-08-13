@@ -52,6 +52,9 @@ yarn-error.log*
 # railway CLI link state — per-machine, contains project and service ids
 .railway
 
+# local AI assistant workflow notes — personal, not project docs
+/AI_WORKFLOW.md
+
 # vercel
 .vercel
 
