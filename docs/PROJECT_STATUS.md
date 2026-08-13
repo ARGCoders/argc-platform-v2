@@ -7,16 +7,17 @@ Read this first if you are joining. `README.md` tells you how to run it,
 file tells you **what state the project is in and which decisions are already settled**,
 so nobody re-litigates a question that has an answer or rebuilds something that exists.
 
-_Last updated: 2 August 2026._
+_Last updated: 13 August 2026._
 
 ---
 
 ## In one paragraph
 
 V2 is a rebuild of `argc_platform`. The engineering environment is finished — formatter,
-tests, hooks, CI, and a reproducible backend. The **public UI is deliberately not built**:
-only the hero and navbar exist, because the design is being reworked and building against
-the old design twice would be waste. The next real work is the UI redesign.
+tests, hooks, CI, and a reproducible backend. The public UI was kept minimal — only the
+hero and navbar — because the design was being reworked and building against the old
+design twice would be waste. The read-only blog has since been rebuilt on the new design
+system; the remaining public sections still wait on the redesign.
 
 ---
 
@@ -29,7 +30,8 @@ the old design twice would be waste. The next real work is the UI redesign.
 | Auth               | Full 42 Intra OAuth: login, callback, logout, session refresh, `AuthProvider` |
 | Route gating       | `proxy.ts`, all three rules verified against a running server                 |
 | Component library  | 18 modules, themed and accessible — see `COMPONENTS.md`                       |
-| Tests              | Vitest + Testing Library, 51 tests                                            |
+| Blog (read-only)   | Public index + post pages, data layer, sanitised rendering, 3 components      |
+| Tests              | Vitest + Testing Library, 66 tests                                            |
 | CI                 | GitHub Actions: format, lint, typecheck, test, build                          |
 | Commit hygiene     | Prettier, husky, lint-staged, commitlint                                      |
 | Backend schema     | `scripts/setup-collections.mjs` — 17 collections, idempotent                  |
@@ -38,15 +40,15 @@ the old design twice would be waste. The next real work is the UI redesign.
 
 ## What is not done
 
-| Area             | State                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| Landing page     | **Hero only.** Vision, about and contact were removed pending the redesign           |
-| Blog             | Removed. Was fully working — components, pages, four API routes, sanitised rendering |
-| Events           | Removed. Was reading the PocketBase `events` collection                              |
-| Handbook         | Removed. Was rendering markdown from the `argc-handbook` repo with 1h ISR            |
-| Registration     | Removed. Was writing to `submissions`                                                |
-| Dashboard        | Never started                                                                        |
-| Deployed backend | Blocked — see below                                                                  |
+| Area             | State                                                                                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Landing page     | **Hero only.** Vision, about and contact were removed pending the redesign                                                                             |
+| Blog submit      | Member submission + review flow. V1 had a submit form and four API routes; the read-only side is rebuilt, submission is the next increment — see below |
+| Events           | Removed. Was reading the PocketBase `events` collection                                                                                                |
+| Handbook         | Removed. Was rendering markdown from the `argc-handbook` repo with 1h ISR                                                                              |
+| Registration     | Removed. Was writing to `submissions`                                                                                                                  |
+| Dashboard        | Never started                                                                                                                                          |
+| Deployed backend | Blocked — see below                                                                                                                                    |
 
 Everything in that first block was built, worked, and was rolled back **on purpose**. The
 code is in git history at `efefd73^` if it is useful as reference — but it was written
@@ -64,6 +66,11 @@ assumed.
 | **Next.js 16, not 15**                            | The master plan says pin 15 "not 16". The stack is 16 and `AGENTS.md` mandates reading the shipped docs. C1 (async request APIs) still applies.                                                      |
 | **`proxy.ts`, not `middleware.ts`**               | Next 16 renamed the convention and deprecated `middleware`. The plan calls `proxy.ts` a bug; it is the opposite. Verified: the build reports `Proxy (Middleware)` and all three redirect rules fire. |
 | **Content lives in `content/*.json`**             | So copy edits never touch a component. Typed, so a bad edit fails the build.                                                                                                                         |
+| **Blog pages are `force-dynamic`**                | CI runs `pnpm build` with no PocketBase, and the SDK's fetch is not tracked by Next's prerenderer. Request-time rendering keeps the build green and the post list fresh without cache invalidation.  |
+| **Blog copy is content, not components**          | The header (eyebrow, title, tagline) lives in `content/blog.json` and is swapped without touching a component.                                                                                       |
+| **Sanitize blog HTML at fetch time**              | `sanitizeHtml()` runs in `lib/blog.ts`, so `dangerouslySetInnerHTML` only ever receives clean HTML and pages never import jsdom.                                                                     |
+| **Banner images via `next/image`, env-derived**   | `remotePatterns` are built from `NEXT_PUBLIC_POCKETBASE_URL` plus the 42 CDN, so no hand-maintained host list.                                                                                       |
+| **Maroon header band for the blog**               | The blog hero matches `/events` and `/register`; the navbar gets the opaque `maroon` variant on `/blog`.                                                                                             |
 | **ASCII frames are a static asset, not a module** | Importing them cost **18.4 MB** of JavaScript in V1. Largest chunk now is 0.22 MB.                                                                                                                   |
 | **shadcn adopted, rethemed**                      | Accessible primitives without the stock look `PRODUCT.md` rejects.                                                                                                                                   |
 | **Cool neutral base, not warm cream**             | V1's `#FAF8F2` cast a sepia tint over every page.                                                                                                                                                    |
@@ -86,6 +93,15 @@ instruction** — its preliminary notes repeat the `proxy.ts` error.
 ---
 
 ## Known blockers
+
+### Local auth is blocked on real 42 OAuth credentials
+
+`NEXT_PUBLIC_42_CLIENT_ID` and `FORTYTWO_CLIENT_SECRET` are placeholders locally. Anyone on
+the team can register the app at `profile.intra.42.fr/oauth/applications` (redirect:
+`http://localhost:3000/api/auth/callback`). Note that `lib/env.ts` is an **eager proxy** —
+it validates every variable on any read and throws on the first empty one (the 42 pair
+comes first), so an incomplete `.env` breaks every page that touches PocketBase, the blog
+included, not just login. Making validation lazy per-key is a small planned refactor.
 
 ### The backend is not deployed
 
@@ -138,14 +154,19 @@ has run, **that directory is the database.** Do not delete it.
 
 In rough order.
 
-1. **The UI redesign.** Everything else waits on it. Landing sections, then blog, events,
-   handbook, registration. The API routes and data shapes for all four are in git history
-   and can be lifted; the components should be written fresh.
-2. **Deploy PocketBase** on an account without the quota limit, then `make pb-restore` to
+1. **The UI redesign.** Everything else waits on it. Landing sections, then events,
+   handbook, registration. The API routes and data shapes are in git history and can be
+   lifted; the components should be written fresh. The blog was already rebuilt (see above).
+2. **Blog submit + review (members only).** A submit form and `POST /api/blog` route that
+   create a post with `status=pending`, published by reviewers in the PocketBase admin UI.
+   Depends on the 42 OAuth flow being verified with real credentials first.
+3. **Fix `lib/env.ts` eager validation.** Make it validate lazily per key so a missing
+   variable only fails the page that needs it, instead of every DB-touching page.
+4. **Deploy PocketBase** on an account without the quota limit, then `make pb-restore` to
    carry the local data across, then repoint `NEXT_PUBLIC_POCKETBASE_URL`.
-3. **Deploy the frontend.** V1's `deploy.yml` (`railway up` on green CI) is a working
+5. **Deploy the frontend.** V1's `deploy.yml` (`railway up` on green CI) is a working
    starting point; it was deliberately not carried over.
-4. **The dashboard**, once `PLATFORM.md` §6 has answers.
+6. **The dashboard**, once `PLATFORM.md` §6 has answers.
 
 ### Good first tasks
 

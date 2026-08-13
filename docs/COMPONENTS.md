@@ -14,11 +14,14 @@ Surfaces referenced below:
 
 ## In use
 
-| Component     | File                                           | Notes                                                                                                                                                                                                                               |
-| ------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Navbar`      | `components/shared/navbar.tsx`                 | Sticky, scroll-aware, mobile hamburger with scroll lock and a profile dropdown. Links come from `content/site.json`. Reads auth from `useAuth()` — do not add another session fetch. `maroon` variant on `/events` and `/register`. |
-| `Hero`        | `components/features/landing/hero.tsx`         | Full-viewport maroon hero. Copy from `content/landing.json`.                                                                                                                                                                        |
-| `AsciiCanvas` | `components/features/landing/ascii-canvas.tsx` | 24fps ASCII animation. Fetches `public/ascii/frames.txt`; **never import the frames as a module** — that cost 18.4 MB of JavaScript in V1. Respects reduced motion, pauses on tab-blur and off-screen.                              |
+| Component     | File                                           | Notes                                                                                                                                                                                                                                        |
+| ------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Navbar`      | `components/shared/navbar.tsx`                 | Sticky, scroll-aware, mobile hamburger with scroll lock and a profile dropdown. Links come from `content/site.json`. Reads auth from `useAuth()` — do not add another session fetch. `maroon` variant on `/events`, `/register` and `/blog`. |
+| `Hero`        | `components/features/landing/hero.tsx`         | Full-viewport maroon hero. Copy from `content/landing.json`.                                                                                                                                                                                 |
+| `AsciiCanvas` | `components/features/landing/ascii-canvas.tsx` | 24fps ASCII animation. Fetches `public/ascii/frames.txt`; **never import the frames as a module** — that cost 18.4 MB of JavaScript in V1. Respects reduced motion, pauses on tab-blur and off-screen.                                       |
+| `PostCard`    | `components/features/blog/post-card.tsx`       | Whole-card `Link` to `/blog/[slug]`. Banner via `next/image` or `BannerPlaceholder`, `Badge` tags, `AuthorLine`, mono date + read time. Data is a `PostView` from `lib/blog.ts`.                                                             |
+| `AuthorLine`  | `components/features/blog/author-line.tsx`     | Monogram in an avatar fallback when `avatar_url` is empty; shows the intra login.                                                                                                                                                            |
+| `PostBody`    | `components/features/blog/post-body.tsx`       | Renders sanitised editor HTML (already cleaned in `lib/blog.ts`) under the `.article-body` typography. Never sanitise here.                                                                                                                  |
 
 ---
 
@@ -58,6 +61,9 @@ others with `npx shadcn@latest add <name>` rather than hand-writing a primitive.
 | `lib/content.ts`           | Typed accessors for `content/*.json`. Import from here, never the JSON directly.                                                                                                                           |
 | `lib/cookies.ts`           | Shared auth cookie options so they cannot drift between routes.                                                                                                                                            |
 | `lib/pocketbase-server.ts` | `getAdminClient()` (cached + HMR-safe) and `getPocketBaseClient()`.                                                                                                                                        |
+| `lib/blog.ts`              | `getPublishedPosts()` / `getPublishedPostBySlug()` returning `PostView`. Only published rows; sanitises content at fetch time. Covered by `lib/blog.test.ts`.                                              |
+| `lib/pb-assets.ts`         | `pocketBaseFileUrl()` — turns a stored file into a ready-to-serve absolute URL. Covered by `lib/pb-assets.test.ts`.                                                                                        |
+| `lib/dates.ts`             | `formatBlogDate()` — ARGC mono style, e.g. `13 AUG 2026`. Covered by `lib/dates.test.ts`.                                                                                                                  |
 | `lib/api/42-api.ts`        | 42 Intra OAuth URL, code exchange, profile fetch.                                                                                                                                                          |
 
 ---
