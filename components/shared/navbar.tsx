@@ -21,9 +21,14 @@ export function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
 
-  // Pages whose hero is maroon need an opaque maroon bar, not a translucent one.
+  // Maroon is the brand colour for top navigation (BLOG_DESIGN_SPECS §3.0).
+  // /events, /register and /blog all get the opaque maroon bar; the landing
+  // page keeps a translucent bar so the maroon hero shows through. Navy is
+  // reserved for the dashboard and mobile overlay, never the top nav bar.
   const variant: 'default' | 'maroon' =
-    pathname.startsWith('/events') || pathname.startsWith('/register')
+    pathname.startsWith('/blog') ||
+    pathname.startsWith('/events') ||
+    pathname.startsWith('/register')
       ? 'maroon'
       : 'default'
 
@@ -92,7 +97,7 @@ export function Navbar() {
               ? 'bg-argc-maroon-dk'
               : 'bg-argc-maroon'
             : scrolled
-              ? 'bg-eng-navy/88 backdrop-blur-md saturate-150'
+              ? 'bg-argc-maroon-dk'
               : 'bg-black/10',
         ].join(' ')}
       >
@@ -116,24 +121,24 @@ export function Navbar() {
           className="hidden md:flex items-center gap-[clamp(1.25rem,2.5vw,2rem)] ml-auto"
         >
           {NAV_LINKS.map(({ label, href }) => (
-            <a
+            <Link
               key={href}
               href={href}
               className="text-sm font-medium tracking-wide text-hero-ink/75 hover:text-hero-ink transition-colors whitespace-nowrap"
             >
               {label}
-            </a>
+            </Link>
           ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-2 shrink-0">
           {showRegister && (
-            <a
+            <Link
               href="/register"
               className="inline-flex items-center text-[0.8rem] font-semibold tracking-[0.06em] uppercase text-hero-ink bg-black/20 hover:bg-black/30 transition-colors px-4 py-3"
             >
               Register
-            </a>
+            </Link>
           )}
 
           {user && (
@@ -219,7 +224,7 @@ export function Navbar() {
         id="mobile-menu"
         aria-hidden={!menuOpen}
         className={[
-          'fixed inset-0 z-overlay bg-eng-navy',
+          'fixed inset-0 z-overlay bg-argc-maroon',
           'flex flex-col justify-center px-[clamp(2rem,8vw,4rem)]',
           'transition-[opacity,transform,visibility] duration-350',
           menuOpen
@@ -229,7 +234,7 @@ export function Navbar() {
       >
         <nav className="flex flex-col gap-1" aria-label="Mobile">
           {NAV_LINKS.map(({ label, href }) => (
-            <a
+            <Link
               key={href}
               href={href}
               tabIndex={menuOpen ? undefined : -1}
@@ -237,18 +242,18 @@ export function Navbar() {
               className="text-[clamp(2rem,8vw,3.5rem)] font-bold leading-[1.25] text-hero-ink/50 hover:text-hero-ink transition-colors"
             >
               {label}
-            </a>
+            </Link>
           ))}
 
           {user && user.role !== 'guest' && (
-            <a
+            <Link
               href="/dashboard"
               tabIndex={menuOpen ? undefined : -1}
               onClick={() => setMenuOpen(false)}
               className="mt-8 inline-flex w-fit items-center text-[0.9375rem] font-semibold tracking-[0.05em] uppercase text-argc-maroon bg-hero-ink px-7 py-3"
             >
               Dashboard
-            </a>
+            </Link>
           )}
 
           {user && (
@@ -263,14 +268,14 @@ export function Navbar() {
           )}
 
           {showRegister && (
-            <a
+            <Link
               href="/register"
               tabIndex={menuOpen ? undefined : -1}
               onClick={() => setMenuOpen(false)}
               className="mt-8 inline-flex w-fit items-center text-[0.9375rem] font-semibold tracking-[0.05em] uppercase text-argc-maroon bg-hero-ink px-7 py-3"
             >
               Register
-            </a>
+            </Link>
           )}
         </nav>
       </div>

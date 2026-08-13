@@ -7,18 +7,22 @@ for pages that are being redesigned, not abandoned.
 Surfaces referenced below:
 
 - **paper** — the light page background (`--background`)
-- **navy** — `eng-navy`, used for the dashboard and mobile menu
-- **maroon** — `argc-maroon`, the hero and registration background
+- **navy** — `eng-navy`, used for the dashboard and code/technical surfaces
+- **maroon** — `argc-maroon`, the top navbar, hero, registration, and mobile overlay backgrounds
 
 ---
 
 ## In use
 
-| Component     | File                                           | Notes                                                                                                                                                                                                                               |
-| ------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Navbar`      | `components/shared/navbar.tsx`                 | Sticky, scroll-aware, mobile hamburger with scroll lock and a profile dropdown. Links come from `content/site.json`. Reads auth from `useAuth()` — do not add another session fetch. `maroon` variant on `/events` and `/register`. |
-| `Hero`        | `components/features/landing/hero.tsx`         | Full-viewport maroon hero. Copy from `content/landing.json`.                                                                                                                                                                        |
-| `AsciiCanvas` | `components/features/landing/ascii-canvas.tsx` | 24fps ASCII animation. Fetches `public/ascii/frames.txt`; **never import the frames as a module** — that cost 18.4 MB of JavaScript in V1. Respects reduced motion, pauses on tab-blur and off-screen.                              |
+| Component     | File                                           | Notes                                                                                                                                                                                                                                                                               |
+| ------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Navbar`      | `components/shared/navbar.tsx`                 | Sticky, scroll-aware, mobile hamburger with scroll lock and a profile dropdown. Links come from `content/site.json`. Reads auth from `useAuth()` — do not add another session fetch. Maroon variant on `/blog`, `/events` and `/register`; never navy (BLOG_DESIGN_SPECS §3.0).     |
+| `Hero`        | `components/features/landing/hero.tsx`         | Full-viewport maroon hero. Copy from `content/landing.json`.                                                                                                                                                                                                                        |
+| `AsciiCanvas` | `components/features/landing/ascii-canvas.tsx` | 24fps ASCII animation. Fetches `public/ascii/frames.txt`; **never import the frames as a module** — that cost 18.4 MB of JavaScript in V1. Respects reduced motion, pauses on tab-blur and off-screen.                                                                              |
+| `PostRow`     | `components/features/blog/post-row.tsx`        | Whole-row `Link` to `/blog/[slug]`. Horizontal log row on the wide index: 16:9 thumbnail (grayscale → colour on hover) via `next/image` or `BannerPlaceholder`, `Tag` brackets, title, `AuthorLine` + mono date/read time, hover `READ →`. Data is a `PostView` from `lib/blog.ts`. |
+| `AuthorLine`  | `components/features/blog/author-line.tsx`     | Monogram in an avatar fallback when `avatar_url` is empty; mono uppercase byline.                                                                                                                                                                                                   |
+| `Tag`         | `components/features/blog/tag.tsx`             | Bracket tag label `[LIKE THIS]` — mono, all-caps, no pill (per BLOG_DESIGN_SPECS §3.3).                                                                                                                                                                                             |
+| `PostBody`    | `components/features/blog/post-body.tsx`       | Renders sanitised editor HTML (already cleaned in `lib/blog.ts`) under the `.article-body` typography. Never sanitise here.                                                                                                                                                         |
 
 ---
 
@@ -26,15 +30,15 @@ Surfaces referenced below:
 
 ### Shared
 
-| Component                            | File                                       | Props / behaviour                                                                                                                                                              |
-| ------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Field`, `FieldArea`, `FieldWrapper` | `components/shared/field.tsx`              | Labelled input and textarea. `surface: 'dark' \| 'light'`. Ids come from `useId()`; error text is wired to `aria-describedby` and borders meet the 3:1 non-text contrast rule. |
-| `EmptyState`                         | `components/shared/empty-state.tsx`        | `title`, `description?`, `icon?`, `action?`. Use this for every "no records" case rather than writing prose inline.                                                            |
-| `Spinner`                            | `components/shared/spinner.tsx`            | `size: 'sm' \| 'md' \| 'lg'`, `label` for screen readers.                                                                                                                      |
-| `ErrorFallback`                      | `components/shared/error-fallback.tsx`     | Body for every `error.tsx`. Shows the raw message only in development; surfaces `digest` in production.                                                                        |
-| `Breadcrumb`                         | `components/shared/breadcrumb.tsx`         | `items: { label, href? }[]`. The final crumb renders as text with `aria-current="page"`.                                                                                       |
-| Skeletons                            | `components/shared/loading-skeleton.tsx`   | `CardSkeleton`, `CardGridSkeleton`, `RowSkeleton`, `RowListSkeleton`, `DetailSkeleton`. Shaped to match real layouts so loading does not shift content.                        |
-| `BannerPlaceholder`                  | `components/shared/banner-placeholder.tsx` | Deterministic gradient from a `seed` string, for records with no image.                                                                                                        |
+| Component                            | File                                       | Props / behaviour                                                                                                                                                               |
+| ------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Field`, `FieldArea`, `FieldWrapper` | `components/shared/field.tsx`              | Labelled input and textarea. `surface: 'dark' \| 'light'`. Ids come from `useId()`; error text is wired to `aria-describedby` and borders meet the 3:1 non-text contrast rule.  |
+| `EmptyState`                         | `components/shared/empty-state.tsx`        | `title`, `description?`, `icon?`, `action?`. Use this for every "no records" case rather than writing prose inline.                                                             |
+| `Spinner`                            | `components/shared/spinner.tsx`            | `size: 'sm' \| 'md' \| 'lg'`, `label` for screen readers.                                                                                                                       |
+| `ErrorFallback`                      | `components/shared/error-fallback.tsx`     | Body for every `error.tsx`. Shows the raw message only in development; surfaces `digest` in production.                                                                         |
+| `Breadcrumb`                         | `components/shared/breadcrumb.tsx`         | `items: { label, href? }[]`. The final crumb renders as text with `aria-current="page"`.                                                                                        |
+| Skeletons                            | `components/shared/loading-skeleton.tsx`   | `RowSkeleton`, `RowListSkeleton`, `PostRowSkeleton`, `PostListSkeleton`, `BlogIndexSkeleton`, `DetailSkeleton`. Shaped to match real layouts so loading does not shift content. |
+| `BannerPlaceholder`                  | `components/shared/banner-placeholder.tsx` | Deterministic gradient from a `seed` string, blueprint grid and `REF /` label, for records with no image.                                                                       |
 
 ### shadcn primitives
 
@@ -58,6 +62,9 @@ others with `npx shadcn@latest add <name>` rather than hand-writing a primitive.
 | `lib/content.ts`           | Typed accessors for `content/*.json`. Import from here, never the JSON directly.                                                                                                                           |
 | `lib/cookies.ts`           | Shared auth cookie options so they cannot drift between routes.                                                                                                                                            |
 | `lib/pocketbase-server.ts` | `getAdminClient()` (cached + HMR-safe) and `getPocketBaseClient()`.                                                                                                                                        |
+| `lib/blog.ts`              | `getPublishedPosts()` / `getPublishedPostBySlug()` returning `PostView`. Only published rows; sanitises content at fetch time. Covered by `lib/blog.test.ts`.                                              |
+| `lib/pb-assets.ts`         | `pocketBaseFileUrl()` — turns a stored file into a ready-to-serve absolute URL. Covered by `lib/pb-assets.test.ts`.                                                                                        |
+| `lib/dates.ts`             | `formatBlogDate()` — ARGC mono style, e.g. `13 AUG 2026`. Covered by `lib/dates.test.ts`.                                                                                                                  |
 | `lib/api/42-api.ts`        | 42 Intra OAuth URL, code exchange, profile fetch.                                                                                                                                                          |
 
 ---

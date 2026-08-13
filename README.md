@@ -24,11 +24,12 @@ and navbar are carried over so far; the rest of the UI is being redesigned.
 
 ```bash
 pnpm install
-cp .env.example .env      # then fill it in
+cp .env.example .env      # then FILL IN every value — see "Environment" below
 make run                  # PocketBase + schema + Next.js
 ```
 
-`make run` starts PocketBase on `:8090`, applies the schema, and starts Next on `:3000`.
+`.env` is a hard prerequisite: the app will not run with blank values. `make run` starts
+PocketBase on `:8090`, applies the schema, and starts Next on `:3000`.
 Run `make help` for the full target list.
 
 To develop against the local database rather than production, point
@@ -37,9 +38,11 @@ To develop against the local database rather than production, point
 
 ### Environment
 
-Every variable in `.env.example` is required except `NEXT_PUBLIC_APP_URL`. They are read
-lazily at request time, so a missing value fails on the first request that needs it
-rather than at build time.
+Every variable in `.env.example` is required except `NEXT_PUBLIC_APP_URL`. Missing values
+fail at request time, not build time, with `Missing required environment variable: <NAME>`.
+This hits the blog and every page that touches PocketBase, not just auth — and it includes
+the 42 OAuth pair: the env accessor validates the whole set on any read, so an empty
+`NEXT_PUBLIC_42_CLIENT_ID` breaks PocketBase reads too. Fill `.env` before running the app.
 
 ## Commands
 

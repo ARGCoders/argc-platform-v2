@@ -193,6 +193,134 @@
   }
 }
 
+/* ── Blog article typography ─────────────────────────────────────────────
+   Styles the sanitized HTML rendered by PostBody. The allowed tag set lives
+   in lib/sanitize.ts; every tag it permits has a rule here. */
+@layer components {
+  .article-body {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--color-ink);
+  }
+
+  .article-body > * + * {
+    margin-top: 1.25em;
+  }
+
+  .article-body h2,
+  .article-body h3,
+  .article-body h4 {
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .article-body h2 {
+    margin-top: 2em;
+    font-size: 1.5rem;
+  }
+
+  .article-body h3 {
+    margin-top: 1.75em;
+    font-size: 1.25rem;
+  }
+
+  .article-body h4 {
+    margin-top: 1.5em;
+    font-size: 1.0625rem;
+  }
+
+  .article-body a {
+    color: var(--color-argc-maroon);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .article-body a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .article-body ul {
+    list-style: disc;
+    padding-left: 1.5em;
+  }
+
+  .article-body ol {
+    list-style: decimal;
+    padding-left: 1.5em;
+  }
+
+  .article-body li + li {
+    margin-top: 0.5em;
+  }
+
+  .article-body blockquote {
+    border-left: 2px solid var(--color-argc-maroon);
+    padding-left: 1em;
+    font-style: italic;
+    color: var(--color-ink-muted);
+  }
+
+  .article-body pre {
+    overflow-x: auto;
+    padding: 1rem;
+    background: var(--color-eng-navy);
+    color: var(--color-hero-ink);
+  }
+
+  .article-body code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+  }
+
+  .article-body pre code {
+    background: transparent;
+    padding: 0;
+  }
+
+  .article-body img {
+    height: auto;
+    max-width: 100%;
+  }
+
+  .article-body figure {
+    margin-top: 2em;
+    margin-bottom: 2em;
+  }
+
+  .article-body figcaption {
+    margin-top: 0.5em;
+    font-size: 0.8125rem;
+    text-align: center;
+    color: var(--color-ink-muted);
+  }
+
+  .article-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  .article-body th,
+  .article-body td {
+    border: 1px solid var(--color-border);
+    padding: 0.5em 0.75em;
+    text-align: left;
+  }
+
+  .article-body th {
+    background: var(--color-stone);
+    font-weight: 600;
+  }
+
+  .article-body hr {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border: 0;
+    border-top: 1px solid var(--color-border);
+  }
+}
+
 /* ── Keyframes ──────────────────────────────────────────────────────────── */
 @keyframes hero-rise {
   from {
@@ -240,33 +368,45 @@
 }
 
 /* ── Page transitions (View Transitions API) ────────────────────────────── */
+/* Calm, minimal cross-fade: the outgoing page fades out while the incoming
+   one fades in over it. No drift, no lift. Both run in lockstep so the two
+   pages dissolve into each other instead of flashing white between them. */
 ::view-transition-old(root) {
-  animation: 140ms cubic-bezier(0.4, 0, 1, 1) both page-exit;
+  animation: 400ms ease both page-exit;
 }
 ::view-transition-new(root) {
-  animation: 220ms cubic-bezier(0.16, 1, 0.3, 1) 140ms both page-enter;
+  animation: 400ms ease both page-enter;
 }
 
 @keyframes page-exit {
   from {
     opacity: 1;
-    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(-8px);
   }
 }
 
 @keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
+}
+
+/* The page content is grouped under a `page` snapshot. It must not morph
+   (that was the old "pop up"), so the group is pinned — the fade is the only
+   motion. Old fades out while new fades in, in lockstep with the root. */
+::view-transition-group(page) {
+  animation: none;
+}
+::view-transition-old(page) {
+  animation: 400ms ease both page-exit;
+}
+::view-transition-new(page) {
+  animation: 400ms ease both page-enter;
 }
 
 /* The navbar is fixed — animating it during a transition makes it visibly
