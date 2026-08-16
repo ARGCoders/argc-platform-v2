@@ -205,7 +205,7 @@
 | HB-335 | 03-protocols/03-advancement.md         | REVIEWED   |       |
 | HB-341 | 04-ecosystem/01-nodes.md               | REVIEWED   |       |
 | HB-342 | 04-ecosystem/02-events.md              | REVIEWED   |       |
-| HB-343 | 04-ecosystem/03-knowledge-sessions.md  | TODO   |       |
+| HB-343 | 04-ecosystem/03-knowledge-sessions.md  | REVIEWED   |       |
 | HB-344 | 04-ecosystem/04-hackathons.md          | TODO   |       |
 | HB-345 | 04-ecosystem/05-external-outreach.md   | TODO   |       |
 | HB-351 | 05-operations/01-platform.md           | TODO   |       |
