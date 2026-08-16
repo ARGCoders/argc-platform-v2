@@ -212,7 +212,7 @@
 | HB-352 | 05-operations/03-communications.md     | REVIEWED   |       |
 | HB-353 | 05-operations/04-code-of-conduct.md    | REVIEWED   |       |
 | HB-354 | 05-operations/05-security.md           | REVIEWED   |       |
-| HB-355 | 05-operations/02-tooling.md            | TODO   |       |
+| HB-355 | 05-operations/02-tooling.md            | REVIEWED   |       |
 
 ---
 
