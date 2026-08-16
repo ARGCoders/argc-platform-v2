@@ -482,18 +482,57 @@ The recompute route should be idempotent — running it multiple times produces 
 
 ---
 
-## 6. Open Questions for the Club Founder
+## 6. Product Decisions (resolved)
 
-These must be answered before implementation begins. They affect the schema, business logic, or UX in ways that cannot be assumed.
+Resolved 16 August 2026 (task INFRA-01). Each decision records its source —
+`argc-handbook` files are the club's authoritative docs; anything marked
+**provisional** has a working assumption that the founder can revise without
+schema changes. Decisions marked **locked** are settled.
 
-1. **Q1 — Tier thresholds:** what are the XP cutoffs for each tier? The 4 tiers (Initiate → Contributor → Architect → Vanguard) need defined XP thresholds per cycle. Without these, the XpBar progress component and tier advancement logic cannot be built.
-2. **Q2 — Cross-node voting eligibility:** Can a member vote on anyone cross-node, or only within a defined set of eligible peers? The spec says "cross-node voting." Does this mean any member who is not in the voter's own node, or is there a curated list of eligible vote subjects per cycle? (e.g., only members who have completed at least one evaluation)
-3. **Q3 — Vote budget:** How many votes can a member cast per cycle? The current plan assumes one positive vote and one negative vote per cycle per member. Is this correct? Or is it a budget (e.g., 3 positive, 1 negative)?
-4. **Q4 — eval_plus_node_leader stage:** who conducts it? Standard evaluations 1 and 2 are presumably assigned to peers. Is stage 3 always conducted by the member's own node leader, or can it be any node leader, or a super peer?
-5. **Q5 — Endorsement link generation:** How is the endorsement public link generated? Currently planned as a UUID token per endorsement record. But who creates it — does a super peer generate it specifically for a member, or does a member request it for themselves from their dashboard?
-6. **Q6 — Evaluation score format:** Are evaluation scores numeric or categorical? The schema plans for a 0–100 numeric score. Does ARGC use a rubric with discrete levels (e.g., Pass/Fail, or 1–5), or a free-score system?
-7. **Q7 — Missed evaluation penalty:** What happens to a member's XP if they miss an evaluation? The spec says evaluations can be "on schedule vs late" for XP purposes. Is a missed evaluation a zero XP event, or does it carry a negative XP penalty? Does it affect tier eligibility outright (blocking advancement regardless of total XP)?
-8. **Q8 — super_admin_peer vs super_peer:** What is the distinction? The codebase has both. The plan treats `super_admin_peer` as having elevated rights for destructive/irreversible operations (cycle creation, member role changes, XP recompute). Is this the intended distinction, or are they equivalent?
-9. **Q9 — Public /events page migration:** Should the public /events page be updated to read from the new `events` PocketBase collection? Currently events are hardcoded in `SectionEvents.tsx`. The new `events` collection has an `is_public` flag. Migrating the public events page to be data-driven is a natural step but adds scope. Confirm whether this should happen as part of the dashboard work or separately.
-10. **Q10 — Dashboard navbar:** Does the dashboard need a navbar? DESIGN.md §8 notes "no navbar yet" for /dashboard. Should the dashboard use the existing site Navbar, a simplified top bar, or the DashboardSidebar as the sole navigation? Given the density of dashboard routes, a persistent sidebar is planned — but confirm if the public navbar should still appear on dashboard pages.
-```
+1. **Q1 — Tier thresholds:** XP cutoffs per cycle are `TIER_THRESHOLDS` in
+   `lib/constants.ts` — Initiate 0, Contributor 60, Architect 140, Vanguard 300.
+   Calibrated against `XP_WEIGHTS` (a solid cycle ≈ 4 on-time evaluations +
+   1 event + 1 session ≈ 165 XP → Architect). Source: handbook
+   `03-protocols/03-advancement.md` — thresholds are deliberately **not**
+   published in the handbook because they live on the member platform and are
+   re-evaluated by Super Peers each cycle. Code constants, never schema.
+   **Locked** (tunable per cycle in `constants.ts`).
+2. **Q2 — Cross-node voting eligibility:** any member in the active cycle who
+   is not in the voter's own node and has a `user_stats` row for the cycle
+   (i.e., is an active, assigned member). No curated list beyond that.
+   **Provisional** — the handbook's voting protocol covers structural votes,
+   not this peer-recognition mechanism, so the founder should confirm.
+3. **Q3 — Vote budget:** one positive + one negative per cycle per member
+   (`VOTE_BUDGET` in `lib/constants.ts`). **Provisional.**
+4. **Q4 — Stage 3 conductor:** `eval_plus_node_leader` is conducted by the
+   evaluatee's own node leader. Stages 1–2 are assigned to peers within the
+   evaluatee's node by the node leader. **Provisional.**
+5. **Q5 — Endorsement link generation:** a Super Peer generates the public
+   token from the admin panel (`endorsements` record with `verified = false`).
+   Members cannot self-generate. Matches the flow in §5.
+   **Locked.**
+6. **Q6 — Evaluation score format:** numeric 0–100 with written feedback;
+   pass = score ≥ 50 (`EVAL_PASS_SCORE`). The handbook (`01-evaluations.md`)
+   mandates a score + written feedback but no scale, so the pass threshold is
+   the working assumption. **Provisional** — founder to confirm rubric levels.
+7. **Q7 — Missed evaluation:** a missed evaluation is a **zero-XP** event —
+   no award, no negative XP. Late (notified ≥ 2h in advance) earns the reduced
+   `evaluation_late` weight. Missed evaluations do not auto-block tier
+   advancement, but 3+ missed in a cycle flags the member for review. Source:
+   handbook `03-protocols/01-evaluations.md` (missing without notice is "a
+   failure of commitment"). **Provisional.**
+8. **Q8 — super_admin_peer vs super_peer:** `super_admin_peer` is an internal
+   platform elevation of `super_peer`, scoped to destructive/irreversible
+   operations only: cycle create/open/close, member role changes, XP recompute,
+   vote deletion. Everything else a Super Peer can do. The handbook defines
+   three club roles; this fourth is platform plumbing.
+   **Locked.**
+9. **Q9 — Public /events page:** rebuild it data-driven from the `events`
+   collection (`is_public = true`) when the public events page is rebuilt —
+   **not** part of the dashboard scope. Tracked as its own follow-up issue.
+   The V2 page does not exist yet, so it will be built data-driven from the
+   start. **Locked.**
+10. **Q10 — Dashboard navbar:** no public navbar on dashboard pages.
+    `DashboardSidebar` is the sole navigation; `DashboardHeader` carries the
+    mono page title and breadcrumbs. Matches the §3 component inventory.
+    **Locked.**

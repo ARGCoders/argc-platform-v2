@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
     'coverage/**',
+    // Local PocketBase data dir: contains generated files (types.d.ts) that
+    // are gitignored and must never be linted or committed.
+    'pb_data/**',
   ]),
   // MUST be last: turns off every stylistic rule that would fight Prettier.
   prettier,
