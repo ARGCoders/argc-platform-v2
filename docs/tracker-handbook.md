@@ -208,7 +208,7 @@
 | HB-343 | 04-ecosystem/03-knowledge-sessions.md  | REVIEWED   |       |
 | HB-344 | 04-ecosystem/04-hackathons.md          | REVIEWED   |       |
 | HB-345 | 04-ecosystem/05-external-outreach.md   | REVIEWED   |       |
-| HB-351 | 05-operations/01-platform.md           | TODO   |       |
+| HB-351 | 05-operations/01-platform.md           | REVIEWED   |       |
 | HB-352 | 05-operations/03-communications.md     | TODO   |       |
 | HB-353 | 05-operations/04-code-of-conduct.md    | TODO   |       |
 | HB-354 | 05-operations/05-security.md           | TODO   |       |
