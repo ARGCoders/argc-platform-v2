@@ -188,31 +188,31 @@
 
 | ID     | File                                | Status | Notes |
 |--------|-------------------------------------|--------|-------|
-| HB-311 | 01-company/01-mission.md               | TODO   |       |
-| HB-312 | 01-company/02-vision.md                | TODO   |       |
-| HB-313 | 01-company/03-values.md                | TODO   |       |
-| HB-314 | 01-company/04-history.md               | TODO   |       |
-| HB-315 | 01-company/05-structure.md             | TODO   |       |
-| HB-321 | 02-people/01-who-we-are.md             | TODO   |       |
-| HB-322 | 02-people/02-how-we-work.md            | TODO   |       |
-| HB-323 | 02-people/03-membership.md             | TODO   |       |
-| HB-324 | 02-people/04-roles-and-tiers.md        | TODO   |       |
-| HB-325 | 02-people/05-onboarding.md             | TODO   |       |
-| HB-331 | 03-protocols/01-evaluations.md         | TODO   |       |
-| HB-332 | 03-protocols/02-xp-system.md           | TODO   |       |
-| HB-333 | 03-protocols/04-voting.md              | TODO   |       |
-| HB-334 | 03-protocols/05-conflict-resolution.md | TODO   |       |
-| HB-335 | 03-protocols/03-advancement.md         | TODO   |       |
-| HB-341 | 04-ecosystem/01-nodes.md               | TODO   |       |
-| HB-342 | 04-ecosystem/02-events.md              | TODO   |       |
-| HB-343 | 04-ecosystem/03-knowledge-sessions.md  | TODO   |       |
-| HB-344 | 04-ecosystem/04-hackathons.md          | TODO   |       |
-| HB-345 | 04-ecosystem/05-external-outreach.md   | TODO   |       |
-| HB-351 | 05-operations/01-platform.md           | TODO   |       |
-| HB-352 | 05-operations/03-communications.md     | TODO   |       |
-| HB-353 | 05-operations/04-code-of-conduct.md    | TODO   |       |
-| HB-354 | 05-operations/05-security.md           | TODO   |       |
-| HB-355 | 05-operations/02-tooling.md            | TODO   |       |
+| HB-311 | 01-company/01-mission.md               | REVIEWED   |       |
+| HB-312 | 01-company/02-vision.md                | REVIEWED   |       |
+| HB-313 | 01-company/03-values.md                | REVIEWED   |       |
+| HB-314 | 01-company/04-history.md               | REVIEWED   |       |
+| HB-315 | 01-company/05-structure.md             | REVIEWED   |       |
+| HB-321 | 02-people/01-who-we-are.md             | REVIEWED   |       |
+| HB-322 | 02-people/02-how-we-work.md            | REVIEWED   |       |
+| HB-323 | 02-people/03-membership.md             | REVIEWED   |       |
+| HB-324 | 02-people/04-roles-and-tiers.md        | REVIEWED   |       |
+| HB-325 | 02-people/05-onboarding.md             | REVIEWED   |       |
+| HB-331 | 03-protocols/01-evaluations.md         | REVIEWED   |       |
+| HB-332 | 03-protocols/02-xp-system.md           | REVIEWED   |       |
+| HB-333 | 03-protocols/04-voting.md              | REVIEWED   |       |
+| HB-334 | 03-protocols/05-conflict-resolution.md | REVIEWED   |       |
+| HB-335 | 03-protocols/03-advancement.md         | REVIEWED   |       |
+| HB-341 | 04-ecosystem/01-nodes.md               | REVIEWED   |       |
+| HB-342 | 04-ecosystem/02-events.md              | REVIEWED   |       |
+| HB-343 | 04-ecosystem/03-knowledge-sessions.md  | REVIEWED   |       |
+| HB-344 | 04-ecosystem/04-hackathons.md          | REVIEWED   |       |
+| HB-345 | 04-ecosystem/05-external-outreach.md   | REVIEWED   |       |
+| HB-351 | 05-operations/01-platform.md           | REVIEWED   |       |
+| HB-352 | 05-operations/03-communications.md     | REVIEWED   |       |
+| HB-353 | 05-operations/04-code-of-conduct.md    | REVIEWED   |       |
+| HB-354 | 05-operations/05-security.md           | REVIEWED   |       |
+| HB-355 | 05-operations/02-tooling.md            | REVIEWED   |       |
 
 ---
 
@@ -226,7 +226,7 @@
 | Phase 1 — Scaffold       | 25    | 25   | —        | 0         |
 | Phase 2 — Summaries      | 25    | 25   | —        | 0         |
 | Phase 3 — Draft Content  | 25    | 25   | —        | 0         |
-| Phase 4 — Self Review    | 25    | 0    | 0        | 25        |
+| Phase 4 — Self Review    | 25    | 25   | 25       | 0         |
 
 ---
 
