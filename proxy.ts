@@ -6,6 +6,9 @@ import {
   AUTH_ROUTES,
   AUTH_COOKIE,
   ROLE_COOKIE,
+  ROLE_HOMES,
+  DASHBOARD_GATES,
+  roleAtLeast,
 } from '@/lib/constants'
 import type { Role } from '@/types/pocketbase'
 
@@ -42,6 +45,22 @@ export function proxy(req: NextRequest): NextResponse {
   // Logged in but still a guest → no dashboard access
   if (needsNonGuest && isAuthenticated && role === 'guest') {
     return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  // Role-aware dashboard routing (INFRA-03): a member is sent to their role's
+  // home from the /dashboard root, and away from sections their role is too
+  // low for. Coarse cookie checks — a client can forge them, so requireRole()
+  // on every API route remains the real authorization boundary.
+  if (isAuthenticated && role && role !== 'guest') {
+    if (pathname === '/dashboard' || pathname === '/dashboard/') {
+      return NextResponse.redirect(new URL(ROLE_HOMES[role], req.url))
+    }
+
+    for (const { prefix, minRole } of DASHBOARD_GATES) {
+      if (pathname.startsWith(prefix) && !roleAtLeast(role, minRole)) {
+        return NextResponse.redirect(new URL(ROLE_HOMES[role], req.url))
+      }
+    }
   }
 
   // Already a member → skip the registration page

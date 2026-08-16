@@ -38,6 +38,29 @@ export const NON_GUEST_PREFIXES = ['/dashboard'] as const
 /** Authenticated non-guests are redirected away from these. */
 export const AUTH_ROUTES = ['/register'] as const
 
+/**
+ * Home path per role (PLATFORM.md §3). `super_admin_peer` shares the super
+ * peer home. Used by proxy.ts for the /dashboard root redirect and for
+ * sending too-low roles back to their own section.
+ */
+export const ROLE_HOMES: Record<Role, string> = {
+  guest: '/',
+  node_peer: '/dashboard/overview',
+  node_leader: '/dashboard/node',
+  super_peer: '/dashboard/admin',
+  super_admin_peer: '/dashboard/admin',
+}
+
+/**
+ * Dashboard sections and the minimum role each requires (PLATFORM.md §3:
+ * node section is NL+, admin section is SP+). Consumed by proxy.ts — coarse
+ * cookie redirects only; requireRole() in lib/auth.ts stays the boundary.
+ */
+export const DASHBOARD_GATES = [
+  { prefix: '/dashboard/node', minRole: 'node_leader' },
+  { prefix: '/dashboard/admin', minRole: 'super_peer' },
+] as const
+
 // ─── XP ───────────────────────────────────────────────────────────────────
 
 export const XP_CATEGORIES = [
