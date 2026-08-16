@@ -48,7 +48,7 @@ CONTAINER    := $(shell command -v podman 2>/dev/null || command -v docker 2>/de
 # podman, and rejected outright by Docker Desktop on macOS.
 VOL_OPT := $(if $(filter linux,$(PB_OS)),:Z,)
 
-.PHONY: help install db db-setup dev run stop clean test check \
+.PHONY: help install db db-setup db-seed dev run stop clean test check \
         pb-image pb-image-run pb-image-stop \
         pb-provision pb-deploy pb-logs pb-status pb-backup pb-restore \
         require-railway
@@ -59,7 +59,8 @@ help:
 	@echo "Local development"
 	@echo "  make install       Install dependencies"
 	@echo "  make db            Start local PocketBase on :$(PB_PORT) (downloads it once)"
-	@echo "  make db-setup      Create/update collections from scripts/setup-collections.mjs"
+	@echo "  make db-setup      Create/update collections from scripts/setup-collections.mjs (local)"
+	@echo "  make db-seed       Load dev seed data (idempotent, local)"
 	@echo "  make dev           Start Next.js on :$(DEV_PORT)"
 	@echo "  make run           db + db-setup + dev"
 	@echo "  make check         Everything CI runs: format, lint, typecheck, test, build"
@@ -111,8 +112,18 @@ db: $(PB_BIN)
 		echo "  login:    $(PB_ADMIN_EMAIL) / $(PB_ADMIN_PASSWORD)"; \
 	fi
 
+# Local first: .env points at production, so these targets must force the
+# local URL and the local admin credentials (PB_ADMIN_EMAIL/PASSWORD above).
+# The scripts only read .env for variables that are not already set.
+LOCAL_DB_ENV = NEXT_PUBLIC_POCKETBASE_URL=http://127.0.0.1:$(PB_PORT) \
+	POCKETBASE_ADMIN_EMAIL=$(PB_ADMIN_EMAIL) \
+	POCKETBASE_ADMIN_PASSWORD=$(PB_ADMIN_PASSWORD)
+
 db-setup:
-	@pnpm db:setup
+	@$(LOCAL_DB_ENV) pnpm db:setup
+
+db-seed:
+	@$(LOCAL_DB_ENV) pnpm db:seed
 
 dev:
 	@if $(call port_busy,$(DEV_PORT)); then \
