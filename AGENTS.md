@@ -21,6 +21,10 @@ https://pocketbase-production-59e1.up.railway.app
 ```
 Only the Next.js backend communicates with this service directly. The frontend must never call this URL.
 
+# Dashboard Conventions
+
+Before implementing anything under `/dashboard`, `/api/dashboard`, or `/api/admin`, read `docs/DASHBOARD_CONTRACT.md` (INFRA-09) — it defines the API response envelope, error codes, component ownership map (Role 2 owns shared components, Roles 3/4 own feature components), and ledger write rules. Routes not in `docs/PLATFORM.md` §4 do not exist; pages not in §2 do not exist.
+
 # Commit Message Standard
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/). Format:

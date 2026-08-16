@@ -66,7 +66,7 @@ others with `npx shadcn@latest add <name>` rather than hand-writing a primitive.
 ## Adding a component
 
 1. Check this file first.
-2. One feature → `components/features/<domain>/`. Used by two or more → `components/shared/`.
+2. One feature → `components/features/<domain>/`. Used by two or more → `components/shared/` (ownership: see `docs/DASHBOARD_CONTRACT.md` §3).
 3. Style with tokens (`bg-paper`, `text-ink-muted`, `border-input`), never raw hex.
 4. Server component by default; add `'use client'` only when you need state or an effect.
 5. Colocate a `*.test.tsx` and render it through `test/render.tsx`.
