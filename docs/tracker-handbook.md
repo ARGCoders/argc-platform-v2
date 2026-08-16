@@ -189,7 +189,7 @@
 | ID     | File                                | Status | Notes |
 |--------|-------------------------------------|--------|-------|
 | HB-311 | 01-company/01-mission.md               | REVIEWED   |       |
-| HB-312 | 01-company/02-vision.md                | TODO   |       |
+| HB-312 | 01-company/02-vision.md                | REVIEWED   |       |
 | HB-313 | 01-company/03-values.md                | TODO   |       |
 | HB-314 | 01-company/04-history.md               | TODO   |       |
 | HB-315 | 01-company/05-structure.md             | TODO   |       |
