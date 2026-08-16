@@ -200,7 +200,7 @@
 | HB-325 | 02-people/05-onboarding.md             | REVIEWED   |       |
 | HB-331 | 03-protocols/01-evaluations.md         | REVIEWED   |       |
 | HB-332 | 03-protocols/02-xp-system.md           | REVIEWED   |       |
-| HB-333 | 03-protocols/04-voting.md              | TODO   |       |
+| HB-333 | 03-protocols/04-voting.md              | REVIEWED   |       |
 | HB-334 | 03-protocols/05-conflict-resolution.md | TODO   |       |
 | HB-335 | 03-protocols/03-advancement.md         | TODO   |       |
 | HB-341 | 04-ecosystem/01-nodes.md               | TODO   |       |
