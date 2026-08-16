@@ -31,11 +31,15 @@ make run                  # PocketBase + schema + Next.js
 `make run` starts PocketBase on `:8090`, applies the schema, and starts Next on `:3000`.
 Run `make help` for the full target list.
 
+The setup targets are local-first: `make db-setup` and `make db-seed` force the
+local URL and the local admin credentials, so a `.env` pointing at production
+can never make a local setup step authenticate against the wrong instance.
+
 For a working dataset — one user per role, two nodes, an active advancement
 cycle, XP ledger entries, events, evaluations, votes and endorsements — run:
 
 ```bash
-pnpm db:seed      # idempotent, safe to re-run
+make db-seed      # idempotent, safe to re-run
 ```
 
 Seeded users share the dev-only password `argc-seed-pass`
@@ -54,19 +58,20 @@ rather than at build time.
 
 ## Commands
 
-| Command                        | Does                                                    |
-| ------------------------------ | ------------------------------------------------------- |
-| `pnpm dev`                     | Next.js dev server                                      |
-| `pnpm build`                   | Production build                                        |
-| `pnpm test`                    | Vitest, watch mode                                      |
-| `pnpm test:run`                | Vitest once — what CI runs                              |
-| `pnpm test:coverage`           | Coverage report                                         |
-| `pnpm lint` / `lint:fix`       | ESLint                                                  |
-| `pnpm format` / `format:check` | Prettier                                                |
-| `pnpm typecheck`               | `tsc --noEmit`                                          |
-| `pnpm db:setup`                | Apply `scripts/setup-collections.mjs`                   |
-| `pnpm db:seed`                 | Load dev seed data (`scripts/seed-dev.mjs`, idempotent) |
-| `make check`                   | Everything CI runs, in order                            |
+| Command                        | Does                                                        |
+| ------------------------------ | ----------------------------------------------------------- |
+| `pnpm dev`                     | Next.js dev server                                          |
+| `pnpm build`                   | Production build                                            |
+| `pnpm test`                    | Vitest, watch mode                                          |
+| `pnpm test:run`                | Vitest once — what CI runs                                  |
+| `pnpm test:coverage`           | Coverage report                                             |
+| `pnpm lint` / `lint:fix`       | ESLint                                                      |
+| `pnpm format` / `format:check` | Prettier                                                    |
+| `pnpm typecheck`               | `tsc --noEmit`                                              |
+| `pnpm db:setup`                | Apply `scripts/setup-collections.mjs`                       |
+| `make db-setup` / `db-seed`    | Same, but forced against the local instance and admin creds |
+| `pnpm db:seed`                 | Load dev seed data (`scripts/seed-dev.mjs`, idempotent)     |
+| `make check`                   | Everything CI runs, in order                                |
 
 Run `make check` before pushing. CI runs the same sequence and will reject anything that
 fails it.

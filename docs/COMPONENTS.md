@@ -58,6 +58,7 @@ others with `npx shadcn@latest add <name>` rather than hand-writing a primitive.
 | `lib/content.ts`           | Typed accessors for `content/*.json`. Import from here, never the JSON directly.                                                                                                                           |
 | `lib/cookies.ts`           | Shared auth cookie options so they cannot drift between routes.                                                                                                                                            |
 | `lib/pocketbase-server.ts` | `getAdminClient()` (cached + HMR-safe) and `getPocketBaseClient()`.                                                                                                                                        |
+| `lib/xp.ts`                | `awardXp()` — the single ledger-write path for XP (idempotent, keeps `user_stats` in sync). Every XP award goes through it. See ARCHITECTURE.md. Covered by `lib/xp.test.ts`.                              |
 | `lib/api/42-api.ts`        | 42 Intra OAuth URL, code exchange, profile fetch.                                                                                                                                                          |
 
 ---
