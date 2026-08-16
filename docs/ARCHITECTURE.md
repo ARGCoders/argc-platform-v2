@@ -97,6 +97,37 @@ admin.filter('slug = {:slug}', { slug })
 idempotent — run it as often as you like. If you add a collection or a field, add it there
 and to `types/pocketbase.ts` in the same commit.
 
+### XP is only ever written through `awardXp`
+
+Every XP award — vote received, evaluation completed, event organized, endorsement
+verified, manual adjustment — goes through `awardXp()` from `lib/xp.ts`. Never create an
+`xp_ledger` row directly from a route handler.
+
+The contract (frozen in INFRA-06, argument order included):
+
+```ts
+awardXp(user, amount, category, referenceId, referenceType, cycle, awardedBy?)
+// user, referenceId, cycle: record ids
+// amount: non-zero; negative only for corrections
+// category: an XpCategory; amount is decided by the caller, usually XP_WEIGHTS[category]
+// awardedBy: the awarding super peer's id; null for self-verifying events
+```
+
+It returns `{ created, ledger, stats }`. What it guarantees:
+
+- **Idempotency** — a second call with the same `(user, referenceId)` is a no-op
+  (`created: false`); it never double-awards. Reference the source record (vote id,
+  evaluation id, ...) so a retried request cannot double-pay.
+- **`user_stats` sync** — `xp_total` is incremented, the tier recomputed from
+  `TIER_THRESHOLDS`, and the counter matching the category is bumped via `XP_STATS_BUMPS`
+  (PLATFORM.md §5's "increment in the same request" option).
+- **Validation** — a non-zero finite amount, known category/reference type and non-empty
+  ids, or it throws `XpError` before touching the database.
+
+For cycle-close reconciliation, ADMIN-08's recompute rebuilds `user_stats` from the
+ledger — the recovery path if inline updates ever diverge. The ledger stays append-only;
+a wrong award is corrected with a negative `manual_adjustment`, never by editing a row.
+
 ## Testing
 
 Vitest with jsdom. Tests are colocated as `*.test.ts(x)` next to the code they cover.
