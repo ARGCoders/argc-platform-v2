@@ -19,6 +19,7 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "db:setup": "node scripts/setup-collections.mjs",
+    "db:seed": "node scripts/seed-dev.mjs",
     "prepare": "husky"
   },
   "lint-staged": {

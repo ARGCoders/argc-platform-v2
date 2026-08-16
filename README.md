@@ -31,6 +31,17 @@ make run                  # PocketBase + schema + Next.js
 `make run` starts PocketBase on `:8090`, applies the schema, and starts Next on `:3000`.
 Run `make help` for the full target list.
 
+For a working dataset — one user per role, two nodes, an active advancement
+cycle, XP ledger entries, events, evaluations, votes and endorsements — run:
+
+```bash
+pnpm db:seed      # idempotent, safe to re-run
+```
+
+Seeded users share the dev-only password `argc-seed-pass`
+(e.g. `mem-a2@argc.dev`). Seed data is for local development only — never run
+the seed script against the deployed instance.
+
 To develop against the local database rather than production, point
 `NEXT_PUBLIC_POCKETBASE_URL` at `http://127.0.0.1:8090` in `.env`. The admin UI is at
 `http://127.0.0.1:8090/_/`.
@@ -43,18 +54,19 @@ rather than at build time.
 
 ## Commands
 
-| Command                        | Does                                  |
-| ------------------------------ | ------------------------------------- |
-| `pnpm dev`                     | Next.js dev server                    |
-| `pnpm build`                   | Production build                      |
-| `pnpm test`                    | Vitest, watch mode                    |
-| `pnpm test:run`                | Vitest once — what CI runs            |
-| `pnpm test:coverage`           | Coverage report                       |
-| `pnpm lint` / `lint:fix`       | ESLint                                |
-| `pnpm format` / `format:check` | Prettier                              |
-| `pnpm typecheck`               | `tsc --noEmit`                        |
-| `pnpm db:setup`                | Apply `scripts/setup-collections.mjs` |
-| `make check`                   | Everything CI runs, in order          |
+| Command                        | Does                                                    |
+| ------------------------------ | ------------------------------------------------------- |
+| `pnpm dev`                     | Next.js dev server                                      |
+| `pnpm build`                   | Production build                                        |
+| `pnpm test`                    | Vitest, watch mode                                      |
+| `pnpm test:run`                | Vitest once — what CI runs                              |
+| `pnpm test:coverage`           | Coverage report                                         |
+| `pnpm lint` / `lint:fix`       | ESLint                                                  |
+| `pnpm format` / `format:check` | Prettier                                                |
+| `pnpm typecheck`               | `tsc --noEmit`                                          |
+| `pnpm db:setup`                | Apply `scripts/setup-collections.mjs`                   |
+| `pnpm db:seed`                 | Load dev seed data (`scripts/seed-dev.mjs`, idempotent) |
+| `make check`                   | Everything CI runs, in order                            |
 
 Run `make check` before pushing. CI runs the same sequence and will reject anything that
 fails it.
