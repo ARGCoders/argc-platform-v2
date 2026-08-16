@@ -199,7 +199,7 @@
 | HB-324 | 02-people/04-roles-and-tiers.md        | REVIEWED   |       |
 | HB-325 | 02-people/05-onboarding.md             | REVIEWED   |       |
 | HB-331 | 03-protocols/01-evaluations.md         | REVIEWED   |       |
-| HB-332 | 03-protocols/02-xp-system.md           | TODO   |       |
+| HB-332 | 03-protocols/02-xp-system.md           | REVIEWED   |       |
 | HB-333 | 03-protocols/04-voting.md              | TODO   |       |
 | HB-334 | 03-protocols/05-conflict-resolution.md | TODO   |       |
 | HB-335 | 03-protocols/03-advancement.md         | TODO   |       |
