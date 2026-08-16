@@ -192,7 +192,7 @@
 | HB-312 | 01-company/02-vision.md                | REVIEWED   |       |
 | HB-313 | 01-company/03-values.md                | REVIEWED   |       |
 | HB-314 | 01-company/04-history.md               | REVIEWED   |       |
-| HB-315 | 01-company/05-structure.md             | TODO   |       |
+| HB-315 | 01-company/05-structure.md             | REVIEWED   |       |
 | HB-321 | 02-people/01-who-we-are.md             | TODO   |       |
 | HB-322 | 02-people/02-how-we-work.md            | TODO   |       |
 | HB-323 | 02-people/03-membership.md             | TODO   |       |
