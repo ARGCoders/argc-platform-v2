@@ -7,7 +7,7 @@
  *   pnpm db:setup                 # uses .env
  *   make db-setup                 # same, after `make db`
  *
- * Two things it fixes versus the V1 script it is derived from:
+ * Three things it fixes versus the V1 script it is derived from:
  *
  * 1. It is idempotent. V1 POSTed unconditionally and printed an error for every
  *    collection that already existed, so re-running produced a wall of noise
@@ -15,6 +15,11 @@
  * 2. It defines `posts`, `post_images` and `submissions`. V1 never did — which
  *    is exactly why those three are missing from the deployed instance while
  *    every collection the script did define is present.
+ * 3. It enforces collection access rules. A fresh PocketBase gives a new base
+ *    collection open rules ("" = allow), and only the running instance happened
+ *    to be locked — so any new machine or redeploy would expose every
+ *    collection to direct client access. The script now locks each collection
+ *    at creation and re-checks rules on every run.
  *
  * Field shapes mirror types/pocketbase.ts. Keep them in step.
  */
@@ -144,6 +149,80 @@ async function ensureIndex(collection, sql) {
   return res.ok
 }
 
+// ─── Access rules ──────────────────────────────────────────────────────────
+//
+// The frontend never talks to PocketBase directly (AGENTS.md): every read and
+// write goes through the Next.js backend with the admin client, which bypasses
+// rules entirely. So every data collection is locked to the backend — all five
+// rules null, denying direct client access.
+//
+// `events` (is_public) and `endorsements` (public token form) could expose
+// narrower client rules, but a client rule would let browsers hit PocketBase
+// directly, skipping the API routes that apply validation and business logic.
+// Locked like everything else; the public surfaces are served by API routes.
+
+/** All five access rules denied — backend-only collections. */
+const LOCKED = {
+  listRule: null,
+  viewRule: null,
+  createRule: null,
+  updateRule: null,
+  deleteRule: null,
+}
+
+/**
+ * `users` is the auth collection. Keep self-service reads for the auth flow
+ * (authRefresh/authWithPassword are auth endpoints and work regardless, but a
+ * member reading their own record is legitimate). Everything else is denied:
+ * anonymous self-registration, self role edits, self deletion — none of which
+ * V2 uses (user creation/updates go through the OAuth callback's admin client).
+ */
+const USER_RULES = {
+  listRule: null,
+  viewRule: 'id = @request.auth.id',
+  createRule: null,
+  updateRule: null,
+  deleteRule: null,
+}
+
+/** Enforces the desired access rules, patching the collection when different. */
+async function ensureRules(name, rules) {
+  const existing = await api(`/api/collections/${name}`)
+  if (!existing.ok) {
+    console.error(`  ! ${name}: not found`)
+    summary.failed.push(name)
+    return false
+  }
+
+  const current = existing.body
+  const changed = Object.entries(rules).some(([key, value]) => current[key] !== value)
+
+  if (!changed) {
+    console.log(`  = rules on ${name} (ok)`)
+    return true
+  }
+
+  const res = await api(`/api/collections/${name}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ ...current, ...rules }),
+  })
+
+  if (res.ok) {
+    console.log(`  + rules on ${name}`)
+    return true
+  }
+
+  console.error(`  ! ${name} rules: ${res.body?.message ?? res.status}`)
+  summary.failed.push(name)
+  return false
+}
+
+/** Creates (or keeps) a backend-only collection with locked access rules. */
+async function ensureLocked(name, fields) {
+  await ensureCollection(name, fields, { ...LOCKED })
+  await ensureRules(name, LOCKED)
+}
+
 // ─── Field helpers ─────────────────────────────────────────────────────────
 
 const sel = (values, required = false) => ({ type: 'select', values, required })
@@ -189,6 +268,11 @@ async function main() {
     { name: 'role', ...sel(ROLES, true) },
     { name: 'last_sync_at', type: 'date' },
   ])
+  // The auth collection is the one place client access is allowed at all —
+  // self-service only. V1 left createRule open (anonymous self-registration)
+  // and updateRule open (a member could set their own role). V2 creates and
+  // updates users exclusively through the OAuth callback's admin client.
+  await ensureRules('users', USER_RULES)
   // PocketBase 0.23+ expresses uniqueness as an index, not a field flag.
   await ensureIndex(
     'users',
@@ -199,13 +283,13 @@ async function main() {
   // Absent from the V1 script, which is why they are missing in production.
 
   console.log('\npublic site')
-  await ensureCollection('post_images', [
+  await ensureLocked('post_images', [
     { name: 'image', ...file() },
     { name: 'uploaded_by', ...rel('users') },
     { name: 'created', ...autodate() },
   ])
 
-  await ensureCollection('posts', [
+  await ensureLocked('posts', [
     { name: 'slug', type: 'text', required: true },
     { name: 'title', type: 'text', required: true },
     { name: 'description', type: 'text', required: true },
@@ -222,7 +306,7 @@ async function main() {
   ])
   await ensureIndex('posts', 'CREATE UNIQUE INDEX `idx_posts_slug` ON `posts` (`slug`)')
 
-  await ensureCollection('submissions', [
+  await ensureLocked('submissions', [
     { name: 'user', ...rel('users', true) },
     { name: 'cohort', type: 'text', required: true },
     { name: 'motivation', type: 'text', required: true },
@@ -242,7 +326,7 @@ async function main() {
   // ── Tier 1: no dependencies beyond users ─────────────────────────────────
 
   console.log('\nstructure')
-  await ensureCollection('node', [
+  await ensureLocked('node', [
     { name: 'name', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true },
     { name: 'cohort', type: 'text' },
@@ -252,7 +336,7 @@ async function main() {
   ])
   await ensureIndex('node', 'CREATE UNIQUE INDEX `idx_node_slug` ON `node` (`slug`)')
 
-  await ensureCollection('achievements', [
+  await ensureLocked('achievements', [
     { name: 'title', type: 'text', required: true },
     { name: 'profile_prefix', type: 'text' },
     { name: 'image', ...file() },
@@ -262,7 +346,7 @@ async function main() {
     { name: 'updated_at', ...autodate(true, true) },
   ])
 
-  await ensureCollection('advancement_cycles', [
+  await ensureLocked('advancement_cycles', [
     { name: 'label', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true },
     { name: 'starts_at', type: 'date', required: true },
@@ -280,7 +364,7 @@ async function main() {
   // ── Tier 2 ───────────────────────────────────────────────────────────────
 
   console.log('\nmembership and progress')
-  await ensureCollection('node_member', [
+  await ensureLocked('node_member', [
     { name: 'role', ...sel(['member', 'leader']) },
     { name: 'user', ...rel('users', true) },
     { name: 'node', ...rel('node', true) },
@@ -288,7 +372,7 @@ async function main() {
     { name: 'left_at', type: 'date' },
   ])
 
-  await ensureCollection('xp_ledger', [
+  await ensureLocked('xp_ledger', [
     { name: 'user', ...rel('users', true) },
     { name: 'amount', type: 'number', required: true },
     {
@@ -329,7 +413,7 @@ async function main() {
     { name: 'created', ...autodate() },
   ])
 
-  await ensureCollection('user_stats', [
+  await ensureLocked('user_stats', [
     { name: 'user', ...rel('users', true) },
     { name: 'cycle', ...rel('advancement_cycles', true) },
     { name: 'xp_total', type: 'number' },
@@ -345,7 +429,7 @@ async function main() {
     { name: 'last_computed_at', type: 'date' },
   ])
 
-  await ensureCollection('evaluations', [
+  await ensureLocked('evaluations', [
     { name: 'evaluatee', ...rel('users', true) },
     { name: 'evaluator', ...rel('users') },
     { name: 'cycle', ...rel('advancement_cycles', true) },
@@ -366,7 +450,7 @@ async function main() {
   // ── Tier 3 ───────────────────────────────────────────────────────────────
 
   console.log('\nevents, votes, endorsements')
-  await ensureCollection('events', [
+  await ensureLocked('events', [
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true },
     { name: 'poster_photo', ...file() },
@@ -399,7 +483,7 @@ async function main() {
     'CREATE UNIQUE INDEX `idx_events_slug` ON `events` (`slug`)',
   )
 
-  await ensureCollection('event_attendance', [
+  await ensureLocked('event_attendance', [
     { name: 'event', ...rel('events', true) },
     { name: 'user', ...rel('users', true) },
     { name: 'role', ...sel(['organizer', 'attendee', 'speaker']) },
@@ -408,7 +492,7 @@ async function main() {
     { name: 'created', ...autodate() },
   ])
 
-  await ensureCollection('votes', [
+  await ensureLocked('votes', [
     { name: 'voter', ...rel('users', true) },
     { name: 'subject', ...rel('users', true) },
     { name: 'cycle', ...rel('advancement_cycles', true) },
@@ -418,7 +502,7 @@ async function main() {
     { name: 'created', ...autodate() },
   ])
 
-  await ensureCollection('endorsements', [
+  await ensureLocked('endorsements', [
     { name: 'subject', ...rel('users', true) },
     { name: 'endorser_name', type: 'text', required: true },
     { name: 'endorser_email', type: 'text' },
@@ -435,13 +519,13 @@ async function main() {
     'CREATE UNIQUE INDEX `idx_endorsement_token` ON `endorsements` (`public_token`)',
   )
 
-  await ensureCollection('node_achievement', [
+  await ensureLocked('node_achievement', [
     { name: 'node', ...rel('node', true) },
     { name: 'achievement', ...rel('achievements', true) },
     { name: 'created_at', ...autodate() },
   ])
 
-  await ensureCollection('user_achievement', [
+  await ensureLocked('user_achievement', [
     { name: 'user', ...rel('users', true) },
     { name: 'achievement', ...rel('achievements', true) },
     { name: 'created_at', ...autodate() },
