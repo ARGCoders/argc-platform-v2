@@ -226,7 +226,7 @@
 | Phase 1 — Scaffold       | 25    | 25   | —        | 0         |
 | Phase 2 — Summaries      | 25    | 25   | —        | 0         |
 | Phase 3 — Draft Content  | 25    | 25   | —        | 0         |
-| Phase 4 — Self Review    | 25    | 0    | 0        | 25        |
+| Phase 4 — Self Review    | 25    | 25   | 25       | 0         |
 
 ---
 
