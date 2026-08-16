@@ -202,7 +202,7 @@
 | HB-332 | 03-protocols/02-xp-system.md           | REVIEWED   |       |
 | HB-333 | 03-protocols/04-voting.md              | REVIEWED   |       |
 | HB-334 | 03-protocols/05-conflict-resolution.md | REVIEWED   |       |
-| HB-335 | 03-protocols/03-advancement.md         | TODO   |       |
+| HB-335 | 03-protocols/03-advancement.md         | REVIEWED   |       |
 | HB-341 | 04-ecosystem/01-nodes.md               | TODO   |       |
 | HB-342 | 04-ecosystem/02-events.md              | TODO   |       |
 | HB-343 | 04-ecosystem/03-knowledge-sessions.md  | TODO   |       |
