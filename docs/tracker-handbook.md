@@ -197,7 +197,7 @@
 | HB-322 | 02-people/02-how-we-work.md            | REVIEWED   |       |
 | HB-323 | 02-people/03-membership.md             | REVIEWED   |       |
 | HB-324 | 02-people/04-roles-and-tiers.md        | REVIEWED   |       |
-| HB-325 | 02-people/05-onboarding.md             | TODO   |       |
+| HB-325 | 02-people/05-onboarding.md             | REVIEWED   |       |
 | HB-331 | 03-protocols/01-evaluations.md         | TODO   |       |
 | HB-332 | 03-protocols/02-xp-system.md           | TODO   |       |
 | HB-333 | 03-protocols/04-voting.md              | TODO   |       |
