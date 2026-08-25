@@ -63,3 +63,17 @@ refactor(db): extract PocketBase client into shared util
 - Keep the subject line under 72 characters
 - Scope is optional but recommended — use the layer or module name (`frontend`, `backend`, `auth`, `api`, etc.)
 - Do not end the subject line with a period
+
+## Commit Granularity
+
+**No giant commits.** One task = one PR, but a PR should contain multiple
+focused commits — not one monolithic blob. Split commits by logical unit:
+
+- Route implementation → 1 commit
+- Tests for that route → separate commit(s)
+- Fixes and refactors → their own commits
+- Schema changes → their own commit (must include both `setup-collections.mjs` and `types/pocketbase.ts`)
+
+If a commit touches more than ~200 lines or mixes unrelated concerns, split it.
+The exception: a route and its tests are tightly coupled — if splitting them
+would leave the build or test suite broken, keep them together in one commit.
