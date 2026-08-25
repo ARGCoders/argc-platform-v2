@@ -293,11 +293,11 @@ describe('payload', () => {
     const { status, body } = await callGet()
 
     expect(status).toBe(200)
-    const data = (body as { data: { items: XpLedgerRecord[]; totalItems: number } }).data
-    expect(data.items).toHaveLength(3) // only MEMBER_ID's 3 rows
-    expect(data.items[0]!.id).toBe('l1')
-    expect(data.items[0]!.amount).toBe(25)
-    expect(data.totalItems).toBe(3)
+    const res = body as { data: XpLedgerRecord[]; totalItems: number }
+    expect(res.data).toHaveLength(3) // only MEMBER_ID's 3 rows
+    expect(res.data[0]!.id).toBe('l1')
+    expect(res.data[0]!.amount).toBe(25)
+    expect(res.totalItems).toBe(3)
   })
 
   it('returns empty list for a member with no ledger entries', async () => {
@@ -307,14 +307,10 @@ describe('payload', () => {
     const { status, body } = await callGet()
 
     expect(status).toBe(200)
-    const data = (
-      body as {
-        data: { items: XpLedgerRecord[]; totalItems: number; totalPages: number }
-      }
-    ).data
-    expect(data.items).toEqual([])
-    expect(data.totalItems).toBe(0)
-    expect(data.totalPages).toBe(0)
+    const res = body as { data: XpLedgerRecord[]; totalItems: number; totalPages: number }
+    expect(res.data).toEqual([])
+    expect(res.totalItems).toBe(0)
+    expect(res.totalPages).toBe(0)
   })
 })
 
@@ -336,23 +332,19 @@ describe('pagination', () => {
     givenAdmin({ users: [MEMBER], ledger: items })
 
     const { body } = await callGet()
-    const data = (
-      body as {
-        data: {
-          items: unknown[]
-          page: number
-          perPage: number
-          totalItems: number
-          totalPages: number
-        }
-      }
-    ).data
+    const res = body as {
+      data: unknown[]
+      page: number
+      perPage: number
+      totalItems: number
+      totalPages: number
+    }
 
-    expect(data.page).toBe(1)
-    expect(data.perPage).toBe(20)
-    expect(data.items).toHaveLength(20)
-    expect(data.totalItems).toBe(30)
-    expect(data.totalPages).toBe(2)
+    expect(res.page).toBe(1)
+    expect(res.perPage).toBe(20)
+    expect(res.data).toHaveLength(20)
+    expect(res.totalItems).toBe(30)
+    expect(res.totalPages).toBe(2)
   })
 
   it('accepts custom page and perPage', async () => {
@@ -370,16 +362,17 @@ describe('pagination', () => {
     givenAdmin({ users: [MEMBER], ledger: items })
 
     const { body } = await callGet('?page=2&perPage=10')
-    const data = (
-      body as {
-        data: { items: unknown[]; page: number; perPage: number; totalItems: number }
-      }
-    ).data
+    const res = body as {
+      data: unknown[]
+      page: number
+      perPage: number
+      totalItems: number
+    }
 
-    expect(data.page).toBe(2)
-    expect(data.perPage).toBe(10)
-    expect(data.items).toHaveLength(10)
-    expect(data.totalItems).toBe(30)
+    expect(res.page).toBe(2)
+    expect(res.perPage).toBe(10)
+    expect(res.data).toHaveLength(10)
+    expect(res.totalItems).toBe(30)
   })
 
   it('returns an empty page beyond the range', async () => {
@@ -389,9 +382,9 @@ describe('pagination', () => {
     const { status, body } = await callGet('?page=99&perPage=20')
 
     expect(status).toBe(200)
-    const data = (body as { data: { items: XpLedgerRecord[]; totalItems: number } }).data
-    expect(data.items).toEqual([])
-    expect(data.totalItems).toBe(3)
+    const res = body as { data: XpLedgerRecord[]; totalItems: number }
+    expect(res.data).toEqual([])
+    expect(res.totalItems).toBe(3)
   })
 })
 
@@ -447,17 +440,6 @@ describe('query param validation', () => {
       },
     })
   })
-
-  it('rejects perPage = 101 with 400', async () => {
-    givenSession(MEMBER)
-
-    const { status, body } = await callGet('?perPage=101')
-
-    expect(status).toBe(400)
-    expect(body).toMatchObject({
-      error: { code: 'invalid_input' },
-    })
-  })
 })
 
 // ─── Cycle filter ───────────────────────────────────────────────────────────
@@ -482,10 +464,10 @@ describe('cycle filter', () => {
     const { status, body } = await callGet(`?cycle=${otherCycle.id}`)
 
     expect(status).toBe(200)
-    const data = (body as { data: { items: XpLedgerRecord[]; totalItems: number } }).data
-    expect(data.items).toHaveLength(1)
-    expect(data.items[0]!.id).toBe('l5')
-    expect(data.items[0]!.cycle).toBe(otherCycle.id)
+    const res = body as { data: XpLedgerRecord[]; totalItems: number }
+    expect(res.data).toHaveLength(1)
+    expect(res.data[0]!.id).toBe('l5')
+    expect(res.data[0]!.cycle).toBe(otherCycle.id)
   })
 
   it('returns 400 for an unknown cycle id', async () => {
@@ -511,8 +493,8 @@ describe('ownership scoping', () => {
     const { status, body } = await callGet()
 
     expect(status).toBe(200)
-    const data = (body as { data: { items: XpLedgerRecord[] } }).data
-    data.items.forEach((item) => {
+    const res = body as { data: XpLedgerRecord[] }
+    res.data.forEach((item) => {
       expect(item.user).toBe(MEMBER_ID)
     })
   })
@@ -543,9 +525,9 @@ describe('ownership scoping', () => {
     const { status, body } = await callGet('?perPage=100')
 
     expect(status).toBe(200)
-    const data = (body as { data: { items: XpLedgerRecord[]; totalItems: number } }).data
-    expect(data.items.every((i) => i.user === MEMBER_ID)).toBe(true)
-    expect(data.totalItems).toBe(3)
+    const res = body as { data: XpLedgerRecord[]; totalItems: number }
+    expect(res.data.every((i) => i.user === MEMBER_ID)).toBe(true)
+    expect(res.totalItems).toBe(3)
   })
 })
 

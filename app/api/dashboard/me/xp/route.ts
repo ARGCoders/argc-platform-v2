@@ -93,13 +93,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })
 
     return NextResponse.json({
-      data: {
-        items: result.items,
-        page: result.page,
-        perPage: result.perPage,
-        totalItems: result.totalItems,
-        totalPages: result.totalPages,
-      },
+      data: result.items,
+      page: result.page,
+      perPage: result.perPage,
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
     })
   } catch (err) {
     const { status, error } = authErrorResponse(err)
