@@ -150,6 +150,48 @@ const NODE_ALPHA: NodeRecord = {
   updated: '',
 }
 
+const OTHER_NODE_ID = 'node-beta'
+const MEMBER_A2 = 'u-mem-a2'
+const MEMBER_USER_A2 = makeUser(MEMBER_A2, 'node_peer', 'Sara Mansour')
+
+function makeMembership(
+  id: string,
+  userId: string,
+  nodeId: string,
+  role: 'member' | 'leader',
+  user: UserRecord,
+  opts?: { left_at?: string },
+): NodeMemberRecord {
+  return {
+    id,
+    role,
+    user: userId,
+    node: nodeId,
+    joined_at: '2026-08-01T00:00:00.000Z',
+    left_at: opts?.left_at ?? '',
+    expand: { user, node: undefined },
+  }
+}
+
+function nodeAlphaMemberData() {
+  const m1 = makeMembership(
+    'nm-lead',
+    LEADER_USER_A.id,
+    NODE_ALPHA.id,
+    'leader',
+    LEADER_USER_A,
+  )
+  const m2 = makeMembership(
+    'nm-a1',
+    MEMBER_USER_A1.id,
+    NODE_ALPHA.id,
+    'member',
+    MEMBER_USER_A1,
+  )
+  const m3 = makeMembership('nm-a2', MEMBER_A2, NODE_ALPHA.id, 'member', MEMBER_USER_A2)
+  return { m1, m2, m3 }
+}
+
 // ─── Auth gate ──────────────────────────────────────────────────────────────
 
 describe('auth gate', () => {
@@ -242,5 +284,147 @@ describe('no-node 404', () => {
     expect(body).toEqual({
       error: { code: 'not_found', message: 'Not in a node' },
     })
+  })
+})
+
+// ─── Member view ────────────────────────────────────────────────────────────
+
+describe('member view', () => {
+  it("returns the caller's node and fellow members with projected user fields", async () => {
+    const { m1, m2, m3 } = nodeAlphaMemberData()
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({
+      users: [MEMBER_USER_A1, MEMBER_USER_A2, LEADER_USER_A],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [m1, m2, m3],
+    })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(200)
+    const data = (
+      body as {
+        data: { node: Record<string, unknown>; members: Array<Record<string, unknown>> }
+      }
+    ).data
+
+    expect(data.node).toEqual({
+      id: NODE_ALPHA.id,
+      name: 'Node Alpha',
+      slug: 'alpha',
+      cohort: 'c25',
+      status: 'active',
+    })
+
+    expect(data.members).toHaveLength(3)
+
+    const memberA1 = data.members.find(
+      (m) => (m.user as Record<string, unknown> | null)?.id === MEMBER_USER_A1.id,
+    )
+    expect(memberA1).toBeDefined()
+    expect(memberA1!.user).toEqual({
+      id: MEMBER_USER_A1.id,
+      display_name: 'Yousef Khalil',
+      avatar_url: 'https://cdn.example.com/u-mem-a1.jpg',
+    })
+  })
+})
+
+// ─── Leader view ────────────────────────────────────────────────────────────
+
+describe('leader view', () => {
+  it('returns the same node data for a leader (leaders hold a leader membership)', async () => {
+    const { m1, m2, m3 } = nodeAlphaMemberData()
+    givenSession(LEADER_USER_A)
+    givenAdmin({
+      users: [LEADER_USER_A, MEMBER_USER_A1, MEMBER_USER_A2],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [m1, m2, m3],
+    })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(200)
+    const data = (
+      body as {
+        data: {
+          node: { id: string }
+          members: Array<{ role: string; user: { id: string } | null }>
+        }
+      }
+    ).data
+
+    expect(data.node.id).toBe(NODE_ALPHA.id)
+    expect(data.members).toHaveLength(3)
+
+    const leader = data.members.find((m) => m.user?.id === LEADER_USER_A.id)
+    expect(leader).toBeDefined()
+    expect(leader!.role).toBe('leader')
+  })
+})
+
+// ─── User field projection ──────────────────────────────────────────────────
+
+describe('user field projection', () => {
+  it('returns only id, display_name, and avatar_url — no extra user fields leak', async () => {
+    const { m1, m2, m3 } = nodeAlphaMemberData()
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({
+      users: [MEMBER_USER_A1, MEMBER_USER_A2, LEADER_USER_A],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [m1, m2, m3],
+    })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(200)
+    const members = (
+      body as { data: { members: Array<{ user: Record<string, unknown> | null }> } }
+    ).data.members
+
+    for (const m of members) {
+      if (m.user) {
+        const keys = Object.keys(m.user)
+        expect(keys).toEqual(['id', 'display_name', 'avatar_url'])
+      }
+    }
+  })
+})
+
+// ─── Ownership scoping ──────────────────────────────────────────────────────
+
+describe('ownership scoping', () => {
+  it('does not return members from a different node', async () => {
+    const betaMembership = makeMembership(
+      'nm-b1',
+      'u-mem-b1',
+      OTHER_NODE_ID,
+      'member',
+      makeUser('u-mem-b1', 'node_peer', 'Adam Rahmeh'),
+    )
+
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({
+      users: [MEMBER_USER_A1],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [
+        makeMembership(
+          'nm-a1',
+          MEMBER_USER_A1.id,
+          NODE_ALPHA.id,
+          'member',
+          MEMBER_USER_A1,
+        ),
+        betaMembership,
+      ],
+    })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(200)
+    const members = (
+      body as { data: { members: Array<{ user: { id: string } | null }> } }
+    ).data.members
+    expect(members.every((m) => m.user?.id !== 'u-mem-b1')).toBe(true)
   })
 })
