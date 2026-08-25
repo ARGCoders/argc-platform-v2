@@ -172,3 +172,40 @@ describe('auth gate', () => {
     expect(status).toBe(200)
   })
 })
+
+// ─── No-node 404 ───────────────────────────────────────────────────────────
+
+describe('no-node 404', () => {
+  it('returns 404 when the caller has no active node membership', async () => {
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({ users: [MEMBER_USER_A1], nodeMembers: [] })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(404)
+    expect(body).toEqual({
+      error: { code: 'not_found', message: 'Not in a node' },
+    })
+  })
+
+  it('returns 404 when all memberships have left_at set', async () => {
+    const leftMembership: NodeMemberRecord = {
+      id: 'nm-left',
+      role: 'member',
+      user: MEMBER_USER_A1.id,
+      node: 'node-alpha',
+      joined_at: '2026-01-01T00:00:00.000Z',
+      left_at: '2026-06-01T00:00:00.000Z',
+      expand: { user: MEMBER_USER_A1 },
+    }
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({ users: [MEMBER_USER_A1], nodeMembers: [leftMembership] })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(404)
+    expect(body).toEqual({
+      error: { code: 'not_found', message: 'Not in a node' },
+    })
+  })
+})
