@@ -173,6 +173,61 @@ const OTHER_NODE_ID = 'node-beta'
 const MEMBER_A2 = 'u-mem-a2'
 const MEMBER_USER_A2 = makeUser(MEMBER_A2, 'node_peer', 'Sara Mansour')
 
+const CYCLE: AdvancementCycleRecord = {
+  id: 'cycle-fall',
+  label: 'Fall 2026',
+  slug: 'fall-2026',
+  starts_at: '2026-08-16T00:00:00.000Z',
+  ends_at: '2026-12-19T00:00:00.000Z',
+  status: 'active',
+  created_by: 'u-super',
+  created: '',
+  updated: '',
+}
+
+function makeStats(
+  userId: string,
+  xpTotal: number,
+  tier: UserStatsRecord['tier'],
+): UserStatsRecord {
+  return {
+    id: `stats-${userId}`,
+    user: userId,
+    cycle: CYCLE.id,
+    xp_total: xpTotal,
+    tier,
+    evaluations_completed: 0,
+    evaluations_late: 0,
+    events_organized: 0,
+    events_attended: 0,
+    knowledge_sessions: 0,
+    cross_node_contributions: 0,
+    endorsements_received: 0,
+    votes_received_positive: 0,
+    last_computed_at: '2026-08-20T10:00:00.000Z',
+  }
+}
+
+function makeEval(
+  id: string,
+  evaluatee: string,
+  stage: EvaluationRecord['stage'],
+  status: EvaluationRecord['status'],
+  score?: number,
+): EvaluationRecord {
+  return {
+    id,
+    evaluatee,
+    cycle: CYCLE.id,
+    stage,
+    status,
+    score,
+    xp_awarded: false,
+    created: '',
+    updated: '',
+  }
+}
+
 function makeMembership(
   id: string,
   userId: string,
@@ -316,6 +371,17 @@ describe('member view', () => {
       users: [MEMBER_USER_A1, MEMBER_USER_A2, LEADER_USER_A],
       nodes: [NODE_ALPHA],
       nodeMembers: [m1, m2, m3],
+      cycles: [CYCLE],
+      stats: [
+        makeStats(LEADER_USER_A.id, 100, 'Architect'),
+        makeStats(MEMBER_USER_A1.id, 85, 'Contributor'),
+        makeStats(MEMBER_A2, 40, 'Initiate'),
+      ],
+      evals: [
+        makeEval('e1', MEMBER_USER_A1.id, 'standard_1', 'completed', 75),
+        makeEval('e2', MEMBER_USER_A1.id, 'standard_2', 'scheduled'),
+        makeEval('e3', MEMBER_USER_A1.id, 'eval_plus_node_leader', 'pending'),
+      ],
     })
 
     const { status, body } = await callGet()
@@ -345,6 +411,24 @@ describe('member view', () => {
       id: MEMBER_USER_A1.id,
       display_name: 'Yousef Khalil',
       avatar_url: 'https://cdn.example.com/u-mem-a1.jpg',
+    })
+    expect(memberA1!.tier).toBe('Contributor')
+    expect(memberA1!.xp_total).toBe(85)
+    expect(memberA1!.evals).toHaveLength(3)
+    const evals = memberA1!.evals as Array<{
+      stage: string
+      status: string
+      score: number | undefined
+    }>
+    expect(evals[0]).toEqual({
+      stage: 'standard_1',
+      status: 'completed',
+      score: 75,
+    })
+    expect(evals[1]).toEqual({
+      stage: 'standard_2',
+      status: 'scheduled',
+      score: undefined,
     })
   })
 })
@@ -445,5 +529,95 @@ describe('ownership scoping', () => {
       body as { data: { members: Array<{ user: { id: string } | null }> } }
     ).data.members
     expect(members.every((m) => m.user?.id !== 'u-mem-b1')).toBe(true)
+  })
+})
+
+// ─── Zeroed stats for members without a stats row ──────────────────────────
+
+describe('zeroed stats', () => {
+  it('defaults to tier Initiate and xp_total 0 when a member has no stats row', async () => {
+    const { m1, m2 } = nodeAlphaMemberData()
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({
+      users: [MEMBER_USER_A1, LEADER_USER_A],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [m1, m2],
+      cycles: [CYCLE],
+      stats: [],
+    })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(200)
+    const members = (
+      body as { data: { members: Array<{ tier: string; xp_total: number }> } }
+    ).data.members
+
+    for (const m of members) {
+      expect(m.tier).toBe('Initiate')
+      expect(m.xp_total).toBe(0)
+    }
+  })
+})
+
+// ─── No active cycle ────────────────────────────────────────────────────────
+
+describe('no active cycle', () => {
+  it('returns node and members with empty evals when no cycle is active', async () => {
+    const { m1, m2 } = nodeAlphaMemberData()
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({
+      users: [MEMBER_USER_A1, LEADER_USER_A],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [m1, m2],
+      cycles: [],
+    })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(200)
+    const members = (
+      body as { data: { members: Array<{ evals: unknown[]; tier: string }> } }
+    ).data.members
+
+    for (const m of members) {
+      expect(m.evals).toEqual([])
+      expect(m.tier).toBe('Initiate')
+    }
+  })
+})
+
+// ─── Failure mapping ────────────────────────────────────────────────────────
+
+describe('failure mapping', () => {
+  it('maps a PocketBase outage to an opaque 500 internal envelope', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    givenSession(MEMBER_USER_A1)
+
+    const brokenAdmin = {
+      filter: (str: string, params: Record<string, unknown>) =>
+        str.replace(/\{:([a-zA-Z0-9_]+)\}/g, (_m: string, _name: string) =>
+          JSON.stringify(params[_name]),
+        ),
+      collection: () => ({
+        getOne: async () => {
+          throw new ClientResponseError({ status: 500 })
+        },
+        getFirstListItem: async () => {
+          throw new ClientResponseError({ status: 500 })
+        },
+        getFullList: async () => {
+          throw new ClientResponseError({ status: 500 })
+        },
+      }),
+    } as unknown as PocketBase
+
+    vi.mocked(getAdminClient).mockResolvedValue(brokenAdmin)
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(500)
+    expect(body).toEqual({ error: { code: 'internal', message: 'Server error' } })
+    expect(consoleSpy).toHaveBeenCalled()
   })
 })
