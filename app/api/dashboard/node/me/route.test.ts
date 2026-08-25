@@ -3,7 +3,7 @@ import { ClientResponseError } from 'pocketbase'
 import type PocketBase from 'pocketbase'
 import { GET } from './route'
 import { AUTH_COOKIE } from '@/lib/constants'
-import type { UserRecord } from '@/types/pocketbase'
+import type { NodeMemberRecord, UserRecord } from '@/types/pocketbase'
 
 vi.mock('next/headers', () => ({ cookies: vi.fn() }))
 vi.mock('@/lib/pocketbase-server', () => ({
@@ -41,9 +41,10 @@ const LEADER_USER_A = makeUser('u-lead-alpha', 'node_leader', 'Leila Haddad')
 
 interface AdminData {
   users?: UserRecord[]
+  nodeMembers?: NodeMemberRecord[]
 }
 
-function fakeAdmin({ users = [] }: AdminData = {}): PocketBase {
+function fakeAdmin({ users = [], nodeMembers = [] }: AdminData = {}): PocketBase {
   return {
     filter: (str: string, params: Record<string, unknown>) =>
       str.replace(/\{:([a-zA-Z0-9_]+)\}/g, (_match: string, name: string) =>
@@ -56,8 +57,16 @@ function fakeAdmin({ users = [] }: AdminData = {}): PocketBase {
         if (!row) throw new ClientResponseError({ status: 404 })
         return row
       },
-      getFirstListItem: async () => {
-        throw new ClientResponseError({ status: 404 })
+      getFirstListItem: async (filter: string) => {
+        let rows: Array<Record<string, unknown>> = []
+        if (name === 'node_member')
+          rows = nodeMembers as unknown as Array<Record<string, unknown>>
+        const clauses = [...filter.matchAll(/([a-z_]+) = ("(?:[^"\\]|\\.)*")/g)]
+        const match = rows.find((row) =>
+          clauses.every(([, field, raw]) => row[field!] === JSON.parse(raw!)),
+        )
+        if (!match) throw new ClientResponseError({ status: 404 })
+        return match
       },
     }),
   } as unknown as PocketBase
@@ -146,8 +155,17 @@ describe('auth gate', () => {
   })
 
   it('lets a node leader through (route is M+)', async () => {
+    const leaderMembership: NodeMemberRecord = {
+      id: 'nm-lead',
+      role: 'leader',
+      user: LEADER_USER_A.id,
+      node: 'node-alpha',
+      joined_at: '2026-08-01T00:00:00.000Z',
+      left_at: '',
+      expand: { user: LEADER_USER_A, node: undefined },
+    }
     givenSession(LEADER_USER_A)
-    givenAdmin({ users: [LEADER_USER_A] })
+    givenAdmin({ users: [LEADER_USER_A], nodeMembers: [leaderMembership] })
 
     const { status } = await callGet()
 
