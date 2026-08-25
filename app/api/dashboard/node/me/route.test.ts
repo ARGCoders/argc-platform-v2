@@ -3,7 +3,14 @@ import { ClientResponseError } from 'pocketbase'
 import type PocketBase from 'pocketbase'
 import { GET } from './route'
 import { AUTH_COOKIE } from '@/lib/constants'
-import type { NodeMemberRecord, NodeRecord, UserRecord } from '@/types/pocketbase'
+import type {
+  AdvancementCycleRecord,
+  EvaluationRecord,
+  NodeMemberRecord,
+  NodeRecord,
+  UserRecord,
+  UserStatsRecord,
+} from '@/types/pocketbase'
 
 vi.mock('next/headers', () => ({ cookies: vi.fn() }))
 vi.mock('@/lib/pocketbase-server', () => ({
@@ -55,12 +62,18 @@ interface AdminData {
   users?: UserRecord[]
   nodes?: NodeRecord[]
   nodeMembers?: NodeMemberRecord[]
+  cycles?: AdvancementCycleRecord[]
+  stats?: UserStatsRecord[]
+  evals?: EvaluationRecord[]
 }
 
 function fakeAdmin({
   users = [],
   nodes = [],
   nodeMembers = [],
+  cycles = [],
+  stats = [],
+  evals = [],
 }: AdminData = {}): PocketBase {
   return {
     filter: (str: string, params: Record<string, unknown>) =>
@@ -76,16 +89,22 @@ function fakeAdmin({
         return row
       },
       getFirstListItem: async (filter: string) => {
-        let rows: Identifiable[] = []
-        if (name === 'node_member') rows = nodeMembers
+        const rows: Identifiable[] =
+          name === 'node_member'
+            ? nodeMembers
+            : name === 'advancement_cycles'
+              ? cycles
+              : name === 'user_stats'
+                ? stats
+                : []
         const filtered = applyFilter(filter, rows)
         const row = filtered[0]
         if (!row) throw new ClientResponseError({ status: 404 })
         return row
       },
       getFullList: async (opts?: { filter?: string; expand?: string }) => {
-        let rows: Identifiable[] = []
-        if (name === 'node_member') rows = nodeMembers
+        let rows: Identifiable[] =
+          name === 'node_member' ? nodeMembers : name === 'evaluations' ? evals : []
         if (opts?.filter) rows = applyFilter(opts.filter, rows)
         return rows
       },
