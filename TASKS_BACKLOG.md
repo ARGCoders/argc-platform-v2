@@ -336,9 +336,9 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
 - **Dependencies:** Blocked by: INFRA-02, INFRA-04 · Blocks: MEMBER-03.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] 401/403 for anonymous/too-low role
-  - [ ] Correct payload (stats + active cycle)
-  - [ ] Tests pass; `make check` green
+  - [x] 401/403 for anonymous/too-low role
+  - [x] Correct payload (stats + active cycle)
+  - [x] Tests pass; `make check` green
 
 ### [MEMBER-02] GET /api/dashboard/me/xp
 
@@ -347,8 +347,8 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
 - **Dependencies:** Blocked by: INFRA-02, INFRA-04 · Blocks: MEMBER-04.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Pagination + cycle filter work
-  - [ ] Tests pass
+  - [x] Pagination + cycle filter work
+  - [x] Tests pass
 
 ### [MEMBER-03] /dashboard/overview page
 
@@ -400,8 +400,8 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
 - **Dependencies:** Blocked by: INFRA-02, INFRA-04 · Blocks: MEMBER-08, MEMBER-10.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Correct payload (node + members with tier/eval status)
-  - [ ] Tests pass
+  - [x] Correct payload (node + members with tier/eval status)
+  - [x] Tests pass
 
 ### [MEMBER-08] /dashboard/node page
 
