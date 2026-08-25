@@ -3,7 +3,7 @@ import { ClientResponseError } from 'pocketbase'
 import type PocketBase from 'pocketbase'
 import { GET } from './route'
 import { AUTH_COOKIE } from '@/lib/constants'
-import type { NodeMemberRecord, UserRecord } from '@/types/pocketbase'
+import type { NodeMemberRecord, NodeRecord, UserRecord } from '@/types/pocketbase'
 
 vi.mock('next/headers', () => ({ cookies: vi.fn() }))
 vi.mock('@/lib/pocketbase-server', () => ({
@@ -39,12 +39,29 @@ const LEADER_USER_A = makeUser('u-lead-alpha', 'node_leader', 'Leila Haddad')
 
 // ─── Fake PocketBase ────────────────────────────────────────────────────────
 
+type Identifiable = { id: string }
+
+function applyFilter<T extends Identifiable>(filter: string, rows: T[]): T[] {
+  const clauses = [...filter.matchAll(/([a-z_]+) = ("(?:[^"\\]|\\.)*")/g)]
+  return rows.filter((row) =>
+    clauses.every(
+      ([, field, raw]) =>
+        (row as unknown as Record<string, unknown>)[field!] === JSON.parse(raw!),
+    ),
+  )
+}
+
 interface AdminData {
   users?: UserRecord[]
+  nodes?: NodeRecord[]
   nodeMembers?: NodeMemberRecord[]
 }
 
-function fakeAdmin({ users = [], nodeMembers = [] }: AdminData = {}): PocketBase {
+function fakeAdmin({
+  users = [],
+  nodes = [],
+  nodeMembers = [],
+}: AdminData = {}): PocketBase {
   return {
     filter: (str: string, params: Record<string, unknown>) =>
       str.replace(/\{:([a-zA-Z0-9_]+)\}/g, (_match: string, name: string) =>
@@ -52,21 +69,25 @@ function fakeAdmin({ users = [], nodeMembers = [] }: AdminData = {}): PocketBase
       ),
     collection: (name: string) => ({
       getOne: async (id: string) => {
-        if (name !== 'users') throw new Error(`unexpected getOne on ${name}`)
-        const row = users.find((r) => r.id === id)
+        const rows: Identifiable[] =
+          name === 'users' ? users : name === 'node' ? nodes : []
+        const row = rows.find((r) => r.id === id)
         if (!row) throw new ClientResponseError({ status: 404 })
         return row
       },
       getFirstListItem: async (filter: string) => {
-        let rows: Array<Record<string, unknown>> = []
-        if (name === 'node_member')
-          rows = nodeMembers as unknown as Array<Record<string, unknown>>
-        const clauses = [...filter.matchAll(/([a-z_]+) = ("(?:[^"\\]|\\.)*")/g)]
-        const match = rows.find((row) =>
-          clauses.every(([, field, raw]) => row[field!] === JSON.parse(raw!)),
-        )
-        if (!match) throw new ClientResponseError({ status: 404 })
-        return match
+        let rows: Identifiable[] = []
+        if (name === 'node_member') rows = nodeMembers
+        const filtered = applyFilter(filter, rows)
+        const row = filtered[0]
+        if (!row) throw new ClientResponseError({ status: 404 })
+        return row
+      },
+      getFullList: async (opts?: { filter?: string; expand?: string }) => {
+        let rows: Identifiable[] = []
+        if (name === 'node_member') rows = nodeMembers
+        if (opts?.filter) rows = applyFilter(opts.filter, rows)
+        return rows
       },
     }),
   } as unknown as PocketBase
@@ -119,6 +140,16 @@ beforeEach(() => {
   } as unknown as Awaited<ReturnType<typeof cookies>>)
 })
 
+const NODE_ALPHA: NodeRecord = {
+  id: 'node-alpha',
+  name: 'Node Alpha',
+  slug: 'alpha',
+  cohort: 'c25',
+  status: 'active',
+  created: '',
+  updated: '',
+}
+
 // ─── Auth gate ──────────────────────────────────────────────────────────────
 
 describe('auth gate', () => {
@@ -165,7 +196,11 @@ describe('auth gate', () => {
       expand: { user: LEADER_USER_A, node: undefined },
     }
     givenSession(LEADER_USER_A)
-    givenAdmin({ users: [LEADER_USER_A], nodeMembers: [leaderMembership] })
+    givenAdmin({
+      users: [LEADER_USER_A],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [leaderMembership],
+    })
 
     const { status } = await callGet()
 
