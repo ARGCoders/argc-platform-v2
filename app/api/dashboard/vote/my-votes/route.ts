@@ -71,7 +71,7 @@ export async function GET(): Promise<NextResponse> {
             : { id: vote.subject, display_name: '', avatar_url: '' },
         }
       })
-      .sort((a, b) => (b.created > a.created ? 1 : -1))
+      .sort((a, b) => b.created.localeCompare(a.created))
 
     return NextResponse.json({ data })
   } catch (err) {
