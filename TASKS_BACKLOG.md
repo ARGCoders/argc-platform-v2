@@ -181,9 +181,9 @@ check-then-create race windows behind RSVP and vote-budget validation, please ad
 convenient — our routes already treat duplicates as idempotent replays / `409`, so
 nothing here blocks Role 3:
 
-- `event_attendance`: `CREATE UNIQUE INDEX `idx_event_attendance_pair`ON`event_attendance` (`event`, `user`)`
+- `event_attendance`: `CREATE UNIQUE INDEX idx_event_attendance_pair ON event_attendance (event, user)`
 - `votes`: partial unique index per polarity —
-  `CREATE UNIQUE INDEX `idx_votes_voter_cycle_positive`ON`votes` (`voter`, `cycle`) WHERE `polarity` = 'positive'`
+  `CREATE UNIQUE INDEX idx_votes_voter_cycle_positive ON votes (voter, cycle) WHERE polarity = 'positive'`
   and the `negative` counterpart.
 
 Same-commit rule applies (script + `types/pocketbase.ts` if a type changes).
