@@ -19,8 +19,10 @@ import type {
  *   - the reason must be 10–500 characters after trimming;
  *   - the active cycle must be open.
  * A positive vote awards the subject XP via `awardXp`, idempotent on the vote
- * id, so a retried or racing request cannot double-pay. The created record is
- * returned without the `voter` field, consistent with every member-facing vote
+ * id, so a retried or racing request cannot double-pay. The vote is always the
+ * budget spend: even if the award fails the response is `201` with
+ * `xp_awarded: false` (see the award block). The created record is returned
+ * without the `voter` field, consistent with every member-facing vote
  * endpoint.
  */
 export const dynamic = 'force-dynamic'
@@ -164,18 +166,34 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // the budget spend either way: it stays even if the award fails. A partial
     // awardXp failure (ledger row written, stats sync failed) must not be
     // rolled back by deleting the vote — that would leave a dangling ledger
-    // reference and double-pay on a retry. The recovery path is a manual award
-    // (ADMIN-02) referencing this vote id, which awardXp keeps idempotent.
+    // reference and double-pay on a retry.
+    //
+    // An award failure is reported, not fatal: the vote was created and the
+    // budget is spent, so the HTTP response is the honest 201 with
+    // `xp_awarded: false` (a retry would otherwise see "no active budget"
+    // 409 after a misleading 500). The failure is logged here and its recovery
+    // path is a manual award (ADMIN-02) referencing this vote id, which
+    // awardXp keeps idempotent.
+    let xpAwarded = false
     if (polarity === 'positive') {
-      await awardXp(
-        subject,
-        XP_WEIGHTS.cross_node_vote_received,
-        'cross_node_vote_received',
-        vote.id,
-        'vote',
-        cycle.id,
-      )
+      try {
+        await awardXp(
+          subject,
+          XP_WEIGHTS.cross_node_vote_received,
+          'cross_node_vote_received',
+          vote.id,
+          'vote',
+          cycle.id,
+        )
+        xpAwarded = true
+      } catch (err) {
+        console.error(
+          `[vote] XP award failed for vote ${vote.id} (subject ${subject}):`,
+          err,
+        )
+      }
     }
+    // Negative votes post no XP by design, so xpAwarded stays false for them.
 
     return NextResponse.json(
       {
@@ -186,6 +204,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           polarity: vote.polarity,
           reason: vote.reason,
           is_cross_node: vote.is_cross_node,
+          xp_awarded: xpAwarded,
           created: vote.created,
         },
       },

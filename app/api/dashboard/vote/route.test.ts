@@ -549,6 +549,7 @@ describe('casting a vote', () => {
       polarity: 'positive',
       reason: 'consistent contributor all cycle',
       is_cross_node: true,
+      xp_awarded: true,
       created: '2026-08-25T10:00:00.000Z',
     })
     expect(res.data).not.toHaveProperty('voter')
@@ -577,7 +578,7 @@ describe('casting a vote', () => {
     givenSession(MEMBER)
     const admin = givenAdmin(defaultData())
 
-    const { status } = await callPost(
+    const { status, body } = await callPost(
       JSON.stringify(
         validPayload({
           polarity: 'negative',
@@ -587,6 +588,7 @@ describe('casting a vote', () => {
     )
 
     expect(status).toBe(201)
+    expect((body as { data: { xp_awarded: boolean } }).data.xp_awarded).toBe(false)
     expect(admin.log.votesCreated[0]).toMatchObject({ polarity: 'negative' })
     expect(admin.log.ledgerCreates).toBe(0)
   })
@@ -605,7 +607,7 @@ describe('casting a vote', () => {
     expect(admin.log.ledgerCreates).toBe(1)
   })
 
-  it('keeps the vote and returns 500 when the award path fails', async () => {
+  it('keeps the vote, reports xp_awarded false, and returns 201 when the award fails', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     givenSession(MEMBER)
     const admin = givenAdmin({
@@ -615,10 +617,15 @@ describe('casting a vote', () => {
 
     const { status, body } = await callPost(VALID_BODY)
 
-    expect(status).toBe(500)
-    expect(body).toEqual({ error: { code: 'internal', message: 'Server error' } })
+    // The vote was created and the budget is spent — the HTTP response must
+    // say so honestly, or a retrying client would chase a misleading 500 into
+    // a "budget already used" 409. Recovery is a manual ADMIN-02 award keyed
+    // to the vote id.
+    expect(status).toBe(201)
+    expect((body as { data: { xp_awarded: boolean } }).data.xp_awarded).toBe(false)
     expect(admin.log.votesCreated).toHaveLength(1)
     expect(admin.log.voteDeletes).toHaveLength(0)
+    expect(admin.log.ledgerCreates).toBe(0)
     expect(consoleSpy).toHaveBeenCalled()
   })
 })
