@@ -20,7 +20,10 @@ import type { EventAttendanceRecord, EventRecord } from '@/types/pocketbase'
  *
  * The caller's identity comes only from the session (requireRole), and the
  * attendance row is scoped to that identity — there is no client-controlled
- * user field anywhere in this handler.
+ * user field anywhere in this handler. This write deliberately does NOT bump
+ * `events.attendance_count`: that is an admin's post-event figure (filled on
+ * completion), while RSVP appends a `confirmed: false` attendance row awaiting
+ * confirmation. Live sign-ups are read from event_attendance, never the count.
  */
 export const dynamic = 'force-dynamic'
 
