@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { ClientResponseError } from 'pocketbase'
 import type PocketBase from 'pocketbase'
 import { awardXp, XpError, XP_STATS_BUMPS } from './xp'
 import { TIER_THRESHOLDS, TIERS, XP_CATEGORIES } from './constants'
@@ -21,6 +22,12 @@ interface FakePb {
   collection(name: string): FakeCollection
 }
 
+function missingRecordError(): Error {
+  // Mirror the real SDK: getFirstListItem throws a 404 ClientResponseError
+  // when nothing matches.
+  return new ClientResponseError({ status: 404 })
+}
+
 function fakeClient(): FakePb {
   const collections: Record<string, FakeCollection> = {
     xp_ledger: { rows: [], getFirstListItem: vi.fn(), create: vi.fn(), update: vi.fn() },
@@ -36,7 +43,7 @@ function fakeClient(): FakePb {
       const found = collection.rows.find((row) =>
         clauses.every(([, field, raw]) => row[field!] === JSON.parse(raw!)),
       )
-      if (!found) throw new Error('not found')
+      if (!found) throw missingRecordError()
       return found
     })
     collection.create.mockImplementation(async (data: Record<string, unknown>) => {
@@ -267,6 +274,45 @@ describe('awardXp', () => {
       expect(result.stats.tier).toBe(tier)
       expect(result.stats.xp_total).toBe(total)
     }
+  })
+
+  describe('failure propagation', () => {
+    it('propagates a ledger outage instead of treating it as "never awarded"', async () => {
+      pb.collections.xp_ledger!.getFirstListItem.mockRejectedValueOnce(
+        new ClientResponseError({ status: 500 }),
+      )
+
+      await expect(
+        awardXp(USER, 25, 'evaluation_on_time', 'ref-1', 'evaluation', CYCLE),
+      ).rejects.toBeInstanceOf(ClientResponseError)
+      expect(pb.collections.xp_ledger!.rows).toHaveLength(0)
+      expect(pb.collections.user_stats!.rows).toHaveLength(0)
+    })
+
+    it('propagates a stats outage after the ledger row is written', async () => {
+      pb.collections.user_stats!.getFirstListItem.mockRejectedValueOnce(
+        new ClientResponseError({ status: 500 }),
+      )
+
+      await expect(
+        awardXp(USER, 25, 'evaluation_on_time', 'ref-1', 'evaluation', CYCLE),
+      ).rejects.toBeInstanceOf(ClientResponseError)
+      // The ledger row is the source of truth; the stats sync failed, so the
+      // award is recoverable via ADMIN recompute — never silently "done".
+      expect(pb.collections.xp_ledger!.rows).toHaveLength(1)
+    })
+
+    it('still treats a genuine 404 as "no row yet"', async () => {
+      const { created } = await awardXp(
+        USER,
+        25,
+        'evaluation_on_time',
+        'ref-1',
+        'evaluation',
+        CYCLE,
+      )
+      expect(created).toBe(true)
+    })
   })
 
   describe('validation', () => {
