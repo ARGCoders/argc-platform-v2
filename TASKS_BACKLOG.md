@@ -393,8 +393,8 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
 - **Dependencies:** Blocked by: INFRA-04 · Blocks: MEMBER-06.
 - **Target Week:** 3.
 - **DoD:**
-  - [ ] Idempotent RSVP — no duplicates
-  - [ ] Tests pass
+  - [x] Idempotent RSVP — no duplicates
+  - [x] Tests pass
 
 ### [MEMBER-06] /dashboard/events page
 
