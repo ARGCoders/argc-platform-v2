@@ -17,6 +17,11 @@ import type {
  * Q2), minus anyone the caller has already voted for. Returns a projected
  * member shape; this is the caller's voting surface, so no fields beyond what
  * the vote form needs leave the server.
+ *
+ * Deliberately unpaginated: the list is bounded by product rules (active
+ * cross-node members in the current cycle), not by data growth, so it returns
+ * the bare `{ data }` envelope instead of the paginated list form in
+ * DASHBOARD_CONTRACT §1.
  */
 export const dynamic = 'force-dynamic'
 

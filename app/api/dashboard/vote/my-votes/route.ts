@@ -9,6 +9,11 @@ import type { AdvancementCycleRecord, VoteRecord } from '@/types/pocketbase'
  * cycle (MEMBER-12). The query is scoped to `voter = caller`, so this can
  * never reveal another member's vote. The `voter` field is not projected —
  * the response carries only what the caller's vote history needs.
+ *
+ * Deliberately unpaginated: the list is bounded by design — at most the
+ * `VOTE_BUDGET` (one positive + one negative) per cycle — so it returns the
+ * bare `{ data }` envelope instead of the paginated list form in
+ * DASHBOARD_CONTRACT §1.
  */
 export const dynamic = 'force-dynamic'
 
