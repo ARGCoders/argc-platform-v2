@@ -1,6 +1,7 @@
 import siteJson from '@/content/site.json'
 import landingJson from '@/content/landing.json'
-import type { SiteContent, LandingContent } from '@/types/content'
+import voteJson from '@/content/vote.json'
+import type { SiteContent, LandingContent, VoteContent } from '@/types/content'
 
 /**
  * Typed accessors for the editable copy in `content/`.
@@ -15,3 +16,4 @@ import type { SiteContent, LandingContent } from '@/types/content'
  */
 export const site: SiteContent = siteJson
 export const landing: LandingContent = landingJson
+export const vote: VoteContent = voteJson
