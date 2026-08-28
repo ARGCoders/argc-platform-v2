@@ -86,6 +86,7 @@ export async function GET(): Promise<NextResponse> {
         voter: user.id,
         cycle: cycle.id,
       }),
+      fields: 'subject',
     })
     const votedIds = new Set(votedSubjects.map((v) => v.subject))
 

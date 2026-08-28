@@ -8,8 +8,9 @@ import type { AdvancementCycleRecord, VoteRecord } from '@/types/pocketbase'
  * GET /api/dashboard/vote/summary — how many positive and negative votes the
  * caller has received in the active cycle (MEMBER-12 / PLATFORM §5 vote
  * anonymization). The response is two counts. The `voter` field is never
- * projected, mapped, or logged by this handler — a member can only ever learn
- * aggregates, never who voted.
+ * selected, projected, mapped, or logged by this handler — a member can only
+ * ever learn aggregates, never who voted. The query itself fetches `polarity`
+ * only, so a voter identity is never even read into the handler.
  */
 export const dynamic = 'force-dynamic'
 
@@ -41,6 +42,7 @@ export async function GET(): Promise<NextResponse> {
         subject: user.id,
         cycle: cycle.id,
       }),
+      fields: 'polarity',
     })
 
     let positive = 0
