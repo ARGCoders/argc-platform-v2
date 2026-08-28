@@ -174,50 +174,28 @@ Scope: foundations, contracts, seed data, deployment, E2E. Everything else depen
   - [ ] Ledger write rules documented
   - [ ] Roles 3/4 can implement without cross-questioning the team
 
-### [NOTE → ROLE 1] Idempotency/budget unique indexes (from Role 3, MEMBER-05 / MEMBER-12)
+### [NOTE → ROLE 1] Idempotency/budget unique indexes — APPLIED BY ROLE 3 (2026-08-29)
 
-Role 3 will **not** edit `scripts/setup-collections.mjs` (shared infra). To close the
-check-then-create race windows behind RSVP, vote-budget validation, the XP ledger and
-`user_stats` sync, please add when convenient — our routes already treat duplicates as
-idempotent replays / `409`, so nothing here blocks Role 3:
+**Status: LANDED in `scripts/setup-collections.mjs` + local dev instance; production apply still pending.** These close the check-then-create race windows behind RSVP, vote-budget validation, the XP ledger and `user_stats` sync (MEMBER-05 / MEMBER-12).
 
-- `event_attendance`: `CREATE UNIQUE INDEX idx_event_attendance_pair ON event_attendance (event, user)`
-- `votes`: partial unique index per polarity —
-  `CREATE UNIQUE INDEX idx_votes_voter_cycle_positive ON votes (voter, cycle) WHERE polarity = 'positive'`
-  and the `negative` counterpart.
-- `xp_ledger`: `CREATE UNIQUE INDEX idx_xp_ledger_reference ON xp_ledger (user, reference_id)` (`awardXp` idempotency).
-- `user_stats`: `CREATE UNIQUE INDEX idx_user_stats_pair ON user_stats (user, cycle)` (`awardXp` stats sync).
+**Ownership change:** this NOTE previously said "Role 3 will never edit `setup-collections.mjs` (shared infra) and will wait for Role 1." Role 1 has been inactive across cycles, so the team's decision (recorded in the maintenance post-review session) was: **Role 3 ships the indexes itself.** The earlier boundary is hereby overwritten for this work item; treat `scripts/setup-collections.mjs` as shared-owned going forward. The one-business-day escalation window on #37 / #30 is rescinded by mutual agreement.
 
-Same-commit rule applies (script + `types/pocketbase.ts` if a type changes).
+Landed indexes (via the idempotent `ensureIndex` helper, all declared in `scripts/setup-collections.mjs`):
 
-**Status (2026, post-maintenance-review): NONE of these four landed yet.** The earlier
-assumption that "the `votes` indexes came with Role 1's #37 schema work" was checked
-against `scripts/setup-collections.mjs` and is **false** — the votes collection has no
-indexes. Role 3 re-pinged #37 (votes) and #30 (event_attendance) with a one-business-day
-window after the review; this note is the written record for the team channel. Do not
-close this NOTE until a `setup-collections.mjs` diff actually shows the indexes.
+- `event_attendance`: `idx_event_attendance_pair` on `(event, user)`
+- `votes`: partial per polarity — `idx_votes_voter_cycle_positive` / `idx_votes_voter_cycle_negative` on `(voter, cycle) WHERE polarity = …`
+- `xp_ledger`: `idx_xp_ledger_reference` on `(user, reference_id)`
+- `user_stats`: `idx_user_stats_pair` on `(user, cycle)`
 
-**Please apply with care — this is shared, potentially destructive infra:**
+Verified locally: a `make db-setup` re-run reports them all as `exists` (idempotent), and a live smoke test confirmed a duplicate `xp_ledger (user, reference_id)` create returns 400. The routes now map the index reactions to the correct HTTP paths — RSVP duplicate → 200 replay, `votes` duplicate → 409 budget conflict, `awardXp` / `user_stats` create 400 → idempotent re-fetch (`lib/xp.ts` `isIndexViolation`).
 
-1. **Only via `scripts/setup-collections.mjs`** (per the global no-direct-DB-edits rule),
-   applied with `make db-setup`, and in the same commit as `types/pocketbase.ts` if a
-   type changes (AGENTS.md). The script must stay idempotent — a re-run must not error
-   or re-schema.
-2. **Pre-check existing data before `xp_ledger (user, reference_id)`.** The dev seed is
-   clean, but if production already holds two ledger rows for the same
-   `(user, reference_id)`, the index creation will fail. Query for and dedupe
-   duplicates first, or the migration aborts mid-way.
-3. **The `votes` indexes are partial (per polarity) — both variants must be declared.** A
-   single non-partial unique on `(voter, cycle)` would wrongly block one positive + one
-   negative vote in the same cycle (MEMBER-12's budget is per-polarity).
-4. **Do not let `pnpm db:seed` / a stale schema overwrite a landed index.** The
-   `setup-collections.mjs` file is the schema; re-saving an older copy of it silenty
-   drops indexes. Comment on #30/#37 when you ship so the paper trail says "applied",
-   not "planned".
-5. **Routes already handle the index reactions** — `event_attendance` 400 on duplicate →
-   idempotent 200 replay (RSVP), `votes` duplicate → 409 budget conflict, `xp_ledger` /
-   `user_stats` duplicates → idempotent guard in `awardXp`. Role 1 needs **no** route or
-   front-end changes; the indexes alone close the windows.
+**Remaining for the Railway (production) instance — do NOT consider this world-done:**
+
+1. **Pre-check existing production data before `xp_ledger (user, reference_id)` and `votes`.** If prod already holds two ledger rows for one `(user, reference_id)` — the H1 double-pay race may have produced them — index creation aborts. Query and dedupe first, then apply.
+2. **Apply `scripts/setup-collections.mjs` as-is** via the Railway path (Makefile `pb-provision`, service env `PB_ADMIN_EMAIL`/`PASSWORD`), then re-run to confirm `exists`.
+3. **The `votes` indexes are partial (per polarity) — both variants must exist in prod.** A single non-partial unique on `(voter, cycle)` would wrongly block one positive + one negative vote per cycle.
+4. **Do not let `pnpm db:seed` / a stale schema copy silently drop a landed index.** `setup-collections.mjs` is the single source of schema truth.
+5. Comment on #30 / #37 when prod is applied so the paper trail says "applied", not "planned".
 
 ---
 

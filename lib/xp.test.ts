@@ -313,6 +313,81 @@ describe('awardXp', () => {
       )
       expect(created).toBe(true)
     })
+
+    it('treats a concurrent duplicate ledger write (index 400) as already awarded', async () => {
+      const ledger = pb.collections.xp_ledger!
+      // The other writer won the race and its row is already in the DB...
+      ledger.rows.push({
+        id: 'ledger-existing',
+        user: USER,
+        amount: 25,
+        category: 'cross_node_vote_received',
+        reference_id: 'ref-vote',
+        reference_type: 'vote',
+        awarded_by: null,
+        cycle: CYCLE,
+      })
+      // ...our pre-check looked before that insert landed...
+      ledger.getFirstListItem.mockRejectedValueOnce(
+        new ClientResponseError({ status: 404 }),
+      )
+      // ...and the unique index rejects the duplicate create.
+      ledger.create.mockRejectedValueOnce(new ClientResponseError({ status: 400 }))
+
+      const { created, ledger: row } = await awardXp(
+        USER,
+        25,
+        'cross_node_vote_received',
+        'ref-vote',
+        'vote',
+        CYCLE,
+      )
+
+      expect(created).toBe(false)
+      expect(row.id).toBe('ledger-existing')
+      expect(pb.collections.xp_ledger!.rows).toHaveLength(1)
+      // No double bump: the stats sync sees a zero delta on the winner's row.
+      expect(pb.collections.user_stats!.rows[0]!.xp_total).toBe(0)
+    })
+
+    it('rebases onto the stats row another writer won (user_stats index 400)', async () => {
+      const stats = pb.collections.user_stats!
+      stats.getFirstListItem.mockRejectedValueOnce(
+        new ClientResponseError({ status: 404 }),
+      )
+      // The winner created the stats row between our pre-check and our create.
+      stats.create.mockRejectedValueOnce(new ClientResponseError({ status: 400 }))
+      stats.rows.push({
+        id: 'stats-racer',
+        user: USER,
+        cycle: CYCLE,
+        xp_total: 25,
+        tier: 'Initiate',
+        evaluations_completed: 0,
+        evaluations_late: 0,
+        events_organized: 0,
+        events_attended: 0,
+        knowledge_sessions: 0,
+        cross_node_contributions: 0,
+        endorsements_received: 0,
+        votes_received_positive: 0,
+      })
+
+      const { stats: updated } = await awardXp(
+        USER,
+        25,
+        'evaluation_on_time',
+        'ref-1',
+        'evaluation',
+        CYCLE,
+      )
+
+      // The delta lands on the winner's row instead of erroring.
+      expect(updated.id).toBe('stats-racer')
+      expect(updated.xp_total).toBe(50)
+      expect(updated.evaluations_completed).toBe(1)
+      expect(pb.collections.user_stats!.rows).toHaveLength(1)
+    })
   })
 
   describe('validation', () => {

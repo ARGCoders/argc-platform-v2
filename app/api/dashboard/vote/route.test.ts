@@ -98,6 +98,7 @@ interface AdminData {
   stats?: (Identifiable & Record<string, unknown>)[]
   ledgerCreateError?: Error
   statsUpdateError?: Error
+  voteCreateError?: Error
 }
 
 interface FakeAdminLog {
@@ -163,6 +164,7 @@ function fakeAdmin(data: AdminData): FakeAdmin {
       },
       create: async (payload: Record<string, unknown>) => {
         if (name === 'votes') {
+          if (data.voteCreateError) throw data.voteCreateError
           voteCounter += 1
           const record = {
             id: `vote-${voteCounter}`,
@@ -519,6 +521,40 @@ describe('domain validation', () => {
     })
     expect(admin.log.votesCreated).toHaveLength(0)
     expect(admin.log.ledgerCreates).toBe(0)
+  })
+
+  it('maps an index-violation 400 on create to a 409 conflict (race lost)', async () => {
+    givenSession(MEMBER)
+    const data = defaultData()
+    // The unique partial index rejected the interleaved duplicate create.
+    data.voteCreateError = new ClientResponseError({ status: 400 })
+    const admin = givenAdmin(data)
+
+    const { status, body } = await callPost(VALID_BODY)
+
+    // Same condition as the budget check: this polarity is spent.
+    expect(status).toBe(409)
+    expect(body).toEqual({
+      error: {
+        code: 'conflict',
+        message: 'You have already used your positive vote this cycle',
+      },
+    })
+    // The DB already holds the winning vote — we never award XP again.
+    expect(admin.log.votesCreated).toHaveLength(0)
+    expect(admin.log.ledgerCreates).toBe(0)
+    expect(admin.log.ledgerReferenceIds).toHaveLength(0)
+  })
+
+  it('still surfaces a non-conflict create failure as a 500', async () => {
+    givenSession(MEMBER)
+    const data = defaultData()
+    data.voteCreateError = new ClientResponseError({ status: 500 })
+    givenAdmin(data)
+
+    const { status } = await callPost(VALID_BODY)
+
+    expect(status).toBe(500)
   })
 })
 

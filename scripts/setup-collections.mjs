@@ -412,6 +412,12 @@ async function main() {
     { name: 'note', type: 'text' },
     { name: 'created', ...autodate() },
   ])
+  // Unique per (user, reference_id): this is what makes awardXp's idempotency
+  // structural — two same-reference awards can never both write a ledger row.
+  await ensureIndex(
+    'xp_ledger',
+    'CREATE UNIQUE INDEX `idx_xp_ledger_reference` ON `xp_ledger` (`user`, `reference_id`)',
+  )
 
   await ensureLocked('user_stats', [
     { name: 'user', ...rel('users', true) },
@@ -428,6 +434,12 @@ async function main() {
     { name: 'votes_received_positive', type: 'number' },
     { name: 'last_computed_at', type: 'date' },
   ])
+  // Unique per (user, cycle): awardXp's stats upsert can never produce two
+  // stats rows for the same member in one cycle.
+  await ensureIndex(
+    'user_stats',
+    'CREATE UNIQUE INDEX `idx_user_stats_pair` ON `user_stats` (`user`, `cycle`)',
+  )
 
   await ensureLocked('evaluations', [
     { name: 'evaluatee', ...rel('users', true) },
@@ -491,6 +503,14 @@ async function main() {
     { name: 'xp_awarded', type: 'bool' },
     { name: 'created', ...autodate() },
   ])
+  // Unique pair: one RSVP row per (event, user). This is the index that turns
+  // MEMBER-05's app-level replay guard into a hard guarantee — a concurrent
+  // duplicate create is rejected by the DB and the route answers the 200
+  // replay path (see app/api/dashboard/events/[id]/rsvp/route.ts).
+  await ensureIndex(
+    'event_attendance',
+    'CREATE UNIQUE INDEX `idx_event_attendance_pair` ON `event_attendance` (`event`, `user`)',
+  )
 
   await ensureLocked('votes', [
     { name: 'voter', ...rel('users', true) },
@@ -501,6 +521,18 @@ async function main() {
     { name: 'is_cross_node', type: 'bool' },
     { name: 'created', ...autodate() },
   ])
+  // Partial unique indexes, one per polarity: with them a caller can spend ONE
+  // positive and ONE negative vote per cycle but never two of the same
+  // polarity — closing MEMBER-12's budget race at the DB. A single
+  // non-partial unique on (voter, cycle) would wrongly block the allowed mix.
+  await ensureIndex(
+    'votes',
+    "CREATE UNIQUE INDEX `idx_votes_voter_cycle_positive` ON `votes` (`voter`, `cycle`) WHERE `polarity` = 'positive'",
+  )
+  await ensureIndex(
+    'votes',
+    "CREATE UNIQUE INDEX `idx_votes_voter_cycle_negative` ON `votes` (`voter`, `cycle`) WHERE `polarity` = 'negative'",
+  )
 
   await ensureLocked('endorsements', [
     { name: 'subject', ...rel('users', true) },

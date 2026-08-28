@@ -92,6 +92,16 @@ function isMissingRecord(err: unknown): boolean {
   return err instanceof ClientResponseError && err.status === 404
 }
 
+/**
+ * True when PocketBase rejected a create for a unique-index violation. With
+ * the `xp_ledger (user, reference_id)` / `user_stats (user, cycle)` indexes
+ * in place, two interleaved writers hit this: one wins, the other must be
+ * handled as "already exists" — the idempotent path — never as an error.
+ */
+function isIndexViolation(err: unknown): boolean {
+  return err instanceof ClientResponseError && err.status === 400
+}
+
 export interface XpAwardResult {
   /** False when a ledger entry for this reference already existed. */
   created: boolean
@@ -141,15 +151,36 @@ export async function awardXp(
     }
   }
 
-  const ledger = await ledgerCollection.create<XpLedgerRecord>({
-    user,
-    amount,
-    category,
-    reference_id: referenceId,
-    reference_type: referenceType,
-    awarded_by: awardedBy ?? null,
-    cycle,
-  })
+  let ledger: XpLedgerRecord
+  try {
+    ledger = await ledgerCollection.create<XpLedgerRecord>({
+      user,
+      amount,
+      category,
+      reference_id: referenceId,
+      reference_type: referenceType,
+      awarded_by: awardedBy ?? null,
+      cycle,
+    })
+  } catch (err) {
+    // Same reference written concurrently: the unique index rejects the
+    // duplicate — treat it as the pre-existing row (idempotent, no double
+    // award) rather than surfacing a 500.
+    if (isIndexViolation(err)) {
+      const existing = await ledgerCollection.getFirstListItem<XpLedgerRecord>(
+        pb.filter('user = {:user} && reference_id = {:reference}', {
+          user,
+          reference: referenceId,
+        }),
+      )
+      return {
+        created: false,
+        ledger: existing,
+        stats: await upsertStats(pb, user, cycle, 0, null),
+      }
+    }
+    throw err
+  }
 
   const stats = await upsertStats(pb, user, cycle, amount, XP_STATS_BUMPS[category])
 
@@ -200,20 +231,17 @@ async function upsertStats(
 
   const stats =
     existing ??
-    (await statsCollection.create<UserStatsRecord>({
-      user: userId,
-      cycle: cycleId,
-      xp_total: 0,
-      tier: 'Initiate',
-      evaluations_completed: 0,
-      evaluations_late: 0,
-      events_organized: 0,
-      events_attended: 0,
-      knowledge_sessions: 0,
-      cross_node_contributions: 0,
-      endorsements_received: 0,
-      votes_received_positive: 0,
-      last_computed_at: new Date().toISOString(),
+    (await createStats(pb, userId, cycleId).catch((err) => {
+      // Two awards for the same first cycle raced: the unique index rejects
+      // our create because another writer already made the row — re-fetch it
+      // and apply the delta to theirs instead of erroring.
+      if (!isIndexViolation(err)) throw err
+      return statsCollection.getFirstListItem<UserStatsRecord>(
+        pb.filter('user = {:user} && cycle = {:cycle}', {
+          user: userId,
+          cycle: cycleId,
+        }),
+      )
     }))
 
   // XP totals never go below zero; a negative manual correction bottoms out.
@@ -230,6 +258,29 @@ async function upsertStats(
     xp_total: xpTotal,
     tier: tierForXp(xpTotal),
     ...counterUpdates,
+    last_computed_at: new Date().toISOString(),
+  })
+}
+
+/** Create a fresh (user, cycle) stats row with zeroed counters. */
+async function createStats(
+  pb: Awaited<ReturnType<typeof getAdminClient>>,
+  userId: string,
+  cycleId: string,
+): Promise<UserStatsRecord> {
+  return pb.collection('user_stats').create<UserStatsRecord>({
+    user: userId,
+    cycle: cycleId,
+    xp_total: 0,
+    tier: 'Initiate',
+    evaluations_completed: 0,
+    evaluations_late: 0,
+    events_organized: 0,
+    events_attended: 0,
+    knowledge_sessions: 0,
+    cross_node_contributions: 0,
+    endorsements_received: 0,
+    votes_received_positive: 0,
     last_computed_at: new Date().toISOString(),
   })
 }
