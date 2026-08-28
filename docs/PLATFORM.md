@@ -368,8 +368,8 @@ All routes under `/api/dashboard/` (or `/api/admin/` for super-peer-only operati
 
 | Route | Method | Role | Reads | Writes | Notes |
 | --- | --- | --- | --- | --- | --- |
-| /api/dashboard/events | GET | M+ | events, event_attendance | — | Events relevant to the user (attending + upcoming public) |
-| /api/dashboard/events/[id]/rsvp | POST | M+ | — | event_attendance | RSVP to an event |
+| /api/dashboard/events | GET | M+ | events, event_attendance | — | Events relevant to the user (attending + upcoming public). `attendance_count` is the stored post-event figure — not live RSVPs; use the per-event `attending` flag / attendance rows for sign-ups |
+| /api/dashboard/events/[id]/rsvp | POST | M+ | — | event_attendance | RSVP to an event. Writes `confirmed: false`; does NOT bump `attendance_count` (admin fills that on completion) |
 | /api/dashboard/node/events | GET | NL+ | events | — | Events proposed/organized by the caller's node |
 | /api/dashboard/node/events | POST | NL+ | — | events | Propose a new event |
 | /api/admin/events | GET | SP+ | events, event_attendance | — | All events, all statuses |
