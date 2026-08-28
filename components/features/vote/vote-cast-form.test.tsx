@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
+import { render as bareRender, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@/test/render'
 import { vote as voteCopy } from '@/lib/content'
+import { FieldArea } from '@/components/shared/field'
 import { VoteCastForm, type CastVoteInput, type CastVoteResult } from './vote-cast-form'
 
 // next/navigation has no router in jsdom.
@@ -81,16 +82,33 @@ describe('VoteCastForm', () => {
     expect(onCast).not.toHaveBeenCalled()
   })
 
-  it('caps the reason at 500 characters so it can never exceed the server bound', async () => {
+  // The 500-char cap is asserted WITHOUT replaying 501 keystrokes. jsdom only
+  // honors maxLength for typed (per-keystroke) input, so a faithful replay
+  // drives ~501 full form renders through act() (~4s) — slow enough to be
+  // a real flake source against vitest's 5s default, and a timed-out test
+  // then poisons the next test in the file. Split instead: assert the DOM
+  // attribute is wired to the shared bound, and prove the clamp mechanism
+  // cheaply on a small bound (the attribute and the mechanism are the parts
+  // that actually guarantee "never exceeds the server bound").
+  it('wires the reason textarea to the shared 500-char cap', () => {
+    renderForm()
+
+    const cap = voteCopy.reason.max
+    expect(cap).toBe(500) // the same bound the POST route enforces after trim
+    expect(screen.getByLabelText(voteCopy.reason.label)).toHaveAttribute(
+      'maxlength',
+      String(cap),
+    )
+  })
+
+  it('clamps keystroke entry at maxLength', async () => {
     const user = userEvent.setup()
-    const { onCast } = renderForm()
+    bareRender(<FieldArea label="probe" maxLength={5} />)
+    const probe = screen.getByLabelText('probe') as HTMLTextAreaElement
 
-    const reason = screen.getByLabelText(voteCopy.reason.label)
-    await user.type(reason, 'x'.repeat(501))
+    await user.type(probe, 'abcdef')
 
-    // maxLength hard-caps client entry at the same bound the POST route enforces.
-    expect(reason).toHaveValue('x'.repeat(500))
-    expect(onCast).not.toHaveBeenCalled()
+    expect(probe).toHaveValue('abcde')
   })
 
   it('casts through the confirmation step and reports success', async () => {

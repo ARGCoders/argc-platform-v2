@@ -265,7 +265,7 @@ describe('payload', () => {
     })
   })
 
-  it('normalizes a missing stats row to zeros instead of erroring', async () => {
+  it('normalizes a missing stats row to stats null instead of fabricating one', async () => {
     givenSession(MEMBER)
     givenAdmin({ users: [MEMBER], cycles: [CYCLE], stats: [] })
 
@@ -275,21 +275,7 @@ describe('payload', () => {
     expect(body).toEqual({
       data: {
         cycle: CYCLE,
-        stats: {
-          id: '',
-          user: MEMBER_ID,
-          cycle: CYCLE.id,
-          xp_total: 0,
-          tier: 'Initiate',
-          evaluations_completed: 0,
-          evaluations_late: 0,
-          events_organized: 0,
-          events_attended: 0,
-          knowledge_sessions: 0,
-          cross_node_contributions: 0,
-          endorsements_received: 0,
-          votes_received_positive: 0,
-        },
+        stats: null,
         progress: { current: 'Initiate', next: 'Contributor', required: 60 },
       },
     })
@@ -336,8 +322,8 @@ describe('ownership scoping', () => {
     expect(status).toBe(200)
     expect(lastFilters['user_stats']).toContain(`"${MEMBER_ID}"`)
     expect(lastFilters['user_stats']).not.toContain(`"${OTHER_ID}"`)
-    const { stats } = (body as { data: { stats: UserStatsRecord } }).data
-    expect(stats.xp_total).toBe(0)
+    const { stats } = (body as { data: { stats: UserStatsRecord | null } }).data
+    expect(stats).toBeNull()
   })
 })
 

@@ -65,6 +65,7 @@ next-env.d.ts
 # role-local working notes — never commit to the shared repo
 AGENTS.local.md
 ROLE3_PLAN.md
+MAINTENANCE_PLAN.md
 AI_WORKFLOW.md
 PLAN_MEMBER_PUBLISHING.md
 docs/TUTORIAL_MEMBER_01.md

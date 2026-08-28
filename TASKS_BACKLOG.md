@@ -177,16 +177,47 @@ Scope: foundations, contracts, seed data, deployment, E2E. Everything else depen
 ### [NOTE → ROLE 1] Idempotency/budget unique indexes (from Role 3, MEMBER-05 / MEMBER-12)
 
 Role 3 will **not** edit `scripts/setup-collections.mjs` (shared infra). To close the
-check-then-create race windows behind RSVP and vote-budget validation, please add when
-convenient — our routes already treat duplicates as idempotent replays / `409`, so
-nothing here blocks Role 3:
+check-then-create race windows behind RSVP, vote-budget validation, the XP ledger and
+`user_stats` sync, please add when convenient — our routes already treat duplicates as
+idempotent replays / `409`, so nothing here blocks Role 3:
 
 - `event_attendance`: `CREATE UNIQUE INDEX idx_event_attendance_pair ON event_attendance (event, user)`
 - `votes`: partial unique index per polarity —
   `CREATE UNIQUE INDEX idx_votes_voter_cycle_positive ON votes (voter, cycle) WHERE polarity = 'positive'`
   and the `negative` counterpart.
+- `xp_ledger`: `CREATE UNIQUE INDEX idx_xp_ledger_reference ON xp_ledger (user, reference_id)` (`awardXp` idempotency).
+- `user_stats`: `CREATE UNIQUE INDEX idx_user_stats_pair ON user_stats (user, cycle)` (`awardXp` stats sync).
 
 Same-commit rule applies (script + `types/pocketbase.ts` if a type changes).
+
+**Status (2026, post-maintenance-review): NONE of these four landed yet.** The earlier
+assumption that "the `votes` indexes came with Role 1's #37 schema work" was checked
+against `scripts/setup-collections.mjs` and is **false** — the votes collection has no
+indexes. Role 3 re-pinged #37 (votes) and #30 (event_attendance) with a one-business-day
+window after the review; this note is the written record for the team channel. Do not
+close this NOTE until a `setup-collections.mjs` diff actually shows the indexes.
+
+**Please apply with care — this is shared, potentially destructive infra:**
+
+1. **Only via `scripts/setup-collections.mjs`** (per the global no-direct-DB-edits rule),
+   applied with `make db-setup`, and in the same commit as `types/pocketbase.ts` if a
+   type changes (AGENTS.md). The script must stay idempotent — a re-run must not error
+   or re-schema.
+2. **Pre-check existing data before `xp_ledger (user, reference_id)`.** The dev seed is
+   clean, but if production already holds two ledger rows for the same
+   `(user, reference_id)`, the index creation will fail. Query for and dedupe
+   duplicates first, or the migration aborts mid-way.
+3. **The `votes` indexes are partial (per polarity) — both variants must be declared.** A
+   single non-partial unique on `(voter, cycle)` would wrongly block one positive + one
+   negative vote in the same cycle (MEMBER-12's budget is per-polarity).
+4. **Do not let `pnpm db:seed` / a stale schema overwrite a landed index.** The
+   `setup-collections.mjs` file is the schema; re-saving an older copy of it silenty
+   drops indexes. Comment on #30/#37 when you ship so the paper trail says "applied",
+   not "planned".
+5. **Routes already handle the index reactions** — `event_attendance` 400 on duplicate →
+   idempotent 200 replay (RSVP), `votes` duplicate → 409 budget conflict, `xp_ledger` /
+   `user_stats` duplicates → idempotent guard in `awardXp`. Role 1 needs **no** route or
+   front-end changes; the indexes alone close the windows.
 
 ---
 

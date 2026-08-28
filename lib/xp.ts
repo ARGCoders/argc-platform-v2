@@ -1,4 +1,5 @@
 import 'server-only'
+import { ClientResponseError } from 'pocketbase'
 import { getAdminClient } from './pocketbase-server'
 import { tierForXp, XP_CATEGORIES } from './constants'
 import type {
@@ -81,6 +82,16 @@ export class XpError extends Error {
   }
 }
 
+/**
+ * True only when PocketBase answered "no record matched". Anything else —
+ * an outage, a bad filter — must propagate, never be treated as "never
+ * awarded" or "no stats row yet". Swallowing those would report an award as
+ * written when it was not.
+ */
+function isMissingRecord(err: unknown): boolean {
+  return err instanceof ClientResponseError && err.status === 404
+}
+
 export interface XpAwardResult {
   /** False when a ledger entry for this reference already existed. */
   created: boolean
@@ -109,14 +120,17 @@ export async function awardXp(
   const pb = await getAdminClient()
   const ledgerCollection = pb.collection('xp_ledger')
 
-  const existing = await ledgerCollection
-    .getFirstListItem<XpLedgerRecord>(
+  let existing: XpLedgerRecord | null = null
+  try {
+    existing = await ledgerCollection.getFirstListItem<XpLedgerRecord>(
       pb.filter('user = {:user} && reference_id = {:reference}', {
         user,
         reference: referenceId,
       }),
     )
-    .catch(() => null)
+  } catch (err) {
+    if (!isMissingRecord(err)) throw err
+  }
 
   // Same reference twice → already awarded. Never double-bump the stats.
   if (existing) {
@@ -172,14 +186,17 @@ async function upsertStats(
 ): Promise<UserStatsRecord> {
   const statsCollection = pb.collection('user_stats')
 
-  const existing = await statsCollection
-    .getFirstListItem<UserStatsRecord>(
+  let existing: UserStatsRecord | null = null
+  try {
+    existing = await statsCollection.getFirstListItem<UserStatsRecord>(
       pb.filter('user = {:user} && cycle = {:cycle}', {
         user: userId,
         cycle: cycleId,
       }),
     )
-    .catch(() => null)
+  } catch (err) {
+    if (!isMissingRecord(err)) throw err
+  }
 
   const stats =
     existing ??

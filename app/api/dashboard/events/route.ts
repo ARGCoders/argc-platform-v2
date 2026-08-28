@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, authErrorResponse } from '@/lib/auth'
 import { getAdminClient } from '@/lib/pocketbase-server'
+import { parsePagination } from '@/lib/pagination'
 import type { EventAttendanceRecord, EventRecord } from '@/types/pocketbase'
 
 /**
@@ -21,12 +22,16 @@ import type { EventAttendanceRecord, EventRecord } from '@/types/pocketbase'
  * Query params:
  *   page    — ≥ 1, default 1
  *   perPage — 1–100, default 20
+ *
+ * NOTE ON PAGINATION: this route deliberately fetches the FULL matching sets
+ * and paginates in JS rather than using PocketBase server-side `getList` (as
+ * `me/xp` does). The union of attended + upcoming events, the cross-set
+ * dedupe, and the `starts_at` sort require every candidate row before a page
+ * can be cut. That is correct, not naive — do not "optimize" it to getList
+ * without first making the union/dedupe/sort still work. Event volumes are low
+ * (human-organized); revisit only if events ever reach the thousands.
  */
 export const dynamic = 'force-dynamic'
-
-const DEFAULT_PAGE = 1
-const DEFAULT_PER_PAGE = 20
-const MAX_PER_PAGE = 100
 
 interface ProjectedEvent {
   id: string
@@ -62,35 +67,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const admin = await getAdminClient()
     const sp = request.nextUrl.searchParams
 
-    // ── Validate page ─────────────────────────────────────────────────────
-    const pageRaw = sp.get('page')
-    const page = pageRaw === null ? DEFAULT_PAGE : Number(pageRaw)
-    if (!Number.isFinite(page) || page < 1 || !Number.isInteger(page)) {
+    // ── Validate page/perPage (defaults and cap live in lib/pagination) ────
+    const parsed = parsePagination(sp)
+    if (!parsed.ok) {
       return NextResponse.json(
-        { error: { code: 'invalid_input', message: 'page must be an integer ≥ 1' } },
+        { error: { code: 'invalid_input', message: parsed.message } },
         { status: 400 },
       )
     }
-
-    // ── Validate perPage ──────────────────────────────────────────────────
-    const perPageRaw = sp.get('perPage')
-    const perPage = perPageRaw === null ? DEFAULT_PER_PAGE : Number(perPageRaw)
-    if (
-      !Number.isFinite(perPage) ||
-      perPage < 1 ||
-      perPage > MAX_PER_PAGE ||
-      !Number.isInteger(perPage)
-    ) {
-      return NextResponse.json(
-        {
-          error: {
-            code: 'invalid_input',
-            message: 'perPage must be an integer between 1 and 100',
-          },
-        },
-        { status: 400 },
-      )
-    }
+    const { page, perPage } = parsed
 
     // ── Attended events: attendance rows scoped to the caller ─────────────
     // The `user` clause is the ACL — this read cannot leak another member's
