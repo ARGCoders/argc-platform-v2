@@ -69,60 +69,63 @@ export async function GET(): Promise<NextResponse> {
       if (!isMissingRecord(err)) throw err
     }
 
-    const memberData: MemberSummary[] = await Promise.all(
-      memberRecords.map(async (m) => {
-        const expandedUser = m.expand?.user
-        const projectedUser = expandedUser
-          ? {
-              id: expandedUser.id,
-              display_name: expandedUser.display_name,
-              avatar_url: expandedUser.avatar_url,
-            }
-          : null
+    const memberIds = new Set(memberRecords.map((m) => m.user))
 
-        let stats: UserStatsRecord | null = null
-        if (cycle) {
-          try {
-            stats = await admin
-              .collection('user_stats')
-              .getFirstListItem<UserStatsRecord>(
-                admin.filter('user = {:user} && cycle = {:cycle}', {
-                  user: m.user,
-                  cycle: cycle.id,
-                }),
-              )
-          } catch (err) {
-            if (!isMissingRecord(err)) throw err
+    // Single grouped reads for the whole node instead of two queries per
+    // member (user_stats + evaluations): both are scoped to the active cycle,
+    // then joined to each member's id in JS. Four queries regardless of node
+    // size — constant, not linear — so this holds up as a node grows.
+    const statsByUser = new Map<string, UserStatsRecord>()
+    const evalsByUser = new Map<string, EvaluationRecord[]>()
+    if (cycle) {
+      const statsRows = await admin
+        .collection('user_stats')
+        .getFullList<UserStatsRecord>({
+          filter: admin.filter('cycle = {:cycle}', { cycle: cycle.id }),
+        })
+      for (const row of statsRows) {
+        if (memberIds.has(row.user)) statsByUser.set(row.user, row)
+      }
+
+      const evalRows = await admin
+        .collection('evaluations')
+        .getFullList<EvaluationRecord>({
+          filter: admin.filter('cycle = {:cycle}', { cycle: cycle.id }),
+        })
+      for (const row of evalRows) {
+        if (memberIds.has(row.evaluatee)) {
+          const list = evalsByUser.get(row.evaluatee)
+          if (list) list.push(row)
+          else evalsByUser.set(row.evaluatee, [row])
+        }
+      }
+    }
+
+    const memberData: MemberSummary[] = memberRecords.map((m) => {
+      const expandedUser = m.expand?.user
+      const projectedUser = expandedUser
+        ? {
+            id: expandedUser.id,
+            display_name: expandedUser.display_name,
+            avatar_url: expandedUser.avatar_url,
           }
-        }
+        : null
 
-        let evals: EvaluationRecord[] = []
-        if (cycle) {
-          try {
-            evals = await admin.collection('evaluations').getFullList<EvaluationRecord>({
-              filter: admin.filter('evaluatee = {:evaluatee} && cycle = {:cycle}', {
-                evaluatee: m.user,
-                cycle: cycle.id,
-              }),
-            })
-          } catch (err) {
-            if (!isMissingRecord(err)) throw err
-          }
-        }
+      const stats = statsByUser.get(m.user) ?? null
+      const evals = evalsByUser.get(m.user) ?? []
 
-        return {
-          user: projectedUser,
-          role: m.role,
-          tier: stats?.tier ?? tierForXp(0),
-          xp_total: stats?.xp_total ?? 0,
-          evals: evals.map((e) => ({
-            stage: e.stage,
-            status: e.status,
-            score: e.score,
-          })),
-        }
-      }),
-    )
+      return {
+        user: projectedUser,
+        role: m.role,
+        tier: stats?.tier ?? tierForXp(0),
+        xp_total: stats?.xp_total ?? 0,
+        evals: evals.map((e) => ({
+          stage: e.stage,
+          status: e.status,
+          score: e.score,
+        })),
+      }
+    })
 
     return NextResponse.json({
       data: {

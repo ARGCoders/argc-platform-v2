@@ -104,7 +104,13 @@ function fakeAdmin({
       },
       getFullList: async (opts?: { filter?: string; expand?: string }) => {
         let rows: Identifiable[] =
-          name === 'node_member' ? nodeMembers : name === 'evaluations' ? evals : []
+          name === 'node_member'
+            ? nodeMembers
+            : name === 'evaluations'
+              ? evals
+              : name === 'user_stats'
+                ? stats
+                : []
         if (opts?.filter) rows = applyFilter(opts.filter, rows)
         return rows
       },
@@ -529,6 +535,39 @@ describe('ownership scoping', () => {
       body as { data: { members: Array<{ user: { id: string } | null }> } }
     ).data.members
     expect(members.every((m) => m.user?.id !== 'u-mem-b1')).toBe(true)
+  })
+
+  it('ignores stats and evals that belong to members outside this node', async () => {
+    const { m1, m2, m3 } = nodeAlphaMemberData()
+    givenSession(MEMBER_USER_A1)
+    givenAdmin({
+      users: [MEMBER_USER_A1, MEMBER_USER_A2, LEADER_USER_A],
+      nodes: [NODE_ALPHA],
+      nodeMembers: [m1, m2, m3],
+      cycles: [CYCLE],
+      stats: [
+        makeStats(LEADER_USER_A.id, 100, 'Architect'),
+        makeStats('u-outsider', 999, 'Vanguard'), // not a node member
+      ],
+      evals: [
+        makeEval('e1', MEMBER_USER_A1.id, 'standard_1', 'completed', 75),
+        makeEval('e-x', 'u-outsider', 'standard_1', 'completed', 99), // not a node member
+      ],
+    })
+
+    const { status, body } = await callGet()
+
+    expect(status).toBe(200)
+    const members = (
+      body as {
+        data: {
+          members: Array<{ xp_total: number; evals: Array<{ stage: string }> }>
+        }
+      }
+    ).data.members
+    const totalEvals = members.reduce((count, m) => count + m.evals.length, 0)
+    expect(members.every((m) => m.xp_total !== 999)).toBe(true)
+    expect(totalEvals).toBe(1)
   })
 })
 
