@@ -306,7 +306,7 @@ describe('auth gate', () => {
 
 // ─── Eligibility filtering ──────────────────────────────────────────────────
 
-describe('elegibility filtering', () => {
+describe('eligibility filtering', () => {
   it('returns only active members from other nodes', async () => {
     givenSession(MEMBER)
     givenAdmin(defaultData())
