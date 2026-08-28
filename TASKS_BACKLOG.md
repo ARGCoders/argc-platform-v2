@@ -386,7 +386,7 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
   - [ ] Empty state present
   - [ ] Tests pass
 
-### [MEMBER-05] Events API + RSVP
+### [MEMBER-05] Events API + RSVP — **DONE**
 
 - **Objective:** `GET /api/dashboard/events` (events relevant to the user: attending + upcoming public) and `POST /api/dashboard/events/[id]/rsvp` (writes `event_attendance`). Prevent duplicate RSVPs.
 - **Technical Implementation:** `app/api/dashboard/events/route.ts`, `app/api/dashboard/events/[id]/rsvp/route.ts` (idempotent create — no duplicate `event_attendance` rows).
