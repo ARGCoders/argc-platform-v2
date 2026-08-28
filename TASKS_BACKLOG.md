@@ -460,18 +460,19 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
   - [ ] Schedule + complete flows work
   - [ ] Tests pass
 
-### [MEMBER-12] Vote API + VoteCastForm
+### [MEMBER-12] Vote API + VoteCastForm — **DONE**
 
 - **Objective:** `GET /api/dashboard/vote/eligible`, `/vote/my-votes`, `/vote/summary` (aggregate counts only — never voter IDs), `POST /api/dashboard/vote` (validates cross-node, one positive/negative per cycle, cycle active; ledger write via `lib/xp.ts`). Build `VoteCastForm` with confirmation step.
 - **Technical Implementation:** `app/api/dashboard/vote/{eligible,my-votes,summary}/route.ts`, `app/api/dashboard/vote/route.ts`, `components/features/vote/vote-cast-form.tsx`, `lib/xp.ts` (vote award on cast, per Q3 budget).
 - **Dependencies:** Blocked by: INFRA-01 (Q3 vote budget, DONE), INFRA-02, INFRA-06 · Blocks: MEMBER-13.
 - **Target Week:** 3.
+- **Status:** DONE (PR #63 → `main` @ `7059ee3`; 209 tests green; issue #37 closed).
 - **DoD:**
-  - [ ] Member gate; anonymous to members (aggregate counts only)
-  - [ ] One +/− per cycle enforced
-  - [ ] Cross-node validation (can't vote for own node)
-  - [ ] Cycle must be active
-  - [ ] Tests pass
+  - [x] Member gate; anonymous to members (aggregate counts only)
+  - [x] One +/− per cycle enforced
+  - [x] Cross-node validation (can't vote for own node)
+  - [x] Cycle must be active
+  - [x] Tests pass
 
 ### [MEMBER-13] /dashboard/vote + /dashboard/evaluations pages
 
