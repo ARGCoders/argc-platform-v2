@@ -177,16 +177,25 @@ Scope: foundations, contracts, seed data, deployment, E2E. Everything else depen
 ### [NOTE → ROLE 1] Idempotency/budget unique indexes (from Role 3, MEMBER-05 / MEMBER-12)
 
 Role 3 will **not** edit `scripts/setup-collections.mjs` (shared infra). To close the
-check-then-create race windows behind RSVP and vote-budget validation, please add when
-convenient — our routes already treat duplicates as idempotent replays / `409`, so
-nothing here blocks Role 3:
+check-then-create race windows behind RSVP, vote-budget validation, the XP ledger and
+`user_stats` sync, please add when convenient — our routes already treat duplicates as
+idempotent replays / `409`, so nothing here blocks Role 3:
 
 - `event_attendance`: `CREATE UNIQUE INDEX idx_event_attendance_pair ON event_attendance (event, user)`
 - `votes`: partial unique index per polarity —
   `CREATE UNIQUE INDEX idx_votes_voter_cycle_positive ON votes (voter, cycle) WHERE polarity = 'positive'`
   and the `negative` counterpart.
+- `xp_ledger`: `CREATE UNIQUE INDEX idx_xp_ledger_reference ON xp_ledger (user, reference_id)` (`awardXp` idempotency).
+- `user_stats`: `CREATE UNIQUE INDEX idx_user_stats_pair ON user_stats (user, cycle)` (`awardXp` stats sync).
 
 Same-commit rule applies (script + `types/pocketbase.ts` if a type changes).
+
+**Status (2026, post-maintenance-review): NONE of these four landed yet.** The earlier
+assumption that "the `votes` indexes came with Role 1's #37 schema work" was checked
+against `scripts/setup-collections.mjs` and is **false** — the votes collection has no
+indexes. Role 3 re-pinged #37 (votes) and #30 (event_attendance) with a one-business-day
+window after the review; this note is the written record for the team channel. Do not
+close this NOTE until a `setup-collections.mjs` diff actually shows the indexes.
 
 ---
 
