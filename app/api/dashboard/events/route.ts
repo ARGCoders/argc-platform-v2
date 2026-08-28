@@ -11,8 +11,12 @@ import type { EventAttendanceRecord, EventRecord } from '@/types/pocketbase'
  *
  * Every returned event carries `attending` — whether the caller already RSVP'd
  * — so the events page can render the correct button state without a second
- * request. The `user` clause on the attendance read is the ACL: a supplied
- * `?user=` is ignored by design.
+ * request. `attendance_count` is the event's stored figure: an admin fills it
+ * in post-event (PLATFORM.md events), so it does NOT reflect live RSVPs —
+ * RSVP appends an `event_attendance` with `confirmed: false` and never touches
+ * this number. Display it as-is; do not "fix" it against attendance rows.
+ * The `user` clause on the attendance read is the ACL: a supplied `?user=` is
+ * ignored by design.
  *
  * Query params:
  *   page    — ≥ 1, default 1
