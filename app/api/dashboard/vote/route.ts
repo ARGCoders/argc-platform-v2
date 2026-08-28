@@ -152,14 +152,30 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const vote = await admin.collection('votes').create<VoteRecord>({
-      voter: user.id,
-      subject,
-      cycle: cycle.id,
-      polarity,
-      reason: trimmedReason,
-      is_cross_node: true,
-    })
+    let vote: VoteRecord
+    try {
+      vote = await admin.collection('votes').create<VoteRecord>({
+        voter: user.id,
+        subject,
+        cycle: cycle.id,
+        polarity,
+        reason: trimmedReason,
+        is_cross_node: true,
+      })
+    } catch (err) {
+      // Once the unique partial index on votes(voter, cycle, polarity) exists
+      // (MEMBER-12 escalation), the loser of an interleaved race is rejected
+      // with 400. That is exactly the budget-spent condition checked above, so
+      // answer the identical 409 instead of a misleading 500.
+      if (err instanceof ClientResponseError && err.status === 400) {
+        return errorResponse(
+          409,
+          'conflict',
+          `You have already used your ${polarity} vote this cycle`,
+        )
+      }
+      throw err
+    }
 
     // A positive vote rewards the subject (cross-node recognition, XP_WEIGHTS);
     // a negative vote is a flag, not a reward, so it posts no XP. The vote is
