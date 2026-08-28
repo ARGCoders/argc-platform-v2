@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { ClientResponseError } from 'pocketbase'
 import { requireRole, authErrorResponse } from '@/lib/auth'
 import { getAdminClient } from '@/lib/pocketbase-server'
-import { tierForXp, tierProgress } from '@/lib/constants'
+import { tierProgress } from '@/lib/constants'
 import type { AdvancementCycleRecord, UserStatsRecord } from '@/types/pocketbase'
 
 /**
@@ -12,29 +12,12 @@ import type { AdvancementCycleRecord, UserStatsRecord } from '@/types/pocketbase
  * id, which makes ownership scoping structural: another member's row is not
  * a 403, it is simply unreachable.
  *
- * A brand-new member has no row yet — that renders as zeroed stats, never an
- * error. "No active cycle" is also a valid state, not a failure.
+ * A brand-new member has no row yet — that renders as `stats: null` with
+ * zero-based progress, never a fabricated record and never an error. "No
+ * active cycle" is also a valid state, not a failure. Clients treat `stats:
+ * null` as "nothing earned yet" (the same shape as the no-cycle branch).
  */
 export const dynamic = 'force-dynamic'
-
-/** Stats shape for a member whose first cycle has produced no rows yet. */
-function zeroedStats(userId: string, cycleId: string): UserStatsRecord {
-  return {
-    id: '',
-    user: userId,
-    cycle: cycleId,
-    xp_total: 0,
-    tier: tierForXp(0),
-    evaluations_completed: 0,
-    evaluations_late: 0,
-    events_organized: 0,
-    events_attended: 0,
-    knowledge_sessions: 0,
-    cross_node_contributions: 0,
-    endorsements_received: 0,
-    votes_received_positive: 0,
-  }
-}
 
 /**
  * True only when PocketBase answered "no record matched". Any other failure
@@ -79,9 +62,13 @@ export async function GET(): Promise<NextResponse> {
       if (!isMissingRecord(err)) throw err
     }
 
-    const resolved = stats ?? zeroedStats(user.id, cycle.id)
+    const resolved = stats?.xp_total ?? 0
     return NextResponse.json({
-      data: { cycle, stats: resolved, progress: tierProgress(resolved.xp_total) },
+      data: {
+        cycle,
+        stats,
+        progress: tierProgress(resolved),
+      },
     })
   } catch (err) {
     // AuthError carries its own client-safe message and status; everything
