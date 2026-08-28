@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@/test/render'
 import { vote as voteCopy } from '@/lib/content'
@@ -140,6 +140,30 @@ describe('VoteCastForm', () => {
 
     expect(onCast).toHaveBeenCalledTimes(1)
     expect(screen.getByRole('alert')).toHaveTextContent(voteCopy.errors.default)
+  })
+
+  it('recovers when casting throws, without hanging the form mid-submit', async () => {
+    const user = userEvent.setup()
+    const { onCast } = renderForm({
+      onCast: vi.fn(async (): Promise<CastVoteResult> => {
+        throw new Error('network down')
+      }),
+    })
+
+    await fillValidVote(user)
+    await user.click(screen.getByRole('button', { name: voteCopy.submit }))
+    await user.click(screen.getByRole('button', { name: voteCopy.confirm.confirm }))
+
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(voteCopy.errors.default),
+    )
+    expect(onCast).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('dialog')).toBeNull()
+
+    // The confirmation flow is not stuck: it can be re-opened and retried.
+    await user.click(screen.getByRole('button', { name: voteCopy.submit }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: voteCopy.confirm.confirm })).toBeEnabled()
   })
 
   it('shows the conflict message when the vote budget is already spent', async () => {

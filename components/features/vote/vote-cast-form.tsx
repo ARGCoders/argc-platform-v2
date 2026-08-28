@@ -83,20 +83,22 @@ export function VoteCastForm({ eligible, myVotes, onCast }: VoteCastFormProps) {
   async function handleConfirm() {
     if (!subject || polarity === null) return
     setSubmitting(true)
-    const result = await onCast({
-      subject: subject.id,
-      polarity,
-      reason: trimmedReason,
-    })
-    setSubmitting(false)
+    try {
+      const result = await onCast({
+        subject: subject.id,
+        polarity,
+        reason: trimmedReason,
+      })
 
-    if (result.ok) {
-      setFeedback({ kind: 'success', message: voteCopy.success })
-      setConfirming(false)
-      setSubjectId('')
-      setPolarity(null)
-      setReason('')
-    } else {
+      if (result.ok) {
+        setFeedback({ kind: 'success', message: voteCopy.success })
+        setConfirming(false)
+        setSubjectId('')
+        setPolarity(null)
+        setReason('')
+        return
+      }
+
       setConfirming(false)
       setFeedback({
         kind: 'error',
@@ -105,6 +107,14 @@ export function VoteCastForm({ eligible, myVotes, onCast }: VoteCastFormProps) {
             ? voteCopy.errors.conflict
             : voteCopy.errors.default,
       })
+    } catch {
+      // A rejected promise (failed network request, unexpected error) must
+      // not leave the form stuck mid-submit: close the confirmation and
+      // surface the generic error instead.
+      setConfirming(false)
+      setFeedback({ kind: 'error', message: voteCopy.errors.default })
+    } finally {
+      setSubmitting(false)
     }
   }
 
