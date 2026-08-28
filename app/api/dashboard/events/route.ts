@@ -22,6 +22,14 @@ import type { EventAttendanceRecord, EventRecord } from '@/types/pocketbase'
  * Query params:
  *   page    — ≥ 1, default 1
  *   perPage — 1–100, default 20
+ *
+ * NOTE ON PAGINATION: this route deliberately fetches the FULL matching sets
+ * and paginates in JS rather than using PocketBase server-side `getList` (as
+ * `me/xp` does). The union of attended + upcoming events, the cross-set
+ * dedupe, and the `starts_at` sort require every candidate row before a page
+ * can be cut. That is correct, not naive — do not "optimize" it to getList
+ * without first making the union/dedupe/sort still work. Event volumes are low
+ * (human-organized); revisit only if events ever reach the thousands.
  */
 export const dynamic = 'force-dynamic'
 

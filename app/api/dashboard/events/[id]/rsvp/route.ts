@@ -103,9 +103,11 @@ export async function POST(
     } catch (err) {
       // Race guard: a concurrent duplicate (same event + user) may have been
       // created between the lookup and this write. Treat a rejected create as
-      // the 200 replay unless the row genuinely does not exist. The eventual
-      // unique index on (event, user) — flagged to Role 1 — is what makes this
-      // race safe at the DB, not just here.
+      // the 200 replay unless the row genuinely does not exist. NOTE: this can
+      // only actually fire once the unique `(event, user)` index — flagged to
+      // Role 1 on #30 — exists; until it lands, two interleaved requests can
+      // BOTH pass the lookup and both create a row (accepted residual risk).
+      // The replay path below is what makes double-clicks safe in both worlds.
       if (err instanceof ClientResponseError && err.status === 400) {
         const raced = await findAttendance(admin, id, user.id)
         if (raced) {
