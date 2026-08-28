@@ -174,6 +174,20 @@ Scope: foundations, contracts, seed data, deployment, E2E. Everything else depen
   - [ ] Ledger write rules documented
   - [ ] Roles 3/4 can implement without cross-questioning the team
 
+### [NOTE → ROLE 1] Idempotency/budget unique indexes (from Role 3, MEMBER-05 / MEMBER-12)
+
+Role 3 will **not** edit `scripts/setup-collections.mjs` (shared infra). To close the
+check-then-create race windows behind RSVP and vote-budget validation, please add when
+convenient — our routes already treat duplicates as idempotent replays / `409`, so
+nothing here blocks Role 3:
+
+- `event_attendance`: `CREATE UNIQUE INDEX idx_event_attendance_pair ON event_attendance (event, user)`
+- `votes`: partial unique index per polarity —
+  `CREATE UNIQUE INDEX idx_votes_voter_cycle_positive ON votes (voter, cycle) WHERE polarity = 'positive'`
+  and the `negative` counterpart.
+
+Same-commit rule applies (script + `types/pocketbase.ts` if a type changes).
+
 ---
 
 # ROLE 2 — FRONTEND / LANDING + SHARED DASHBOARD COMPONENTS

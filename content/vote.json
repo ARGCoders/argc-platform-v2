@@ -1,0 +1,36 @@
+{
+  "title": "Cross-node votes",
+  "intro": "Recognize one peer in another node and raise one concern per cycle. Votes are anonymous to members.",
+  "subject": {
+    "label": "Member",
+    "empty": "No members are eligible to receive your vote this cycle."
+  },
+  "polarity": {
+    "label": "Vote type",
+    "positive": "Positive",
+    "negative": "Negative",
+    "positiveHint": "Verified contribution",
+    "negativeHint": "Raises a concern"
+  },
+  "reason": {
+    "label": "Reason",
+    "placeholder": "Explain your vote clearly and concretely",
+    "min": 10,
+    "max": 500,
+    "tooShort": "Your reason needs at least 10 characters.",
+    "tooLong": "Your reason must be 500 characters or fewer.",
+    "chars": "characters"
+  },
+  "submit": "Place vote",
+  "confirm": {
+    "title": "Confirm your vote",
+    "body": "You are casting a {polarity} vote for {name}.",
+    "confirm": "Confirm",
+    "back": "Change"
+  },
+  "success": "Vote recorded. It is anonymous to other members.",
+  "errors": {
+    "conflict": "You have already used that vote this cycle.",
+    "default": "Something went wrong. Please try again."
+  }
+}
