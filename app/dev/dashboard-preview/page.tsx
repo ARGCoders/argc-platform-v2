@@ -3,10 +3,24 @@ import Link from 'next/link'
 import { DashboardShell } from '@/components/shared/dashboard/dashboard-shell'
 import { DashboardHeader } from '@/components/shared/dashboard/dashboard-header'
 import { RoleGate } from '@/components/shared/dashboard/role-gate'
-import { ROLE_LABELS } from '@/lib/constants'
+import { RoleBadge } from '@/components/shared/dashboard/role-badge'
+import { TierBadge } from '@/components/shared/dashboard/tier-badge'
+import { StatusChip } from '@/components/shared/dashboard/status-chip'
+import { ROLE_LABELS, TIERS } from '@/lib/constants'
 import { ROLES } from '@/types/pocketbase'
 import type { Role, UserRecord } from '@/types/pocketbase'
 import { MockAuthProvider } from './mock-auth-provider'
+
+const STATUS_SAMPLES = [
+  { domain: 'eval', status: 'pending' },
+  { domain: 'eval', status: 'scheduled' },
+  { domain: 'eval', status: 'completed' },
+  { domain: 'eval', status: 'missed' },
+  { domain: 'event', status: 'proposed' },
+  { domain: 'event', status: 'approved' },
+  { domain: 'event', status: 'cancelled' },
+  { domain: 'cycle', status: 'active' },
+] as const
 
 const PREVIEW_ROLES = ROLES.filter((role): role is Role => role !== 'guest')
 
@@ -109,6 +123,39 @@ export default async function DashboardPreviewPage({
               Super Peer+ content — visible. RoleGate is working.
             </p>
           </RoleGate>
+
+          <div className="border border-sidebar-border p-4">
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              RoleBadge — every level
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {ROLES.map((r) => (
+                <RoleBadge key={r} role={r} />
+              ))}
+            </div>
+          </div>
+
+          <div className="border border-sidebar-border p-4">
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              TierBadge — every tier
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {TIERS.map((t) => (
+                <TierBadge key={t} tier={t} />
+              ))}
+            </div>
+          </div>
+
+          <div className="border border-sidebar-border p-4">
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              StatusChip — sample across domains
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {STATUS_SAMPLES.map(({ domain, status }) => (
+                <StatusChip key={`${domain}-${status}`} domain={domain} status={status} />
+              ))}
+            </div>
+          </div>
         </div>
       </DashboardShell>
     </MockAuthProvider>
