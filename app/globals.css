@@ -27,6 +27,11 @@
   --color-steel-blue-dk: oklch(0.28 0.06 225);
   --color-mist: oklch(0.85 0.025 225); /* #CBD4DF */
   --color-coral: oklch(0.68 0.18 15); /* #E8635A — accent */
+  /* Same lightness/chroma register as coral, hue rotated — StatusChip's
+     positive and tier/status "pending" accents. Never used as a page-scale
+     field, only inside an outlined chip. */
+  --color-signal-green: oklch(0.68 0.18 145);
+  --color-signal-amber: oklch(0.68 0.18 78);
 
   /* Neutrals sit on the same cool axis as eng-navy (hue 240) rather than the
      warm hue-75 cream V1 used, which cast a sepia tint over every page.
