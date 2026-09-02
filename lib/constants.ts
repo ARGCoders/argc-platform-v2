@@ -1,4 +1,13 @@
-import type { Role, Tier, XpCategory } from '@/types/pocketbase'
+import type {
+  CycleStatus,
+  EvalStatus,
+  EventStatus,
+  PostStatus,
+  Role,
+  SubmissionStatus,
+  Tier,
+  XpCategory,
+} from '@/types/pocketbase'
 
 // ─── Roles ────────────────────────────────────────────────────────────────
 
@@ -172,6 +181,50 @@ export function tierProgress(xp: number): TierProgress {
   const next = TIERS[TIERS.indexOf(current) + 1]
   if (next === undefined) return { current, next: null, required: null }
   return { current, next, required: TIER_THRESHOLDS[next] }
+}
+
+// ─── Status ───────────────────────────────────────────────────────────────
+
+/**
+ * The three meanings StatusChip can render, shared across every status
+ * domain below: positive/complete, negative/blocking, or neutral/in-progress.
+ * `positive` and `negative` render in `signal-green` and `coral` regardless
+ * of domain; `neutral` inherits the ambient border/text of whichever surface
+ * it renders on.
+ */
+export type StatusTone = 'positive' | 'neutral' | 'negative'
+
+export const CYCLE_STATUS_TONE: Record<CycleStatus, StatusTone> = {
+  upcoming: 'neutral',
+  active: 'positive',
+  closed: 'neutral',
+}
+
+export const EVAL_STATUS_TONE: Record<EvalStatus, StatusTone> = {
+  pending: 'neutral',
+  scheduled: 'neutral',
+  completed: 'positive',
+  missed: 'negative',
+}
+
+export const EVENT_STATUS_TONE: Record<EventStatus, StatusTone> = {
+  proposed: 'neutral',
+  approved: 'positive',
+  scheduled: 'neutral',
+  completed: 'positive',
+  cancelled: 'negative',
+}
+
+export const POST_STATUS_TONE: Record<PostStatus, StatusTone> = {
+  pending: 'neutral',
+  published: 'positive',
+  rejected: 'negative',
+}
+
+export const SUBMISSION_STATUS_TONE: Record<SubmissionStatus, StatusTone> = {
+  pending: 'neutral',
+  approved: 'positive',
+  rejected: 'negative',
 }
 
 // ─── Auth cookies ─────────────────────────────────────────────────────────
