@@ -1,0 +1,23 @@
+{
+  "heading": "Events",
+  "tagline": "What the collective is building, running, and shipping — no login required.",
+  "filters": {
+    "all": "All",
+    "upcoming": "Upcoming",
+    "past": "Past"
+  },
+  "empty": {
+    "all": {
+      "title": "No public events yet",
+      "description": "Nothing has been published here yet. Check back soon."
+    },
+    "upcoming": {
+      "title": "Nothing scheduled",
+      "description": "No upcoming events are public right now."
+    },
+    "past": {
+      "title": "No past events",
+      "description": "Nothing has happened here yet."
+    }
+  }
+}

@@ -83,3 +83,17 @@ export interface VoteContent {
     default: string
   }
 }
+
+/** Copy for the public `/events` page (UI-15) — no login, no session state. */
+export interface EventsContent {
+  heading: string
+  tagline: string
+  filters: {
+    all: string
+    upcoming: string
+    past: string
+  }
+  /** One empty-state message per filter tab — "no events" reads differently
+   *  than "none upcoming" or "no history yet". */
+  empty: Record<'all' | 'upcoming' | 'past', { title: string; description: string }>
+}
