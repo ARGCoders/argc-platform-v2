@@ -15,7 +15,7 @@ import {
   type XpLedgerEntry,
 } from '@/components/shared/dashboard/xp-ledger-table'
 import { LoadingRow } from '@/components/shared/dashboard/loading-row'
-import { CycleSelector } from '@/components/shared/dashboard/cycle-selector'
+import { CycleSelectorDemo } from './cycle-selector-demo'
 import { ROLE_LABELS, TIERS } from '@/lib/constants'
 import { ROLES } from '@/types/pocketbase'
 import type { AdvancementCycleRecord, Role, UserRecord } from '@/types/pocketbase'
@@ -371,16 +371,14 @@ export default async function DashboardPreviewPage({
               CycleSelector — dark vs. light surface
             </p>
             <div className="flex flex-wrap gap-6">
-              <CycleSelector
+              <CycleSelectorDemo
                 cycles={CYCLE_SAMPLES}
                 currentCycleId="cycle-spring-2026"
-                hrefFor={(c) => `/dev/dashboard-preview?cycle=${c.slug}`}
               />
               <div className="bg-card p-4">
-                <CycleSelector
+                <CycleSelectorDemo
                   cycles={CYCLE_SAMPLES}
                   currentCycleId="cycle-fall-2025"
-                  hrefFor={(c) => `/dev/dashboard-preview?cycle=${c.slug}`}
                   surface="light"
                 />
               </div>
