@@ -1,23 +1,8 @@
 import { EVAL_STAGE_LABELS } from '@/lib/constants'
+import { formatDate, formatDateShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { StatusChip } from './status-chip'
 import type { EvalStage, EvalStatus } from '@/types/pocketbase'
-
-// UTC explicitly: scheduled_at is ledger truth, and without a fixed zone a
-// UTC-midnight date renders a day early for any viewer west of UTC.
-function formatDate(iso: string): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'UTC' }).format(new Date(iso))
-}
-
-// Abbreviated for the sub-sm column, which can't afford a full YYYY-MM-DD
-// next to the widest stage label and still fit a narrow phone.
-function formatDateShort(iso: string): string {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'UTC',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date(iso))
-}
 
 interface EvaluationStageRowProps {
   stage: EvalStage
