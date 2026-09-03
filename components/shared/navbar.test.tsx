@@ -1,14 +1,21 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@/test/render'
 import { makeUser } from '@/test/auth-harness'
 import { Navbar } from './navbar'
 import { site } from '@/lib/content'
+import { usePathname } from 'next/navigation'
 
-// next/navigation has no router in jsdom.
+// next/navigation has no router in jsdom. A mutable mock so individual tests
+// can switch to a /dashboard path without affecting the rest of the file.
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/',
+  usePathname: vi.fn(() => '/'),
 }))
+
+beforeEach(() => {
+  vi.mocked(usePathname).mockReturnValue('/')
+})
 
 describe('Navbar', () => {
   it('renders every link from content/site.json', async () => {
@@ -55,5 +62,60 @@ describe('Navbar', () => {
     const { container } = renderWithProviders(<Navbar />)
     const header = container.querySelector('header')
     expect(header?.style.viewTransitionName).toBe('site-header')
+  })
+})
+
+describe('Navbar — dashboard variant', () => {
+  beforeEach(() => {
+    vi.mocked(usePathname).mockReturnValue('/dashboard/xp')
+  })
+
+  it('drops every public NAV_LINKS entry', async () => {
+    renderWithProviders(<Navbar />, { user: makeUser({ role: 'node_peer' }) })
+    await screen.findByLabelText('Open profile menu')
+    for (const link of site.nav) {
+      expect(screen.queryByText(link.label)).toBeNull()
+    }
+  })
+
+  it('renders no hamburger or mobile takeover — DashboardSidebar owns dashboard mobile nav', async () => {
+    const { container } = renderWithProviders(<Navbar />, {
+      user: makeUser({ role: 'node_peer' }),
+    })
+    await screen.findByLabelText('Open profile menu')
+    expect(screen.queryByLabelText('Toggle menu')).toBeNull()
+    expect(container.querySelector('#mobile-menu')).toBeNull()
+  })
+
+  it('never offers Register, even while the session is still resolving', async () => {
+    renderWithProviders(<Navbar />, { isLoading: true })
+    expect(screen.queryByText('Register')).toBeNull()
+  })
+
+  it('keeps the profile-menu trigger visible outside the md-only container', async () => {
+    renderWithProviders(<Navbar />, { user: makeUser({ role: 'node_peer' }) })
+    const trigger = await screen.findByLabelText('Open profile menu')
+    // button -> .relative wrapper -> the register/profile container itself.
+    expect(trigger.parentElement?.parentElement?.className).not.toContain('hidden')
+  })
+
+  it("drops the dropdown's self-referential Dashboard link but keeps Logout", async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<Navbar />, { user: makeUser({ role: 'node_peer' }) })
+    await user.click(await screen.findByLabelText('Open profile menu'))
+
+    expect(screen.queryByRole('menuitem', { name: /dashboard/i })).toBeNull()
+    expect(screen.getByRole('menuitem', { name: /logout/i })).toBeInTheDocument()
+  })
+
+  it('renders a flat sidebar-matched header instead of the scroll-driven translucent one', async () => {
+    const { container } = renderWithProviders(<Navbar />, {
+      user: makeUser({ role: 'node_peer' }),
+    })
+    await screen.findByLabelText('Open profile menu')
+    const header = container.querySelector('header')
+    expect(header?.className).toContain('bg-sidebar')
+    expect(header?.className).not.toContain('bg-eng-navy/88')
+    expect(header?.className).not.toContain('bg-black/10')
   })
 })

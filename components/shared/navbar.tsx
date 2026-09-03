@@ -21,20 +21,29 @@ export function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
 
-  // Pages whose hero is maroon need an opaque maroon bar, not a translucent one.
-  const variant: 'default' | 'maroon' =
-    pathname.startsWith('/events') || pathname.startsWith('/register')
+  // Dashboard pages get their own slim variant — checked first since it's the
+  // most specific match. Pages whose hero is maroon need an opaque maroon
+  // bar, not a translucent one.
+  const variant: 'default' | 'maroon' | 'dashboard' = pathname.startsWith('/dashboard')
+    ? 'dashboard'
+    : pathname.startsWith('/events') || pathname.startsWith('/register')
       ? 'maroon'
       : 'default'
+  const isDashboard = variant === 'dashboard'
 
   const isGuest = !user || user.role === 'guest'
-  const showRegister = isLoading || isGuest
+  const showRegister = !isDashboard && (isLoading || isGuest)
 
+  // Scroll-driven translucency exists for a bar sitting over a page hero.
+  // DashboardShell's content scrolls inside main's own container, so
+  // window.scrollY never changes on /dashboard pages anyway — skip the
+  // listener entirely rather than subscribe to an event that can't fire.
   useEffect(() => {
+    if (isDashboard) return
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [isDashboard])
 
   // Prevent the page scrolling behind the full-screen mobile menu.
   useEffect(() => {
@@ -87,13 +96,15 @@ export function Navbar() {
           'flex items-center gap-8',
           'px-[clamp(1.5rem,4vw,3rem)]',
           'transition-[background,backdrop-filter] duration-400',
-          variant === 'maroon'
-            ? scrolled
-              ? 'bg-argc-maroon-dk'
-              : 'bg-argc-maroon'
-            : scrolled
-              ? 'bg-eng-navy/88 backdrop-blur-md saturate-150'
-              : 'bg-black/10',
+          variant === 'dashboard'
+            ? 'bg-sidebar border-b border-sidebar-border'
+            : variant === 'maroon'
+              ? scrolled
+                ? 'bg-argc-maroon-dk'
+                : 'bg-argc-maroon'
+              : scrolled
+                ? 'bg-eng-navy/88 backdrop-blur-md saturate-150'
+                : 'bg-black/10',
         ].join(' ')}
       >
         <Link
@@ -111,22 +122,30 @@ export function Navbar() {
           />
         </Link>
 
-        <nav
-          aria-label="Primary"
-          className="hidden md:flex items-center gap-[clamp(1.25rem,2.5vw,2rem)] ml-auto"
-        >
-          {NAV_LINKS.map(({ label, href }) => (
-            <a
-              key={href}
-              href={href}
-              className="text-sm font-medium tracking-wide text-hero-ink/75 hover:text-hero-ink transition-colors whitespace-nowrap"
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
+        {!isDashboard && (
+          <nav
+            aria-label="Primary"
+            className="hidden md:flex items-center gap-[clamp(1.25rem,2.5vw,2rem)] ml-auto"
+          >
+            {NAV_LINKS.map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                className="text-sm font-medium tracking-wide text-hero-ink/75 hover:text-hero-ink transition-colors whitespace-nowrap"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        )}
 
-        <div className="hidden md:flex items-center gap-2 shrink-0">
+        <div
+          className={
+            isDashboard
+              ? 'flex items-center gap-2 shrink-0 ml-auto'
+              : 'hidden md:flex items-center gap-2 shrink-0'
+          }
+        >
           {showRegister && (
             <a
               href="/register"
@@ -167,7 +186,8 @@ export function Navbar() {
                     </p>
                   </div>
 
-                  {user.role !== 'guest' && (
+                  {/* Self-referential once already inside /dashboard, where this variant renders. */}
+                  {user.role !== 'guest' && !isDashboard && (
                     <Link
                       href="/dashboard"
                       role="menuitem"
@@ -192,88 +212,94 @@ export function Navbar() {
           )}
         </div>
 
-        <button
-          type="button"
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-          aria-controls="mobile-menu"
-          onClick={() => setMenuOpen((o) => !o)}
-          className="md:hidden ml-auto flex flex-col justify-center gap-[5px] p-1 bg-transparent border-0 cursor-pointer"
-        >
-          <span
-            className={[
-              'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
-              menuOpen ? 'translate-y-[3.25px] rotate-45' : '',
-            ].join(' ')}
-          />
-          <span
-            className={[
-              'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
-              menuOpen ? '-translate-y-[3.25px] -rotate-45' : '',
-            ].join(' ')}
-          />
-        </button>
+        {!isDashboard && (
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="md:hidden ml-auto flex flex-col justify-center gap-[5px] p-1 bg-transparent border-0 cursor-pointer"
+          >
+            <span
+              className={[
+                'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
+                menuOpen ? 'translate-y-[3.25px] rotate-45' : '',
+              ].join(' ')}
+            />
+            <span
+              className={[
+                'block w-[22px] h-px bg-hero-ink transition-transform duration-300',
+                menuOpen ? '-translate-y-[3.25px] -rotate-45' : '',
+              ].join(' ')}
+            />
+          </button>
+        )}
       </header>
 
-      <div
-        id="mobile-menu"
-        aria-hidden={!menuOpen}
-        className={[
-          'fixed inset-0 z-overlay bg-eng-navy',
-          'flex flex-col justify-center px-[clamp(2rem,8vw,4rem)]',
-          'transition-[opacity,transform,visibility] duration-350',
-          menuOpen
-            ? 'opacity-100 visible translate-y-0'
-            : 'opacity-0 invisible -translate-y-2',
-        ].join(' ')}
-      >
-        <nav className="flex flex-col gap-1" aria-label="Mobile">
-          {NAV_LINKS.map(({ label, href }) => (
-            <a
-              key={href}
-              href={href}
-              tabIndex={menuOpen ? undefined : -1}
-              onClick={() => setMenuOpen(false)}
-              className="text-[clamp(2rem,8vw,3.5rem)] font-bold leading-[1.25] text-hero-ink/50 hover:text-hero-ink transition-colors"
-            >
-              {label}
-            </a>
-          ))}
+      {/* DashboardSidebar owns dashboard mobile nav — this variant has no
+          hamburger to open it, so the takeover never renders at all. */}
+      {!isDashboard && (
+        <div
+          id="mobile-menu"
+          aria-hidden={!menuOpen}
+          className={[
+            'fixed inset-0 z-overlay bg-eng-navy',
+            'flex flex-col justify-center px-[clamp(2rem,8vw,4rem)]',
+            'transition-[opacity,transform,visibility] duration-350',
+            menuOpen
+              ? 'opacity-100 visible translate-y-0'
+              : 'opacity-0 invisible -translate-y-2',
+          ].join(' ')}
+        >
+          <nav className="flex flex-col gap-1" aria-label="Mobile">
+            {NAV_LINKS.map(({ label, href }) => (
+              <a
+                key={href}
+                href={href}
+                tabIndex={menuOpen ? undefined : -1}
+                onClick={() => setMenuOpen(false)}
+                className="text-[clamp(2rem,8vw,3.5rem)] font-bold leading-[1.25] text-hero-ink/50 hover:text-hero-ink transition-colors"
+              >
+                {label}
+              </a>
+            ))}
 
-          {user && user.role !== 'guest' && (
-            <a
-              href="/dashboard"
-              tabIndex={menuOpen ? undefined : -1}
-              onClick={() => setMenuOpen(false)}
-              className="mt-8 inline-flex w-fit items-center text-[0.9375rem] font-semibold tracking-[0.05em] uppercase text-argc-maroon bg-hero-ink px-7 py-3"
-            >
-              Dashboard
-            </a>
-          )}
+            {user && user.role !== 'guest' && (
+              <a
+                href="/dashboard"
+                tabIndex={menuOpen ? undefined : -1}
+                onClick={() => setMenuOpen(false)}
+                className="mt-8 inline-flex w-fit items-center text-[0.9375rem] font-semibold tracking-[0.05em] uppercase text-argc-maroon bg-hero-ink px-7 py-3"
+              >
+                Dashboard
+              </a>
+            )}
 
-          {user && (
-            <button
-              type="button"
-              tabIndex={menuOpen ? undefined : -1}
-              onClick={handleLogout}
-              className="mt-4 inline-flex w-fit items-center text-[0.8rem] font-semibold tracking-[0.06em] uppercase text-hero-ink/60 hover:text-hero-ink bg-transparent border border-hero-ink/20 hover:border-hero-ink/40 px-7 py-3 transition-colors"
-            >
-              Logout
-            </button>
-          )}
+            {user && (
+              <button
+                type="button"
+                tabIndex={menuOpen ? undefined : -1}
+                onClick={handleLogout}
+                className="mt-4 inline-flex w-fit items-center text-[0.8rem] font-semibold tracking-[0.06em] uppercase text-hero-ink/60 hover:text-hero-ink bg-transparent border border-hero-ink/20 hover:border-hero-ink/40 px-7 py-3 transition-colors"
+              >
+                Logout
+              </button>
+            )}
 
-          {showRegister && (
-            <a
-              href="/register"
-              tabIndex={menuOpen ? undefined : -1}
-              onClick={() => setMenuOpen(false)}
-              className="mt-8 inline-flex w-fit items-center text-[0.9375rem] font-semibold tracking-[0.05em] uppercase text-argc-maroon bg-hero-ink px-7 py-3"
-            >
-              Register
-            </a>
-          )}
-        </nav>
-      </div>
+            {showRegister && (
+              <a
+                href="/register"
+                tabIndex={menuOpen ? undefined : -1}
+                onClick={() => setMenuOpen(false)}
+                className="mt-8 inline-flex w-fit items-center text-[0.9375rem] font-semibold tracking-[0.05em] uppercase text-argc-maroon bg-hero-ink px-7 py-3"
+              >
+                Register
+              </a>
+            )}
+          </nav>
+        </div>
+      )}
     </>
   )
 }
