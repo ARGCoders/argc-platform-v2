@@ -6,6 +6,7 @@ import { RoleGate } from '@/components/shared/dashboard/role-gate'
 import { RoleBadge } from '@/components/shared/dashboard/role-badge'
 import { TierBadge } from '@/components/shared/dashboard/tier-badge'
 import { StatusChip } from '@/components/shared/dashboard/status-chip'
+import { EvaluationStageRow } from '@/components/shared/dashboard/evaluation-stage-row'
 import { ROLE_LABELS, TIERS } from '@/lib/constants'
 import { ROLES } from '@/types/pocketbase'
 import type { Role, UserRecord } from '@/types/pocketbase'
@@ -154,6 +155,43 @@ export default async function DashboardPreviewPage({
               {STATUS_SAMPLES.map(({ domain, status }) => (
                 <StatusChip key={`${domain}-${status}`} domain={domain} status={status} />
               ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              EvaluationStageRow — the bordered-row template
+            </p>
+            <div className="border border-sidebar-border">
+              <EvaluationStageRow
+                stage="standard_1"
+                status="scheduled"
+                evaluatorName="Sam Rivera"
+                scheduledAt="2026-08-19T00:00:00.000Z"
+                score={null}
+              />
+              <EvaluationStageRow
+                stage="standard_2"
+                status="pending"
+                evaluatorName={null}
+                scheduledAt={null}
+                score={null}
+              />
+              <EvaluationStageRow
+                stage="eval_plus_node_leader"
+                status="completed"
+                evaluatorName="Dario Vance"
+                scheduledAt="2026-07-30T00:00:00.000Z"
+                score={82}
+              />
+              <EvaluationStageRow
+                stage="standard_1"
+                status="missed"
+                evaluatorName="Priya Nasser"
+                scheduledAt={null}
+                score={null}
+                className="border-b-0"
+              />
             </div>
           </div>
         </div>
