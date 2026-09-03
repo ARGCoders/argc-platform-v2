@@ -3,6 +3,7 @@ import type {
   EvalStage,
   EvalStatus,
   EventStatus,
+  EventType,
   PostStatus,
   Role,
   SubmissionStatus,
@@ -146,6 +147,17 @@ export const EVAL_STAGE_LABELS: Record<EvalStage, string> = {
  * negative. Cast through `/api/dashboard/vote`, enforced server-side.
  */
 export const VOTE_BUDGET = { positive: 1, negative: 1 } as const
+
+// ─── Events ───────────────────────────────────────────────────────────────
+
+/** Display labels for the public `/events` page's type badge (UI-15). */
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  knowledge_session: 'Knowledge Session',
+  hackathon: 'Hackathon',
+  workshop: 'Workshop',
+  community: 'Community',
+  cross_node: 'Cross-Node',
+}
 
 // ─── Tiers ────────────────────────────────────────────────────────────────
 
