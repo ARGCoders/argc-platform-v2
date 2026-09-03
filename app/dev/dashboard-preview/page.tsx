@@ -8,6 +8,8 @@ import { TierBadge } from '@/components/shared/dashboard/tier-badge'
 import { StatusChip } from '@/components/shared/dashboard/status-chip'
 import { EvaluationStageRow } from '@/components/shared/dashboard/evaluation-stage-row'
 import { NodeMemberRow } from '@/components/shared/dashboard/node-member-row'
+import { XpBar } from '@/components/shared/dashboard/xp-bar'
+import { StatCard } from '@/components/shared/dashboard/stat-card'
 import { ROLE_LABELS, TIERS } from '@/lib/constants'
 import { ROLES } from '@/types/pocketbase'
 import type { Role, UserRecord } from '@/types/pocketbase'
@@ -223,6 +225,39 @@ export default async function DashboardPreviewPage({
                 xp={20}
                 evaluationStages={['scheduled', 'pending', 'pending']}
                 className="border-b-0"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              XpBar — mid-progress vs. top tier
+            </p>
+            <div className="flex max-w-md flex-col gap-4">
+              <XpBar xp={100} />
+              <XpBar xp={300} />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              StatCard — direction vs. tone are independent
+            </p>
+            <div className="grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
+              <StatCard
+                label="XP this cycle"
+                value={418}
+                delta={{ direction: 'up', tone: 'positive', text: '12.4% vs C-11' }}
+              />
+              <StatCard
+                label="Missed evaluations"
+                value={1}
+                delta={{ direction: 'down', tone: 'positive', text: '1 vs C-11' }}
+              />
+              <StatCard
+                label="Node members"
+                value={7}
+                delta={{ direction: 'flat', tone: 'neutral', text: 'No delta' }}
               />
             </div>
           </div>
