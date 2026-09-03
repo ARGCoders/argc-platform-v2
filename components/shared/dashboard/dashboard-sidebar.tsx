@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { roleAtLeast } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+import { Avatar } from '../avatar'
 import { RoleBadge } from './role-badge'
 import type { Role } from '@/types/pocketbase'
 
@@ -200,31 +200,12 @@ function Identity({
 }) {
   return (
     <div className="flex items-center gap-3 border-b border-sidebar-border px-3 py-4">
-      <SidebarAvatar src={avatarUrl} name={name} />
+      <Avatar src={avatarUrl} name={name} size={40} />
       <div className="flex min-w-0 flex-col gap-1">
         <p className="truncate text-sm font-medium text-sidebar-foreground">{name}</p>
         <RoleBadge role={role} />
       </div>
     </div>
-  )
-}
-
-function SidebarAvatar({ src, name }: { src: string; name: string }) {
-  if (!src) {
-    return (
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-sidebar-accent text-xs font-bold text-sidebar-accent-foreground">
-        {(name || '?').charAt(0).toUpperCase()}
-      </span>
-    )
-  }
-  return (
-    <Image
-      src={src}
-      alt={name}
-      width={40}
-      height={40}
-      className="h-10 w-10 shrink-0 object-cover"
-    />
   )
 }
 
