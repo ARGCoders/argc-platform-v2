@@ -10,6 +10,11 @@ import { EvaluationStageRow } from '@/components/shared/dashboard/evaluation-sta
 import { NodeMemberRow } from '@/components/shared/dashboard/node-member-row'
 import { XpBar } from '@/components/shared/dashboard/xp-bar'
 import { StatCard } from '@/components/shared/dashboard/stat-card'
+import {
+  XpLedgerTable,
+  type XpLedgerEntry,
+} from '@/components/shared/dashboard/xp-ledger-table'
+import { LoadingRow } from '@/components/shared/dashboard/loading-row'
 import { ROLE_LABELS, TIERS } from '@/lib/constants'
 import { ROLES } from '@/types/pocketbase'
 import type { Role, UserRecord } from '@/types/pocketbase'
@@ -25,6 +30,37 @@ const STATUS_SAMPLES = [
   { domain: 'event', status: 'cancelled' },
   { domain: 'cycle', status: 'active' },
 ] as const
+
+const XP_LEDGER_SAMPLES: XpLedgerEntry[] = [
+  {
+    id: '1',
+    createdAt: '2026-08-19T00:00:00.000Z',
+    category: 'evaluation_on_time',
+    amount: 25,
+    awardedByName: null,
+  },
+  {
+    id: '2',
+    createdAt: '2026-08-11T00:00:00.000Z',
+    category: 'event_organized',
+    amount: 40,
+    awardedByName: null,
+  },
+  {
+    id: '3',
+    createdAt: '2026-08-02T00:00:00.000Z',
+    category: 'manual_adjustment',
+    amount: -10,
+    awardedByName: 'Priya Nasser',
+  },
+  {
+    id: '4',
+    createdAt: '2026-07-30T00:00:00.000Z',
+    category: 'event_attended',
+    amount: 0,
+    awardedByName: null,
+  },
+]
 
 const PREVIEW_ROLES = ROLES.filter((role): role is Role => role !== 'guest')
 
@@ -259,6 +295,26 @@ export default async function DashboardPreviewPage({
                 value={7}
                 delta={{ direction: 'flat', tone: 'neutral', text: 'No delta' }}
               />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              XpLedgerTable — populated, loading, and empty
+            </p>
+            <div className="flex max-w-xl flex-col gap-6">
+              <XpLedgerTable
+                entries={XP_LEDGER_SAMPLES}
+                rangeLabel="Rows 1-4 of 38"
+                prevHref={null}
+                nextHref="/dev/dashboard-preview"
+              />
+              <div className="border border-sidebar-border">
+                <LoadingRow />
+                <LoadingRow />
+                <LoadingRow className="border-b-0" />
+              </div>
+              <XpLedgerTable entries={[]} rangeLabel="" prevHref={null} nextHref={null} />
             </div>
           </div>
         </div>
