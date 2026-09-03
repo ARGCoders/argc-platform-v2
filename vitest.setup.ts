@@ -37,3 +37,12 @@ class MockIntersectionObserver implements IntersectionObserver {
   }
 }
 vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+
+// Also absent from jsdom; Radix's floating-content primitives (Popover,
+// DropdownMenu, Select) observe their anchor/content size to reposition.
+class MockResizeObserver implements ResizeObserver {
+  disconnect(): void {}
+  observe(): void {}
+  unobserve(): void {}
+}
+vi.stubGlobal('ResizeObserver', MockResizeObserver)

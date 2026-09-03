@@ -273,6 +273,18 @@ Floating menu content — the one place a shadow is correct (see Elevation & Dep
 - **States:** focus/hover fills with `accent`; disabled drops to 50% opacity and stops accepting pointer events. Open/close is a 100ms scale+fade (`zoom-in-95`/`zoom-out-95`), not the slower page-level expo easing — floating UI gets a snappier, shorter transition than page content.
 - **Separator:** a 1px `border` divider with negative margin to bleed to the menu's edges.
 
+### CycleSelector
+
+The first real consumer of the Dropdown Menu floating-panel chrome above (shadow + `ring-1 ring-foreground/10`, square corners), carrying dashboard-specific content instead of generic menu items — switches which advancement cycle `/dashboard/xp` and `/dashboard/evaluations` are viewing.
+
+- **Not an ARIA listbox.** Its rows are real `<Link>`/`<button disabled>` elements, not `role="option"` — the outcome of picking a row is always page navigation, never a value reported into a form, so overriding native link semantics with a value-widget role would fight the element rather than describe it. Arrow-key roving focus, Home/End, and Escape-to-close are layered on top of the real elements instead, so every row stays reachable by plain Tab even without the enhancement.
+- **Trigger label stays mono** (`CYCLE {label}`) — a cycle's label identifies which fixed period is selected, the same classify job `RoleBadge`/`TierBadge`/a Bordered Row's stage field do, not a narrated description.
+- **No dedicated status color on the selector itself.** Cycle status (upcoming/active/closed) is reported by `StatusChip` (`domain="cycle"`) inside each row, not by a bespoke accent — an earlier draft layered a coral dot/border on the active row on top of its already-Maroon fill, which would have made Alert Coral mean "current" here and "something's wrong" everywhere else it appears; dropped for exactly that collision.
+- **Selected ≠ active.** Which cycle is being _viewed_ (Maroon row fill, `aria-current="true"`, the same treatment `DashboardSidebar`'s current-page nav link already uses) and which cycle is _currently live_ for the club (`StatusChip`'s positive tone) are independent facts that can point at different cycles — they get two independent cues, never collapsed into one.
+- **Upcoming cycles are listed but disabled** (`<button disabled>`, not a link) — a member can see one is coming without landing on a cycle that has no records yet.
+- **Panel scrolls** (`max-h-64 overflow-y-auto`) rather than growing unbounded — cycles accumulate for the platform's life with no archival step, so this is the one control in the system explicitly built for an open-ended list rather than a small fixed set.
+- **Surface-aware** like the rest of the dashboard family: `surface: 'dark' | 'light'`, defaulting `'dark'`.
+
 ### ASCII Canvas (signature component)
 
 A 24fps ASCII-art animation rendered live behind the hero headline, sourced from a fetched text-frame asset (never bundled as a JS module — that cost 18.4MB in V1). It is the system's most literal expression of "The Systems Terminal": a real terminal-rendering technique used as a hero visual rather than a decorative illustration. Respects `prefers-reduced-motion` and pauses on tab-blur/off-screen — this component is the platform's clearest signature and should not be replicated elsewhere without equal restraint; it works because it appears exactly once.
