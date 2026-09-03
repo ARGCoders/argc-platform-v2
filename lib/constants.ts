@@ -1,5 +1,6 @@
 import type {
   CycleStatus,
+  EvalStage,
   EvalStatus,
   EventStatus,
   PostStatus,
@@ -127,6 +128,18 @@ export const ENDORSEMENT_XP_AWARD = XP_WEIGHTS.endorsement_received
 
 /** Minimum score for a passed evaluation, on the 0–100 scale (Q6). */
 export const EVAL_PASS_SCORE = 50
+
+/**
+ * Display labels for the 3-stage pipeline (PLATFORM.md §6 Q4): stages 1–2 are
+ * peer evaluations within the evaluatee's node, stage 3 is conducted by their
+ * node leader — naming that in the label itself instead of leaving "Stage 3"
+ * ambiguous about who runs it.
+ */
+export const EVAL_STAGE_LABELS: Record<EvalStage, string> = {
+  standard_1: 'Stage 1',
+  standard_2: 'Stage 2',
+  eval_plus_node_leader: 'Stage 3 · Node Leader',
+}
 
 /**
  * Cross-node votes a member may cast per cycle (Q3): one positive and one
