@@ -15,9 +15,10 @@ import {
   type XpLedgerEntry,
 } from '@/components/shared/dashboard/xp-ledger-table'
 import { LoadingRow } from '@/components/shared/dashboard/loading-row'
+import { CycleSelector } from '@/components/shared/dashboard/cycle-selector'
 import { ROLE_LABELS, TIERS } from '@/lib/constants'
 import { ROLES } from '@/types/pocketbase'
-import type { Role, UserRecord } from '@/types/pocketbase'
+import type { AdvancementCycleRecord, Role, UserRecord } from '@/types/pocketbase'
 import { MockAuthProvider } from './mock-auth-provider'
 
 const STATUS_SAMPLES = [
@@ -59,6 +60,53 @@ const XP_LEDGER_SAMPLES: XpLedgerEntry[] = [
     category: 'event_attended',
     amount: 0,
     awardedByName: null,
+  },
+]
+
+const CYCLE_SAMPLES: AdvancementCycleRecord[] = [
+  {
+    id: 'cycle-fall-2026',
+    label: 'Fall 2026',
+    slug: 'fall-2026',
+    starts_at: '2026-09-01T00:00:00.000Z',
+    ends_at: '2027-01-15T00:00:00.000Z',
+    status: 'upcoming',
+    created_by: 'preview-user',
+    created: '2026-08-01T00:00:00.000Z',
+    updated: '2026-08-01T00:00:00.000Z',
+  },
+  {
+    id: 'cycle-spring-2026',
+    label: 'Spring 2026',
+    slug: 'spring-2026',
+    starts_at: '2026-02-01T00:00:00.000Z',
+    ends_at: '2026-08-31T00:00:00.000Z',
+    status: 'active',
+    created_by: 'preview-user',
+    created: '2026-01-15T00:00:00.000Z',
+    updated: '2026-01-15T00:00:00.000Z',
+  },
+  {
+    id: 'cycle-fall-2025',
+    label: 'Fall 2025',
+    slug: 'fall-2025',
+    starts_at: '2025-09-01T00:00:00.000Z',
+    ends_at: '2026-01-31T00:00:00.000Z',
+    status: 'closed',
+    created_by: 'preview-user',
+    created: '2025-08-15T00:00:00.000Z',
+    updated: '2026-02-01T00:00:00.000Z',
+  },
+  {
+    id: 'cycle-spring-2025',
+    label: 'Spring 2025',
+    slug: 'spring-2025',
+    starts_at: '2025-02-01T00:00:00.000Z',
+    ends_at: '2025-08-31T00:00:00.000Z',
+    status: 'closed',
+    created_by: 'preview-user',
+    created: '2025-01-15T00:00:00.000Z',
+    updated: '2025-09-01T00:00:00.000Z',
   },
 ]
 
@@ -315,6 +363,27 @@ export default async function DashboardPreviewPage({
                 <LoadingRow className="border-b-0" />
               </div>
               <XpLedgerTable entries={[]} rangeLabel="" prevHref={null} nextHref={null} />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-3 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-hero-ink-dim uppercase">
+              CycleSelector — dark vs. light surface
+            </p>
+            <div className="flex flex-wrap gap-6">
+              <CycleSelector
+                cycles={CYCLE_SAMPLES}
+                currentCycleId="cycle-spring-2026"
+                hrefFor={(c) => `/dev/dashboard-preview?cycle=${c.slug}`}
+              />
+              <div className="bg-card p-4">
+                <CycleSelector
+                  cycles={CYCLE_SAMPLES}
+                  currentCycleId="cycle-fall-2025"
+                  hrefFor={(c) => `/dev/dashboard-preview?cycle=${c.slug}`}
+                  surface="light"
+                />
+              </div>
             </div>
           </div>
         </div>
