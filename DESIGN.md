@@ -129,10 +129,13 @@ A tight cool-neutral base with one warm, load-bearing accent; nothing competes w
 
 ### Status Accents
 
-Two chip-only accents, each sharing Alert Coral's lightness and chroma (`0.68` / `0.18`) with only the hue rotated — a family of equally-loud, equally-rare signals rather than an open palette. Neither ever fills a page-scale region; both live exclusively inside an outlined `StatusChip` or a `TierBadge` step.
+Two chip-only accents, each sharing Alert Coral's lightness and chroma (`0.68` / `0.18`) with only the hue rotated — a family of equally-loud, equally-rare signals rather than an open palette. Neither ever fills a page-scale region.
 
-- **Signal Green** (`oklch(0.68 0.18 145)`): `StatusChip`'s positive/complete tone — `completed`, `approved`, `published`, `active`.
+- **Signal Green** (`oklch(0.68 0.18 145)`): `StatusChip`'s positive/complete tone — `completed`, `approved`, `published`, `active`. Also `StatCard`'s positive-toned delta and `NodeMemberRow`'s completed-stage dot.
 - **Signal Amber** (`oklch(0.68 0.18 78)`): the Architect step of `TierBadge` only. `StatusChip`'s neutral tone stays on the ambient border/text of its surface rather than introducing a third chip hue.
+- **Alert Coral** does the equivalent negative-tone job everywhere Signal Green does the positive one — `StatusChip`'s negative tone, `StatCard`'s negative-toned delta, `NodeMemberRow`'s missed-stage dot.
+
+Sanctioned uses beyond `StatusChip`/`TierBadge` each still pair the hue with a non-color cue rather than relying on hue alone — `NodeMemberRow`'s missed dot carries a ring, `StatCard`'s delta carries bold weight — since Green and Coral share lightness/chroma and sit on the same colorblind confusion axis. A new use of either color outside an existing sanctioned context is a durable system change, recorded here, not a silent extension.
 
 ### Neutral
 
