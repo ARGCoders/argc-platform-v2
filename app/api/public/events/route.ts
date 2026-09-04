@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import type PocketBase from 'pocketbase'
 import { getAdminClient } from '@/lib/pocketbase-server'
 import { parsePagination } from '@/lib/pagination'
-import { sanitizeHtml, stripHtml } from '@/lib/sanitize'
+import { sanitizeHtml, stripSanitizedHtml } from '@/lib/sanitize'
 import type { EventRecord } from '@/types/pocketbase'
 
 /**
@@ -13,10 +13,13 @@ import type { EventRecord } from '@/types/pocketbase'
  * `description` is run through `sanitizeHtml()` here, at fetch time, per
  * DASHBOARD_CONTRACT §5 — safe to render with `dangerouslySetInnerHTML` if a
  * future event detail page needs the rich version. `excerpt` is the plain-
- * text projection (`stripHtml()`) the card actually displays: `lib/sanitize.ts`
- * is `server-only` (pulls in jsdom), so the card — a client component, for
- * the filter tabs — cannot call either function itself and needs the
- * stripped text handed to it already computed.
+ * text projection the card actually displays, derived from that already-
+ * sanitized `description` via `stripSanitizedHtml()` (a cheap regex strip,
+ * not a second DOMPurify/jsdom parse — safe specifically because the input
+ * is already known-safe). `lib/sanitize.ts` is `server-only` (pulls in
+ * jsdom), so the card — a client component, for the filter tabs — cannot
+ * call either function itself and needs the stripped text handed to it
+ * already computed.
  *
  * Query params:
  *   page    — ≥ 1, default 1
@@ -53,7 +56,7 @@ function project(admin: PocketBase, event: EventRecord): PublicEvent {
       ? admin.files.getURL(event, event.poster_photo)
       : null,
     description,
-    excerpt: stripHtml(description),
+    excerpt: stripSanitizedHtml(description),
     type: event.type,
     status: event.status,
     starts_at: event.starts_at,

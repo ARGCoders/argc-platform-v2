@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sanitizeHtml, stripHtml } from './sanitize'
+import { sanitizeHtml, stripHtml, stripSanitizedHtml } from './sanitize'
 
 /**
  * These payloads were used to validate the sanitizer by hand when it was
@@ -117,5 +117,44 @@ describe('stripHtml', () => {
 
   it('drops script contents entirely', () => {
     expect(stripHtml('<p>ok</p><script>alert(1)</script>')).toBe('ok')
+  })
+})
+
+describe('stripSanitizedHtml', () => {
+  // Same input/output contract as stripHtml, on already-sanitized input —
+  // the two must agree, since stripSanitizedHtml exists purely as a cheaper
+  // way to get the same result when the input is already known-safe.
+  it('returns visible text only, matching stripHtml on the same markup', () => {
+    const markup = '<p>Hello <strong>world</strong></p>'
+    expect(stripSanitizedHtml(markup)).toBe(stripHtml(markup))
+    expect(stripSanitizedHtml(markup)).toBe('Hello world')
+  })
+
+  // Regression guard: a naive tag->space replacement would insert a space
+  // at every tag boundary, producing "Seven nodes ship ." instead of
+  // "Seven nodes ship." — tags must strip to nothing, not a space, since
+  // any real whitespace is already present in the text nodes themselves.
+  it('does not insert a space at a tag boundary with no whitespace in the source', () => {
+    expect(stripSanitizedHtml('<p>Seven nodes <strong>ship</strong>.</p>')).toBe(
+      'Seven nodes ship.',
+    )
+  })
+
+  it('collapses whitespace', () => {
+    expect(stripSanitizedHtml('<p>a\n\n   b</p>')).toBe('a b')
+  })
+
+  // DOMPurify's string serializer re-escapes &, <, > in text content (the
+  // three that must be escaped there); stripSanitizedHtml has to decode
+  // them back since it isn't running a real parser.
+  it('decodes the entities DOMPurify emits for &, <, >, quotes', () => {
+    expect(stripSanitizedHtml('Reviews &amp; retros')).toBe('Reviews & retros')
+    expect(stripSanitizedHtml('a &lt; b &gt; c')).toBe('a < b > c')
+    expect(stripSanitizedHtml('say &quot;hi&quot;')).toBe('say "hi"')
+    expect(stripSanitizedHtml('don&#39;t')).toBe("don't")
+  })
+
+  it('returns an empty string for empty input', () => {
+    expect(stripSanitizedHtml('')).toBe('')
   })
 })

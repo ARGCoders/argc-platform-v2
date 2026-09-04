@@ -136,6 +136,19 @@ describe('payload', () => {
     expect(res.data[0]!.description).toContain('<strong>')
   })
 
+  // Regression guard: excerpt is derived from the sanitized HTML string via
+  // a cheap regex strip, not a second DOMPurify parse — it must still decode
+  // the entities DOMPurify's serializer emits for &, <, >, quotes.
+  it('decodes HTML entities in the excerpt', async () => {
+    givenAdmin([
+      makeEvent({ description: '<p>Reviews &amp; retros, don&#39;t miss it</p>' }),
+    ])
+
+    const { body } = await callGet()
+    const res = body as { data: PublicEvent[] }
+    expect(res.data[0]!.excerpt).toBe("Reviews & retros, don't miss it")
+  })
+
   it('returns an empty list when there are no public events', async () => {
     givenAdmin([])
 
