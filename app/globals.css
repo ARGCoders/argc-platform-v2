@@ -33,10 +33,14 @@
   --color-signal-green: oklch(0.68 0.18 145);
   --color-signal-amber: oklch(0.68 0.18 78);
 
-  /* Neutrals sit on the same cool axis as eng-navy (hue 240) rather than the
-     warm hue-75 cream V1 used, which cast a sepia tint over every page.
-     Chroma is near-zero: enough to read as cool, not enough to read as blue. */
-  --color-paper: oklch(0.98 0.003 240); /* page background */
+  /* Paper reversed from the cool hue-240 axis to a warm hue-91 (~#F2F0EA) —
+     a deliberate brand-direction change, not the V1 sepia regression this
+     comment used to warn against; see DESIGN.md's Neutral section for the
+     current rationale. Stone stays on the cool hue-240 axis for now — that's
+     a separate decision, not bundled into this one — so Paper and Stone are
+     temporarily on different hue families until Stone's own change (if any)
+     is decided. Chroma stays near-zero on both either way. */
+  --color-paper: oklch(0.955 0.0083 91.5); /* page background */
   --color-stone: oklch(0.94 0.005 240); /* alternating section bg */
 
   /* Text on maroon/navy surfaces */
@@ -120,7 +124,7 @@
 :root {
   --radius: 0rem;
 
-  --background: oklch(0.98 0.003 240); /* paper */
+  --background: oklch(0.955 0.0083 91.5); /* paper */
   --foreground: oklch(0.18 0.03 240); /* eng-navy */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.03 240);
