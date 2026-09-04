@@ -211,13 +211,15 @@ export function tierProgress(xp: number): TierProgress {
 // ─── Status ───────────────────────────────────────────────────────────────
 
 /**
- * The three meanings StatusChip can render, shared across every status
- * domain below: positive/complete, negative/blocking, or neutral/in-progress.
- * `positive` and `negative` render in `signal-green` and `coral` regardless
- * of domain; `neutral` inherits the ambient border/text of whichever surface
- * it renders on.
+ * The five meanings StatusChip can render, shared across every status domain
+ * below: positive/complete and negative/blocking render in `signal-green`
+ * and `coral` regardless of domain; `scheduled` and `pending` each carry
+ * their own dedicated color (Steel Blue/Mist and Signal Amber) rather than
+ * the shared ambient `neutral` — see DESIGN.md's Status Accents section for
+ * why those two specifically were promoted out of `neutral`. Every other
+ * not-yet-happened state (`proposed`, `upcoming`, `closed`) stays `neutral`.
  */
-export type StatusTone = 'positive' | 'neutral' | 'negative'
+export type StatusTone = 'positive' | 'neutral' | 'negative' | 'scheduled' | 'pending'
 
 export const CYCLE_STATUS_TONE: Record<CycleStatus, StatusTone> = {
   upcoming: 'neutral',
@@ -226,8 +228,8 @@ export const CYCLE_STATUS_TONE: Record<CycleStatus, StatusTone> = {
 }
 
 export const EVAL_STATUS_TONE: Record<EvalStatus, StatusTone> = {
-  pending: 'neutral',
-  scheduled: 'neutral',
+  pending: 'pending',
+  scheduled: 'scheduled',
   completed: 'positive',
   missed: 'negative',
 }
@@ -235,19 +237,19 @@ export const EVAL_STATUS_TONE: Record<EvalStatus, StatusTone> = {
 export const EVENT_STATUS_TONE: Record<EventStatus, StatusTone> = {
   proposed: 'neutral',
   approved: 'positive',
-  scheduled: 'neutral',
+  scheduled: 'scheduled',
   completed: 'positive',
   cancelled: 'negative',
 }
 
 export const POST_STATUS_TONE: Record<PostStatus, StatusTone> = {
-  pending: 'neutral',
+  pending: 'pending',
   published: 'positive',
   rejected: 'negative',
 }
 
 export const SUBMISSION_STATUS_TONE: Record<SubmissionStatus, StatusTone> = {
-  pending: 'neutral',
+  pending: 'pending',
   approved: 'positive',
   rejected: 'negative',
 }

@@ -336,7 +336,12 @@ export default async function DashboardPreviewPage({
               <StatCard
                 label="Missed evaluations"
                 value={1}
-                delta={{ direction: 'down', tone: 'positive', text: '1 vs C-11' }}
+                // tone: 'negative' here is a requested swatch example, not
+                // this metric's real polarity — a real "missed evaluations"
+                // count going down is good (positive), per deltaFor()'s own
+                // 'lower-better' polarity. Shown negative/coral only so this
+                // swatch demonstrates all three delta tones, not just two.
+                delta={{ direction: 'down', tone: 'negative', text: '1 vs C-11' }}
               />
               <StatCard
                 label="Node members"

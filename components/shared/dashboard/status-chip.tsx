@@ -37,11 +37,27 @@ const TONE_MAPS: Record<StatusDomain, Record<string, StatusTone>> = {
  * Positive/negative also differ in border style, not just hue — Signal Green
  * and Coral share the same lightness/chroma (only the hue differs), which is
  * exactly the deuteranopia/protanopia confusion axis. Solid vs. dashed reads
- * as a shape difference regardless of color vision.
+ * as a shape difference regardless of color vision. `scheduled` and
+ * `pending` don't need that same treatment — Steel Blue/Mist and Signal
+ * Amber aren't on that red-green confusion line the way Green/Coral are.
+ *
+ * `scheduled` is surface-split (Mist on dark, Steel Blue on light) because
+ * Steel Blue itself measures only 2.26:1 against Terminal Navy — Mist is
+ * Steel Blue's own pale/bright step, already documented as "used for
+ * dashboard sidebar foreground text" for exactly this reason. `pending`
+ * (Signal Amber) holds up on both surfaces without a split (6.40:1 navy,
+ * 2.57:1 paper — in line with what Signal Green/Coral already measure on
+ * Paper, 2.36:1 and 2.76:1, so this isn't a new low bar for the system).
  */
 function toneClass(tone: StatusTone, surface: 'dark' | 'light'): string {
   if (tone === 'positive') return 'border-solid border-signal-green text-signal-green'
   if (tone === 'negative') return 'border-dashed border-coral text-coral'
+  if (tone === 'pending') return 'border-solid border-signal-amber text-signal-amber'
+  if (tone === 'scheduled') {
+    return surface === 'dark'
+      ? 'border-solid border-mist text-mist'
+      : 'border-solid border-steel-blue text-steel-blue'
+  }
   // hero-ink/55 is the codebase's existing dark-surface 3:1 boundary
   // (see components/shared/field.tsx) — sidebar-border's 12%-alpha hairline
   // measured well under that on Terminal Navy.

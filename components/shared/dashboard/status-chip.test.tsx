@@ -34,13 +34,32 @@ describe('StatusChip', () => {
   })
 
   it('uses the codebase-wide 3:1 dark-surface boundary for the neutral tone', () => {
+    render(<StatusChip domain="event" status="proposed" />)
+    expect(screen.getByText('proposed').className).toContain('border-hero-ink/55')
+  })
+
+  it('colors the pending tone with signal-amber', () => {
     render(<StatusChip domain="eval" status="pending" />)
-    expect(screen.getByText('pending').className).toContain('border-hero-ink/55')
+    const chip = screen.getByText('pending')
+    expect(chip.className).toContain('text-signal-amber')
+    expect(chip.className).toContain('border-signal-amber')
+  })
+
+  it('colors the scheduled tone with mist on dark, steel-blue on light', () => {
+    render(<StatusChip domain="eval" status="scheduled" />)
+    expect(screen.getByText('scheduled').className).toContain('text-mist')
+
+    render(<StatusChip domain="eval" status="scheduled" surface="light" />)
+    expect(screen.getAllByText('scheduled')[1]!.className).toContain('text-steel-blue')
   })
 
   it('resolves tone independently per domain for the same word', () => {
-    // "pending" is neutral for evaluations but the same word never appears
-    // in CycleStatus — each domain owns its own tone map.
+    // "pending" resolves to a different tone per domain in principle — each
+    // domain owns its own tone map — even though eval/post/submission all
+    // happen to agree on 'pending' today. The word never appears in
+    // CycleStatus at all, which is the actual cross-domain independence this
+    // guards: a status word with no entry in one domain's map cannot leak a
+    // tone from another domain's map for the same word.
     render(<StatusChip domain="eval" status="pending" />)
     const chip = screen.getByText('pending')
     expect(chip.className).not.toContain('text-signal-green')
