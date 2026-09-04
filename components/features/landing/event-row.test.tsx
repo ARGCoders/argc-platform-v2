@@ -21,13 +21,13 @@ function event(overrides: Partial<PublicEvent> = {}): PublicEvent {
 }
 
 describe('EventRow', () => {
-  it('renders the title, type label, mono date, and status chip', () => {
+  it('renders the title, type label, and Amman-timezone date', () => {
     render(<EventRow event={event()} />)
 
     expect(screen.getByText('Summer Build — Node Showcase')).toBeInTheDocument()
     expect(screen.getByText('Hackathon')).toBeInTheDocument()
-    expect(screen.getByText('2026-09-12')).toBeInTheDocument()
-    expect(screen.getByLabelText('Status: scheduled')).toBeInTheDocument()
+    // 00:00 UTC on 2026-09-12 is 03:00 in Asia/Amman, same calendar day.
+    expect(screen.getByText('Sat, Sep 12 · 3:00 AM')).toBeInTheDocument()
   })
 
   it('renders the plain-text excerpt, not the raw HTML description', () => {
@@ -60,5 +60,39 @@ describe('EventRow', () => {
   it('omits the excerpt paragraph when there is no excerpt', () => {
     const { container } = render(<EventRow event={event({ excerpt: '' })} />)
     expect(container.querySelector('p')).not.toBeInTheDocument()
+  })
+
+  // Regression guard: proposed/approved/scheduled/completed are the club's
+  // internal approval pipeline, not information a public visitor needs —
+  // showing them reads as leaked back-office state.
+  it.each(['proposed', 'approved', 'scheduled', 'completed'] as const)(
+    'shows no status chip for a %s event',
+    (status) => {
+      render(<EventRow event={event({ status })} />)
+      expect(screen.queryByLabelText(/^Status:/)).not.toBeInTheDocument()
+    },
+  )
+
+  it('shows a status chip only for a cancelled event', () => {
+    render(<EventRow event={event({ status: 'cancelled' })} />)
+    expect(screen.getByLabelText('Status: cancelled')).toBeInTheDocument()
+  })
+
+  it('renders the location when present', () => {
+    render(<EventRow event={event({ location: '42 Amman · Cluster 2' })} />)
+    expect(screen.getByText('42 Amman · Cluster 2')).toBeInTheDocument()
+  })
+
+  it('renders no location line when location is absent', () => {
+    render(<EventRow event={event({ location: null })} />)
+    expect(screen.queryByText(/Cluster/)).not.toBeInTheDocument()
+  })
+
+  // Regression guard: the type badge repeats on every card in the grid — a
+  // maroon badge here would make Signal Maroon the page's ambient color
+  // instead of its one "act here" signal (DESIGN.md's One Signal Rule).
+  it('does not render the type badge in Signal Maroon', () => {
+    render(<EventRow event={event()} />)
+    expect(screen.getByText('Hackathon').className).not.toContain('text-primary')
   })
 })

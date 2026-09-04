@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { BannerPlaceholder } from '@/components/shared/banner-placeholder'
 import { StatusChip } from '@/components/shared/dashboard/status-chip'
 import { EVENT_TYPE_LABELS } from '@/lib/constants'
-import { formatDate } from '@/lib/format'
+import { formatEventDate } from '@/lib/format'
 import type { PublicEvent } from '@/app/api/public/events/route'
 
 /**
@@ -17,6 +17,18 @@ import type { PublicEvent } from '@/app/api/public/events/route'
  * No hover treatment and no link: there is no event detail page in this
  * task's scope (PLATFORM.md's route table has no `/events/[slug]`), so this
  * card promises no click affordance it cannot deliver.
+ *
+ * Only `cancelled` gets a status chip. `proposed`/`approved`/`scheduled`/
+ * `completed` are the club's internal approval pipeline — showing them to a
+ * visitor with no context ("PROPOSED", "APPROVED") answers questions nobody
+ * asked and reads as leaked back-office state; `cancelled` is the one status
+ * that changes what a visitor should actually do (don't show up).
+ *
+ * The type badge is `text-foreground`, not Signal Maroon — it appears once
+ * per card, so on a grid of a dozen events maroon would stop meaning "act
+ * here" (DESIGN.md's One Signal Rule) and become the page's ambient color
+ * instead. The active filter tab is the one thing on this page maroon still
+ * belongs to.
  */
 export function EventRow({ event }: { event: PublicEvent }) {
   const typeLabel = EVENT_TYPE_LABELS[event.type]
@@ -35,13 +47,13 @@ export function EventRow({ event }: { event: PublicEvent }) {
         ) : (
           <BannerPlaceholder seed={event.slug} className="h-full" />
         )}
-        <span className="absolute top-2 left-2 bg-card px-2 py-1 font-mono text-[0.6rem] font-semibold tracking-[0.1em] text-primary uppercase">
+        <span className="absolute top-2 left-2 bg-card px-2 py-1 font-mono text-[0.6rem] font-semibold tracking-[0.1em] text-foreground uppercase">
           {typeLabel}
         </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-2.5 p-4">
-        <h3 className="font-sans text-base font-bold text-card-foreground">
+        <h3 className="line-clamp-2 font-sans text-base font-bold text-card-foreground">
           {event.title}
         </h3>
         {event.excerpt && (
@@ -49,11 +61,20 @@ export function EventRow({ event }: { event: PublicEvent }) {
             {event.excerpt}
           </p>
         )}
-        <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-2.5">
-          <span className="font-mono text-xs text-muted-foreground">
-            {formatDate(event.starts_at)}
-          </span>
-          <StatusChip domain="event" status={event.status} surface="light" />
+        <div className="mt-auto flex flex-col gap-1 border-t border-border pt-2.5">
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-mono text-xs text-muted-foreground">
+              {formatEventDate(event.starts_at, event.ends_at)}
+            </span>
+            {event.status === 'cancelled' && (
+              <StatusChip domain="event" status={event.status} surface="light" />
+            )}
+          </div>
+          {event.location && (
+            <span className="truncate font-mono text-xs text-muted-foreground">
+              {event.location}
+            </span>
+          )}
         </div>
       </div>
     </article>

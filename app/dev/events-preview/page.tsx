@@ -30,6 +30,7 @@ const MOCK_EVENTS: PublicEvent[] = [
     type: 'hackathon',
     status: 'scheduled',
     starts_at: days(20),
+    location: '42 Amman · Cluster 2',
   }),
   event({
     id: 'knowledge',
@@ -70,7 +71,9 @@ const MOCK_EVENTS: PublicEvent[] = [
     excerpt: 'Postponed pending venue confirmation.',
     type: 'hackathon',
     status: 'cancelled',
-    starts_at: days(-10),
+    // Deliberately a FUTURE date — checks that a cancelled event still
+    // routes to "Past", not "Upcoming", despite its date.
+    starts_at: days(15),
   }),
 ]
 
@@ -87,7 +90,7 @@ export default function EventsPreviewPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 pt-nav pb-16 sm:px-8 lg:px-12">
       <div className="mt-12 mb-10 flex flex-col gap-3 border-b border-border pb-8">
-        <h1 className="font-sans text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+        <h1 className="font-sans text-[clamp(2rem,5vw,3rem)] font-bold tracking-tight text-foreground">
           Events (preview)
         </h1>
         <p className="max-w-2xl font-sans text-base text-muted-foreground">
@@ -103,11 +106,18 @@ export default function EventsPreviewPage() {
         <EventsList events={MOCK_EVENTS} />
       </div>
 
-      <div>
+      <div className="mb-16">
         <p className="mb-4 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-muted-foreground uppercase">
           EventsList — empty
         </p>
         <EventsList events={[]} />
+      </div>
+
+      <div>
+        <p className="mb-4 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-muted-foreground uppercase">
+          EventsList — truncated (more than one page exists)
+        </p>
+        <EventsList events={MOCK_EVENTS} truncated />
       </div>
     </main>
   )
