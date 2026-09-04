@@ -35,7 +35,19 @@ const resolvers: { [K in keyof Env]: () => string } = {
   POCKETBASE_URL: () => get('NEXT_PUBLIC_POCKETBASE_URL'),
   POCKETBASE_ADMIN_EMAIL: () => get('POCKETBASE_ADMIN_EMAIL'),
   POCKETBASE_ADMIN_PASSWORD: () => get('POCKETBASE_ADMIN_PASSWORD'),
-  APP_URL: () => process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+  // Defaults to localhost:3000 in dev for convenience, but a production
+  // deployment that never set this would otherwise have every self-fetch
+  // (e.g. app/events/page.tsx -> /api/public/events) silently target an
+  // unreachable localhost and fail with no indication why — fail loud
+  // instead, matching every other key here.
+  APP_URL: () => {
+    const value = process.env.NEXT_PUBLIC_APP_URL
+    if (value) return value
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Missing required environment variable: NEXT_PUBLIC_APP_URL')
+    }
+    return 'http://localhost:3000'
+  },
 }
 
 // Lazily evaluated per key so a missing var only throws when that specific

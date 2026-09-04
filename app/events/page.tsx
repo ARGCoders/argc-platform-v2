@@ -7,6 +7,15 @@ export const metadata = {
   title: 'Events — ARGC',
 }
 
+// Without this, `next build` still tries to execute this page once to
+// detect whether it's dynamic — and since it fetches through env.APP_URL
+// (which now throws in production when unset, rather than silently
+// defaulting), that trial execution can fail the build itself in an
+// environment where NEXT_PUBLIC_APP_URL isn't available until deploy time.
+// force-dynamic skips that trial entirely; this page was already
+// effectively dynamic (cache: 'no-store' on every fetch) regardless.
+export const dynamic = 'force-dynamic'
+
 async function fetchEvents(): Promise<{ events: PublicEvent[]; truncated: boolean }> {
   const res = await fetch(`${env.APP_URL}/api/public/events?perPage=100`, {
     cache: 'no-store',

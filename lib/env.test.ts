@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { env } from './env'
 
 const KEYS = [
@@ -23,6 +23,9 @@ afterEach(() => {
     if (saved[k] === undefined) delete process.env[k]
     else process.env[k] = saved[k]
   }
+  // NODE_ENV is typed read-only on process.env — vi.stubEnv is vitest's
+  // sanctioned way to override it, and vi.unstubAllEnvs() restores it.
+  vi.unstubAllEnvs()
 })
 
 describe('env', () => {
@@ -45,7 +48,19 @@ describe('env', () => {
     expect(env.POCKETBASE_URL).toBe('http://pb.test')
   })
 
-  it('defaults APP_URL to localhost:3000 when unset', () => {
+  it('defaults APP_URL to localhost:3000 when unset outside production', () => {
+    vi.stubEnv('NODE_ENV', 'development')
     expect(env.APP_URL).toBe('http://localhost:3000')
+  })
+
+  // Regression: a production deployment with no NEXT_PUBLIC_APP_URL used to
+  // silently get 'http://localhost:3000' — every self-fetch off that value
+  // (app/events/page.tsx -> /api/public/events) then failed with no
+  // indication why. Fail loud instead, matching every other key.
+  it('throws in production when APP_URL is unset, instead of defaulting', () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    expect(() => env.APP_URL).toThrow(
+      'Missing required environment variable: NEXT_PUBLIC_APP_URL',
+    )
   })
 })
