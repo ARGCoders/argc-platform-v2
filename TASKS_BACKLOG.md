@@ -203,127 +203,128 @@ Verified locally: a `make db-setup` re-run reports them all as `exists` (idempot
 
 Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13), and the public `/events` page (UI-15). Role 2 owns **all** of `components/shared/` and `components/ui/` additions; Role 3/4 feature components live in `components/features/`. **Component work is on the critical path for Roles 3/4 — deliver on schedule.**
 
-### [UI-01] Landing page redesign
+### [UI-01] Landing page redesign — **NOT STARTED**
 
 - **Objective:** New landing sections: mission/values, nodes, events/handbook preview, register CTA. All copy in `content/landing.json` — no hardcoded strings. Old sections stay removed.
 - **Technical Implementation:** `app/page.tsx`, `components/features/landing/*`, `content/landing.json`, navbar variants in `components/shared/navbar.tsx`.
 - **Dependencies:** Blocked by: none.
 - **Target Week:** 1.
 - **DoD:** Sections render; content-driven; responsive; WCAG-checked; navbar variants correct; `make check` green.
+- **Status:** `app/page.tsx` is `<Hero />` only — mission/values, nodes, the events/handbook preview section, and the register CTA are all unbuilt. Matches PRODUCT.md's own note that public UI beyond hero/navbar is intentionally deferred, not an oversight. Navbar variants (`default`/`maroon`/`dashboard`) are done, including this session's fixes.
 
-### [UI-02] DashboardShell
+### [UI-02] DashboardShell — **DONE**
 
 - **Objective:** Navy layout wrapper for all dashboard routes: `DashboardSidebar` + main content area, responsive sidebar collapse, `eng-navy` background.
 - **Technical Implementation:** `components/shared/dashboard/dashboard-shell.tsx`, `app/dashboard/layout.tsx` (applies shell), colocated `dashboard-shell.test.tsx`.
 - **Dependencies:** Blocked by: none · Blocks: UI-13, ADMIN-04.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Renders children
-  - [ ] Collapses below `md` breakpoint
-  - [ ] Colocated test passes
+  - [x] Renders children
+  - [x] Collapses below `md` breakpoint
+  - [x] Colocated test passes
 
-### [UI-03] DashboardSidebar
+### [UI-03] DashboardSidebar — **DONE**
 
 - **Objective:** Left nav rail: avatar, display name, `RoleBadge`, nav links filtered by the user's role via `useAuth()` (from `lib/auth-context.tsx`). Collapsible on mobile.
 - **Technical Implementation:** `components/shared/dashboard/dashboard-sidebar.tsx` + test; nav items filtered with `roleAtLeast` (`lib/constants.ts`).
 - **Dependencies:** Blocked by: UI-08 (RoleBadge) · Blocks: UI-13, ADMIN-04.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Links filtered per role (member / node leader / super peer see different sets)
-  - [ ] Collapse works on mobile
-  - [ ] Test passes
+  - [x] Links filtered per role (member / node leader / super peer see different sets)
+  - [x] Collapse works on mobile
+  - [x] Test passes
 
-### [UI-04] DashboardHeader
+### [UI-04] DashboardHeader — **DONE**
 
 - **Objective:** Top bar within the content area: mono page title, breadcrumb, optional actions slot. Compose the existing `Breadcrumb` component.
 - **Technical Implementation:** `components/shared/dashboard/dashboard-header.tsx` + test, reusing `components/shared/breadcrumb.tsx`.
 - **Dependencies:** Blocked by: none · Blocks: UI-13, ADMIN-04.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Renders title + breadcrumb + slot
-  - [ ] Test passes
+  - [x] Renders title + breadcrumb + slot
+  - [x] Test passes
 
-### [UI-05] RoleGate wrapper
+### [UI-05] RoleGate wrapper — **DONE** (built, not yet consumed anywhere real)
 
 - **Objective:** Renders children only if the current user's role meets a minimum threshold (`roleAtLeast` from `lib/constants`). For conditional sections inside shared pages.
 - **Technical Implementation:** `components/shared/dashboard/role-gate.tsx` + test, consuming `useAuth()`.
 - **Dependencies:** Blocked by: none · Blocks: UI-13, ADMIN-04.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Works with `useAuth`
-  - [ ] Test passes
+  - [x] Works with `useAuth`
+  - [x] Test passes
 
 ### [UI-06] XpBar component
 
 - **Objective:** Horizontal progress bar toward the next tier threshold. Mono label shows current / required XP. Zero border-radius, `argc-maroon` fill.
-- **Technical Implementation:** `components/shared/xp/xp-bar.tsx` + test; thresholds from `lib/constants.ts` `TIER_THRESHOLDS`.
+- **Technical Implementation:** `components/shared/dashboard/xp-bar.tsx` + test (real path — this task assumed `components/shared/xp/xp-bar.tsx`, never used); thresholds from `lib/constants.ts` `TIER_THRESHOLDS`.
 - **Dependencies:** Blocked by: INFRA-01 (tier thresholds, DONE) · Blocks: MEMBER-03.
 - **Target Week:** 1.
 - **DoD:**
-  - [ ] Correct fill % (current/required from thresholds)
-  - [ ] Renders at 0 XP and unknown XP
-  - [ ] Test passes
+  - [x] Correct fill % (current/required from thresholds)
+  - [ ] Renders at 0 XP and unknown XP — 0 XP isn't explicitly tested (top-tier/maxed is); there's no "unknown XP" state in the shipped API (`xp: number`, no null/undefined case)
+  - [x] Test passes
 
-### [UI-07] TierBadge component
+### [UI-07] TierBadge component — **DONE**
 
 - **Objective:** Chip showing tier (Initiate, Contributor, Architect, Vanguard). Hard edges, IBM Plex Mono, uppercase.
-- **Technical Implementation:** `components/shared/xp/tier-badge.tsx` + test.
+- **Technical Implementation:** `components/shared/dashboard/tier-badge.tsx` + test (real path — this task assumed `components/shared/xp/tier-badge.tsx`, never used).
 - **Dependencies:** Blocked by: none · Blocks: MEMBER-08.
 - **Target Week:** 1.
 - **DoD:**
-  - [ ] All 4 tiers render
-  - [ ] Test passes
+  - [x] All 4 tiers render
+  - [x] Test passes
 
-### [UI-08] RoleBadge component
+### [UI-08] RoleBadge component — **DONE**
 
 - **Objective:** Chip showing member role, same spec as TierBadge. All 5 roles from `types/pocketbase.ts`.
 - **Technical Implementation:** `components/shared/dashboard/role-badge.tsx` + test.
 - **Dependencies:** Blocked by: none · Blocks: UI-03, MEMBER-08.
 - **Target Week:** 1.
 - **DoD:**
-  - [ ] All 5 roles render
-  - [ ] Test passes
+  - [x] All 5 roles render
+  - [x] Test passes
 
-### [UI-09] StatusChip component
+### [UI-09] StatusChip component — **DONE**
 
 - **Objective:** Reusable status indicator. Variants: pending, scheduled, completed, missed, approved, rejected, proposed. Hard edges, mono text, zero radius. Consistent across evaluations, events, endorsements.
 - **Technical Implementation:** `components/shared/dashboard/status-chip.tsx` + test.
 - **Dependencies:** Blocked by: none · Blocks: MEMBER-06/08/09/13/14, ADMIN-05/06, UI-15.
 - **Target Week:** 1.
 - **DoD:**
-  - [ ] Variant map complete (7 variants)
-  - [ ] Test passes
+  - [x] Variant map complete (7 variants) — `scheduled`/`pending` since promoted to their own dedicated colors (Steel Blue/Mist, Signal Amber) rather than the shared ambient neutral; still 7 status strings, all render
+  - [x] Test passes
 
-### [UI-10] StatCard component
+### [UI-10] StatCard component — **DONE**
 
 - **Objective:** Single metric: large number + label + optional delta. Flat on navy, no shadows.
 - **Technical Implementation:** `components/shared/dashboard/stat-card.tsx` + test.
 - **Dependencies:** Blocked by: none · Blocks: UI-13, ADMIN-04.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Renders with/without delta
-  - [ ] Test passes
+  - [x] Renders with/without delta
+  - [x] Test passes
 
-### [UI-11] XpLedgerTable + LoadingRow
+### [UI-11] XpLedgerTable + LoadingRow — **DONE**
 
 - **Objective:** Paginated XP ledger table: date, category, amount, source. Mono for amounts and dates, bordered-row pattern. `LoadingRow` = skeleton row matching bordered-row height. Reuse shadcn `Table` and shared `Skeletons`.
-- **Technical Implementation:** `components/shared/xp/xp-ledger-table.tsx` + test, `components/shared/loading-skeleton.tsx`, `components/ui/table.tsx`.
+- **Technical Implementation:** `components/shared/dashboard/xp-ledger-table.tsx` + test (real path — assumed `components/shared/xp/xp-ledger-table.tsx`, never used), `components/shared/dashboard/loading-row.tsx` (a separate component from the generic `RowSkeleton` in `components/shared/loading-skeleton.tsx` this task assumed it would reuse), `components/ui/table.tsx` still has no real consumer — real markup is hand-rolled `<table>`.
 - **Dependencies:** Blocked by: none · Blocks: MEMBER-04, UI-13.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Renders rows + skeleton + empty state
-  - [ ] Tests pass
+  - [x] Renders rows + skeleton + empty state
+  - [x] Tests pass
 
-### [UI-12] CycleSelector component
+### [UI-12] CycleSelector component — **DONE**
 
 - **Objective:** Dropdown or segmented control to switch between advancement cycles. Used on XP and evaluation pages.
 - **Technical Implementation:** `components/shared/dashboard/cycle-selector.tsx` + test.
 - **Dependencies:** Blocked by: none · Blocks: MEMBER-04, UI-13.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Options render
-  - [ ] Selection callback fires
-  - [ ] Test passes
+  - [x] Options render
+  - [x] Selection callback fires
+  - [x] Test passes
 
 ### [UI-13] Update COMPONENTS.md
 
@@ -332,19 +333,19 @@ Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13
 - **Dependencies:** Blocked by: UI-02, UI-03, UI-04, UI-05, UI-10, UI-11, UI-12.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Every new component has a row
-  - [ ] No stale entries
+  - [ ] Every new component has a row — `EventRow`/`EventsList` (built for UI-15) are missing; everything from UI-02…12 has one
+  - [x] No stale entries
 
-### [UI-15] Public /events page (data-driven)
+### [UI-15] Public /events page (data-driven) — **DONE**
 
 - **Objective:** Follow-up from INFRA-01 decision Q9 (PR #51): rebuild the public events page data-driven from the `events` collection with `is_public = true`, using the existing `EventRow`/`StatusChip` components. Out of dashboard scope by design.
 - **Technical Implementation:** `app/events/page.tsx` (+ route/segment), `app/api/public/events/route.ts` (is_public filter through the proxy), `components/features/landing/event-row.tsx`, `components/shared/dashboard/status-chip.tsx`.
 - **Dependencies:** Blocked by: INFRA-04 (seed data), UI-09 (StatusChip) · Blocks: none.
 - **Target Week:** 4.
 - **DoD:**
-  - [ ] Public events page renders from PocketBase (is_public only)
-  - [ ] Empty state present
-  - [ ] Tests pass; `make check` green
+  - [x] Public events page renders from PocketBase (is_public only)
+  - [x] Empty state present
+  - [x] Tests pass; `make check` green
 
 ---
 

@@ -112,10 +112,35 @@ export function sanitizeHtml(dirty: string): string {
 
 /**
  * Plain-text projection of editor HTML — used for excerpts and for the
- * "content >= 100 visible chars" validation on blog submit.
+ * "content >= 100 visible chars" validation on blog submit. Runs a real
+ * HTML parser (via DOMPurify/jsdom), which raw/untrusted input needs:
+ * malformed markup, comments, and CDATA tricks can defeat a regex strip.
  */
 export function stripHtml(dirty: string): string {
   if (!dirty) return ''
   const text = DOMPurify.sanitize(dirty, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
   return text.replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * Plain-text projection of HTML that has ALREADY been through
+ * `sanitizeHtml()` — a cheap regex tag-strip instead of a second full
+ * DOMPurify/jsdom parse. Only safe here because the input is known-safe,
+ * well-formed output from DOMPurify itself: never call this on raw or
+ * untrusted HTML, use `stripHtml()` for that. Decodes the small, fixed set
+ * of entities DOMPurify's serializer actually emits (&amp; &lt; &gt; &quot;
+ * &#39;) — everything else DOMPurify outputs as literal Unicode, not
+ * numeric/named entities, so this covers the real output space.
+ */
+export function stripSanitizedHtml(clean: string): string {
+  if (!clean) return ''
+  return clean
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
 }

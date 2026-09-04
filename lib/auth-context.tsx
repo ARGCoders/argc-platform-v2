@@ -35,7 +35,12 @@ const SIGNED_OUT: AuthState = {
 
 const LOADING: AuthState = { ...SIGNED_OUT, isLoading: true }
 
-const AuthContext = createContext<AuthContextValue | null>(null)
+/**
+ * Exported only so dev-only tooling (e.g. app/dev/dashboard-preview) can
+ * supply a fake AuthContextValue without a real session. No production code
+ * should import this directly — use useAuth().
+ */
+export const AuthContext = createContext<AuthContextValue | null>(null)
 
 /**
  * Reads the session and returns the resulting state.

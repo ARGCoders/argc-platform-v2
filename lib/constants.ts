@@ -1,4 +1,15 @@
-import type { Role, Tier, XpCategory } from '@/types/pocketbase'
+import type {
+  CycleStatus,
+  EvalStage,
+  EvalStatus,
+  EventStatus,
+  EventType,
+  PostStatus,
+  Role,
+  SubmissionStatus,
+  Tier,
+  XpCategory,
+} from '@/types/pocketbase'
 
 // ─── Roles ────────────────────────────────────────────────────────────────
 
@@ -120,10 +131,33 @@ export const ENDORSEMENT_XP_AWARD = XP_WEIGHTS.endorsement_received
 export const EVAL_PASS_SCORE = 50
 
 /**
+ * Display labels for the 3-stage pipeline (PLATFORM.md §6 Q4): stages 1–2 are
+ * peer evaluations within the evaluatee's node, stage 3 is conducted by their
+ * node leader — naming that in the label itself instead of leaving "Stage 3"
+ * ambiguous about who runs it.
+ */
+export const EVAL_STAGE_LABELS: Record<EvalStage, string> = {
+  standard_1: 'Stage 1',
+  standard_2: 'Stage 2',
+  eval_plus_node_leader: 'Stage 3 · Node Leader',
+}
+
+/**
  * Cross-node votes a member may cast per cycle (Q3): one positive and one
  * negative. Cast through `/api/dashboard/vote`, enforced server-side.
  */
 export const VOTE_BUDGET = { positive: 1, negative: 1 } as const
+
+// ─── Events ───────────────────────────────────────────────────────────────
+
+/** Display labels for the public `/events` page's type badge (UI-15). */
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  knowledge_session: 'Knowledge Session',
+  hackathon: 'Hackathon',
+  workshop: 'Workshop',
+  community: 'Community',
+  cross_node: 'Cross-Node',
+}
 
 // ─── Tiers ────────────────────────────────────────────────────────────────
 
@@ -172,6 +206,52 @@ export function tierProgress(xp: number): TierProgress {
   const next = TIERS[TIERS.indexOf(current) + 1]
   if (next === undefined) return { current, next: null, required: null }
   return { current, next, required: TIER_THRESHOLDS[next] }
+}
+
+// ─── Status ───────────────────────────────────────────────────────────────
+
+/**
+ * The five meanings StatusChip can render, shared across every status domain
+ * below: positive/complete and negative/blocking render in `signal-green`
+ * and `coral` regardless of domain; `scheduled` and `pending` each carry
+ * their own dedicated color (Steel Blue/Mist and Signal Amber) rather than
+ * the shared ambient `neutral` — see DESIGN.md's Status Accents section for
+ * why those two specifically were promoted out of `neutral`. Every other
+ * not-yet-happened state (`proposed`, `upcoming`, `closed`) stays `neutral`.
+ */
+export type StatusTone = 'positive' | 'neutral' | 'negative' | 'scheduled' | 'pending'
+
+export const CYCLE_STATUS_TONE: Record<CycleStatus, StatusTone> = {
+  upcoming: 'neutral',
+  active: 'positive',
+  closed: 'neutral',
+}
+
+export const EVAL_STATUS_TONE: Record<EvalStatus, StatusTone> = {
+  pending: 'pending',
+  scheduled: 'scheduled',
+  completed: 'positive',
+  missed: 'negative',
+}
+
+export const EVENT_STATUS_TONE: Record<EventStatus, StatusTone> = {
+  proposed: 'neutral',
+  approved: 'positive',
+  scheduled: 'scheduled',
+  completed: 'positive',
+  cancelled: 'negative',
+}
+
+export const POST_STATUS_TONE: Record<PostStatus, StatusTone> = {
+  pending: 'pending',
+  published: 'positive',
+  rejected: 'negative',
+}
+
+export const SUBMISSION_STATUS_TONE: Record<SubmissionStatus, StatusTone> = {
+  pending: 'pending',
+  approved: 'positive',
+  rejected: 'negative',
 }
 
 // ─── Auth cookies ─────────────────────────────────────────────────────────
