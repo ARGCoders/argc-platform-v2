@@ -69,6 +69,24 @@ describe('partitionEvents', () => {
     expect(past.map((e) => e.id)).toEqual(['cancelled-future'])
   })
 
+  // Regression guard: a cancelled event's future starts_at must not let it
+  // sort above events that actually happened — "most recent past event"
+  // should never mean "the one that was cancelled before it occurred."
+  it('sorts a cancelled future event after real past events, not before', () => {
+    const realPast = event({
+      id: 'real-past',
+      status: 'completed',
+      starts_at: '2026-01-01T00:00:00.000Z',
+    })
+    const cancelledFuture = event({
+      id: 'cancelled-future',
+      status: 'cancelled',
+      starts_at: '2026-08-01T00:00:00.000Z',
+    })
+    const { past } = partitionEvents([cancelledFuture, realPast], NOW)
+    expect(past.map((e) => e.id)).toEqual(['real-past', 'cancelled-future'])
+  })
+
   // Regression guard: a malformed date must not silently bury a real future
   // event under "Past" where nobody would look for it.
   it('treats an unparseable date as upcoming, and logs it', () => {

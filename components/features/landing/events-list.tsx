@@ -50,7 +50,16 @@ export function partitionEvents(
   }
 
   upcoming.sort((a, b) => a.starts_at.localeCompare(b.starts_at))
-  past.sort((a, b) => b.starts_at.localeCompare(a.starts_at))
+  // Genuinely-occurred events sort before cancelled ones, most-recent-first
+  // within each group — a cancelled event routed here purely by status can
+  // carry a future starts_at, which would otherwise sort it above events
+  // that actually happened.
+  past.sort((a, b) => {
+    const aCancelled = a.status === 'cancelled' ? 1 : 0
+    const bCancelled = b.status === 'cancelled' ? 1 : 0
+    if (aCancelled !== bCancelled) return aCancelled - bCancelled
+    return b.starts_at.localeCompare(a.starts_at)
+  })
 
   return { upcoming, past }
 }
