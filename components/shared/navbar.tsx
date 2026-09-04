@@ -23,10 +23,12 @@ export function Navbar() {
 
   // Dashboard pages get their own slim variant — checked first since it's the
   // most specific match. Pages whose hero is maroon need an opaque maroon
-  // bar, not a translucent one.
+  // bar, not a translucent one. /events used to be listed here too, but it
+  // has no maroon hero (it's a Paper-background listing page) — the bar was
+  // wearing a hero-mode crown with no hero underneath it.
   const variant: 'default' | 'maroon' | 'dashboard' = pathname.startsWith('/dashboard')
     ? 'dashboard'
-    : pathname.startsWith('/events') || pathname.startsWith('/register')
+    : pathname.startsWith('/register')
       ? 'maroon'
       : 'default'
   const isDashboard = variant === 'dashboard'

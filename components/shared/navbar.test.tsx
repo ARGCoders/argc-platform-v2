@@ -65,6 +65,25 @@ describe('Navbar', () => {
   })
 })
 
+describe('Navbar — maroon variant', () => {
+  // Regression guard: /events was removed from the maroon match (it has no
+  // maroon hero — a Paper-background listing page). /register still has one
+  // and must keep the opaque maroon bar.
+  it('does not apply the maroon bar on /events', async () => {
+    vi.mocked(usePathname).mockReturnValue('/events')
+    const { container } = renderWithProviders(<Navbar />)
+    const header = container.querySelector('header')
+    expect(header?.className).not.toContain('bg-argc-maroon')
+  })
+
+  it('still applies the maroon bar on /register', async () => {
+    vi.mocked(usePathname).mockReturnValue('/register')
+    const { container } = renderWithProviders(<Navbar />)
+    const header = container.querySelector('header')
+    expect(header?.className).toContain('bg-argc-maroon')
+  })
+})
+
 describe('Navbar — dashboard variant', () => {
   beforeEach(() => {
     vi.mocked(usePathname).mockReturnValue('/dashboard/xp')
