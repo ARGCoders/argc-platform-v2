@@ -99,9 +99,9 @@ components:
 
 ARGC's platform reads as a console you'd trust to run infrastructure, not a marketing site wearing an engineering costume. Hard square corners (every radius token resolves to `0`), uppercase mono labels tracked like system output, and an ASCII animation running live in the hero all point the same direction: this is a tool that reports state, not one that decorates it. The maroon/navy surface pair does double duty — maroon is the "live" signal color (hero, primary actions, alerts), navy is the console background the member dashboard runs on.
 
-Color is deliberate but not loud: Signal Maroon is used sparingly and always with intent (primary actions, the one accent that means "this matters"), while the rest of the palette sits in a tight cool-neutral band so nothing competes with it. The pairing of a confident geometric sans (Space Grotesk) for voice and a monospace face (IBM Plex Mono) for system-state text (labels, roles, tags) reinforces the terminal read: prose speaks, mono reports.
+Color is deliberate but not loud: Signal Maroon is used sparingly and always with intent (primary actions, the one accent that means "this matters"), while the rest of the palette sits in a tight neutral band so nothing competes with it — Navy and Stone stay cool, Paper has since moved warm (see Neutral, below). The pairing of a confident geometric sans (Space Grotesk) for voice and a monospace face (IBM Plex Mono) for system-state text (labels, roles, tags) reinforces the terminal read: prose speaks, mono reports.
 
-This is an explicit departure from two things: the generic shadcn/SaaS look (primitives are adopted but rethemed, never left stock) and V1's warm-cream (`#FAF8F2`) base, which cast a sepia tint incompatible with the cool, technical register this system commits to.
+This is an explicit departure from the generic shadcn/SaaS look (primitives are adopted but rethemed, never left stock). Paper's own color has reversed course since this system first shipped — it started cool specifically to reject V1's `#FAF8F2` warm-cream base, then deliberately moved warm again to a different value; see Neutral, below, for the current rationale.
 
 **Key Characteristics:**
 
@@ -113,7 +113,7 @@ This is an explicit departure from two things: the generic shadcn/SaaS look (pri
 
 ## Colors
 
-A tight cool-neutral base with one warm, load-bearing accent; nothing competes with Signal Maroon for attention.
+A tight neutral base — Navy and Stone cool, Paper warm since its own reversal (see Neutral, below) — with one warm, load-bearing accent; nothing competes with Signal Maroon for attention.
 
 ### Primary
 
@@ -121,7 +121,7 @@ A tight cool-neutral base with one warm, load-bearing accent; nothing competes w
 
 ### Secondary
 
-- **Steel Blue** (`oklch(0.42 0.07 225)` / `#3C5F77`): secondary buttons and chart series. A cooler, quieter counterpart to maroon — used when an action exists but isn't the primary one. **Steel Blue Dark** (`oklch(0.28 0.06 225)`) is its dashboard/dark-surface step; **Mist** (`oklch(0.85 0.025 225)` / `#CBD4DF`) is its palest tint, used for dashboard sidebar foreground text.
+- **Steel Blue** (`oklch(0.42 0.07 225)` / `#3C5F77`): secondary buttons and chart series. A cooler, quieter counterpart to maroon — used when an action exists but isn't the primary one. **Steel Blue Dark** (`oklch(0.28 0.06 225)`) is its dashboard/dark-surface step; **Mist** (`oklch(0.85 0.025 225)` / `#CBD4DF`) is its palest tint, used for dashboard sidebar foreground text and `StatusChip`'s dark-surface `scheduled` tone (see Status Accents, below).
 
 ### Tertiary
 
@@ -129,23 +129,24 @@ A tight cool-neutral base with one warm, load-bearing accent; nothing competes w
 
 ### Status Accents
 
-Two chip-only accents, each sharing Alert Coral's lightness and chroma (`0.68` / `0.18`) with only the hue rotated — a family of equally-loud, equally-rare signals rather than an open palette. Neither ever fills a page-scale region.
+`StatusChip` now carries five tones, not the original three — `scheduled` and `pending` were promoted out of the shared ambient `neutral` to their own colors, matching a reference kit's per-status palette rather than this system's earlier "equally-loud, equally-rare, never an open palette" stance. That stance still holds for Green/Coral/Amber specifically (all three share Alert Coral's lightness and chroma, `0.68` / `0.18`, hue rotated); `scheduled` breaks from it on purpose — Steel Blue/Mist sit at a different lightness register entirely, chosen for contrast, not to match the loud family.
 
 - **Signal Green** (`oklch(0.68 0.18 145)`): `StatusChip`'s positive/complete tone — `completed`, `approved`, `published`, `active`. Also `StatCard`'s positive-toned delta and `NodeMemberRow`'s completed-stage dot.
-- **Signal Amber** (`oklch(0.68 0.18 78)`): the Architect step of `TierBadge` only. `StatusChip`'s neutral tone stays on the ambient border/text of its surface rather than introducing a third chip hue.
+- **Signal Amber** (`oklch(0.68 0.18 78)`): the Architect step of `TierBadge`, and now also `StatusChip`'s `pending` tone (`pending` evaluations/posts/submissions) — one value on both surfaces, no split needed (measures 6.40:1 on Navy, 2.57:1 on Paper, in line with what Green/Coral already measure on Paper).
 - **Alert Coral** does the equivalent negative-tone job everywhere Signal Green does the positive one — `StatusChip`'s negative tone, `StatCard`'s negative-toned delta, `NodeMemberRow`'s missed-stage dot.
+- **Steel Blue** (light surface) / **Mist** (dark surface) together carry `StatusChip`'s `scheduled` tone (`scheduled` evaluations and events). Surface-split because Steel Blue alone measures only 2.26:1 against Terminal Navy — Mist is Steel Blue's own pale step, already documented above (Secondary) as built for dashboard-surface text, reused here for the same reason.
 
-Sanctioned uses beyond `StatusChip`/`TierBadge` each still pair the hue with a non-color cue rather than relying on hue alone — `NodeMemberRow`'s missed dot carries a ring, `StatCard`'s delta carries bold weight — since Green and Coral share lightness/chroma and sit on the same colorblind confusion axis. A new use of either color outside an existing sanctioned context is a durable system change, recorded here, not a silent extension.
+Sanctioned uses beyond `StatusChip`/`TierBadge` each still pair the hue with a non-color cue rather than relying on hue alone where the pair sits on the red-green confusion axis — `NodeMemberRow`'s missed dot carries a ring, `StatCard`'s delta carries bold weight, Green/Coral chips differ in border style (solid/dashed). Amber and Steel Blue/Mist don't get that same treatment: they aren't on that confusion line the way Green and Coral are. A new use of any of these colors outside an existing sanctioned context is a durable system change, recorded here, not a silent extension.
 
 ### Neutral
 
 - **Terminal Navy** (`oklch(0.18 0.03 240)` / `#0F1720`): the dashboard background and the mobile full-screen menu. This is the "console" surface — cool, near-black, hue-240.
-- **Paper** (`oklch(0.98 0.003 240)`): the public-site page background. Deliberately cool (hue-240, near-zero chroma), not V1's warm cream.
+- **Paper** (`oklch(0.955 0.0083 91.5)` / `#F2F0EA`): the public-site page background. Warm, near-zero chroma. This reverses an earlier decision on this exact token — Paper was cool (hue-240) and its warmth was explicitly rejected as "V1's sepia-tinted look"; the current direction deliberately re-adopts a warm neutral, distinct from V1's own `#FAF8F2` value but in the same warm register. **Stone stays cool (hue-240) for now** — whether it follows Paper into the warm family is a separate, not-yet-made decision, so Paper and Stone are temporarily on different hue axes.
 - **Stone** (`oklch(0.94 0.005 240)`): the alternating section background on paper, one step down from Paper.
 - **Ink** (`oklch(0.18 0.03 240)`) / **Ink Muted** (`oklch(0.42 0.015 240)`): text on Paper/Stone surfaces, full and muted weight.
 - **Hero Ink** (`oklch(1 0 0)`) / **Hero Ink Muted** (`oklch(0.78 0.04 25)`) / **Hero Ink Dim** (`oklch(0.6 0.05 25)`): text on Maroon/Navy surfaces, three weights of emphasis.
 - **Border** (`oklch(0.84 0.006 240)`): decorative dividers and card outlines only — not for anything that must be perceivable as a control boundary.
-- **Input Boundary** (`oklch(0.6 0.012 240)`): the token for any form-control edge. Deliberately darker than `border` — measured 3.74:1 on Paper and 3.32:1 on Stone, meeting WCAG 2.1 SC 1.4.11's 3:1 non-text contrast requirement. Never substitute `border` for a control edge.
+- **Input Boundary** (`oklch(0.6 0.012 240)`): the token for any form-control edge. Deliberately darker than `border` — measured 3.46:1 on Paper (re-measured after Paper's warm reversal above; was 3.74:1 against the old cool Paper) and 3.32:1 on Stone (unchanged), both still meeting WCAG 2.1 SC 1.4.11's 3:1 non-text contrast requirement — Paper's margin is real but has narrowed, worth re-checking again if Paper's value moves further. Never substitute `border` for a control edge.
 
 ### Named Rules
 
@@ -161,6 +162,7 @@ Sanctioned uses beyond `StatusChip`/`TierBadge` each still pair the hue with a n
 ### Hierarchy
 
 - **Display** (700, `clamp(3rem, 7vw, 5.5rem)`, line-height 1.04, tracking -0.025em): the hero headline only. `text-wrap: balance` keeps line breaks intentional.
+- **Page Title** (700, `clamp(2rem, 5vw, 3rem)`): the H1 of a standalone page that isn't the hero — `/events` is the first consumer. Fills the gap between Display (hero-only) and Headline; a page H1 authored as a raw `text-4xl sm:text-5xl` breakpoint jump was the drift that exposed the missing step, against the system's own fluid-`clamp()`-not-breakpoints rule (see Layout, below).
 - **Headline** (700, ~1.5rem, line-height 1.2): section titles.
 - **Title** (500, 1rem, line-height 1.375; 0.875rem in compact/`sm` card contexts): card titles, component headers.
 - **Body** (400, 0.9375rem, line-height 1.65): running copy, form values. Hero tagline caps at 54ch.
@@ -215,7 +217,7 @@ Three small `h-5` mono/uppercase chips report a different kind of fact each, and
 
 - **RoleBadge** — an assigned permission. Weight and fill escalate through the system's own accent tokens as rank rises: outline-only at Guest, a light neutral fill at Member, Steel Blue at Node Leader, Alert Coral at Super Peer, Signal Maroon — reserved for this one rank alone — at Super Admin Peer.
 - **TierBadge** — an earned progress state, deliberately a different construction so it can never be mistaken for a role: a 4-segment tick bar filling left to right (gray → Steel Blue → Signal Amber → Alert Coral). Every tier, including the top one, stays outline-only — RoleBadge alone owns "solid fill means top rank," so a member who is simultaneously Super Peer and Vanguard tier never renders two identically-filled Coral chips in one row.
-- **StatusChip** — a process state on a record (cycle, evaluation, event, post, submission). Always outline-only, never filled — fills are reserved for rank. Three tones only: Signal Green (positive/complete), Alert Coral (negative/blocking), or the ambient neutral border/text of whatever surface it renders on (pending/in-progress) — on Terminal Navy that's `hero-ink/55`, the same measured 3:1 dark-surface boundary `Field` already uses, not the decorative `sidebar-border` hairline. Positive and negative tones also differ in border style (solid vs. dashed), not just hue, since Signal Green and Alert Coral share lightness/chroma. Takes a `surface: 'dark' | 'light'` prop like any other surface-aware control.
+- **StatusChip** — a process state on a record (cycle, evaluation, event, post, submission). Always outline-only, never filled — fills are reserved for rank. Five tones: Signal Green (positive/complete), Alert Coral (negative/blocking), Signal Amber (`pending`), Steel Blue/Mist (`scheduled`, surface-split), or the ambient neutral border/text of whatever surface it renders on for every other not-yet-happened state (`proposed`, `upcoming`, `closed`) — on Terminal Navy that's `hero-ink/55`, the same measured 3:1 dark-surface boundary `Field` already uses, not the decorative `sidebar-border` hairline. Positive and negative tones also differ in border style (solid vs. dashed), not just hue, since Signal Green and Alert Coral share lightness/chroma. Takes a `surface: 'dark' | 'light'` prop like any other surface-aware control.
 - All three accept an optional `ariaLabel` prop that overrides their default `Role: …` / `Tier: …` / `Status: …` accessible name, so a screen reader reading several chips in one row hears which axis each belongs to instead of a bare, ambiguous word.
 
 ### Bordered Rows
@@ -251,7 +253,7 @@ The dashboard's tabular pattern — `EvaluationStageRow` is the first built; `No
 
 ### Navigation
 
-- **Style:** fixed, full-width, `4rem`-tall. Translucent black-tinted at rest, opaque/blurred (`backdrop-blur-md saturate-150`) once scrolled past 60px — except on maroon-variant pages (`/events`, `/register`), which swap to a solid Maroon → Maroon-Dark shift instead of a blur.
+- **Style:** fixed, full-width, `4rem`-tall. Translucent black-tinted at rest, opaque/blurred (`backdrop-blur-md saturate-150`) once scrolled past 60px — except on maroon-variant pages (`/register`), which swap to a solid Maroon → Maroon-Dark shift instead of a blur. `/events` was removed from this variant — it has no maroon hero to justify an opaque maroon bar (Paper background throughout), and Signal Maroon there was already spent on the event-type badge and active filter tab; a third maroon surface on the same page diluted the One Signal Rule rather than reinforcing it.
 - **Typography:** nav links are Space Grotesk, `text-sm font-medium`, generous letter-spacing; profile-menu items and the mobile-menu Dashboard/Logout CTAs switch to the mono/uppercase/tracked treatment.
 - **States:** links go from 75% to full opacity on hover (no underline, no color change) — a restraint pattern distinct from body-copy links, which do use `underline-offset-4 hover:underline`.
 - **Mobile:** full-screen Terminal Navy takeover (not a drawer), large display-weight nav links fading in from 50% to full opacity on hover, hamburger animates to an X via two independently rotating bars.
@@ -305,6 +307,6 @@ A 24fps ASCII-art animation rendered live behind the hero headline, sourced from
 
 - **Don't** add a `box-shadow` to anything at rest in the page flow (cards, buttons, fields). Shadow is reserved for floating overlays only.
 - **Don't** let Alert Coral or Steel Blue compete with Signal Maroon for primary-action attention on the same screen.
-- **Don't** reintroduce a warm/cream neutral base — the cool hue-240 axis (Paper/Stone/Terminal Navy) is a confirmed rejection of V1's sepia-tinted look.
+- **Don't** shift Stone or Terminal Navy to Paper's new warm hue as a silent side effect of an unrelated change — Paper's move to warm (`oklch(0.955 0.0083 91.5)`) was a deliberate, isolated decision; whether Stone follows it into the same family is separate and not yet decided, so the two currently sit on different hue axes on purpose.
 - **Don't** ship a stock, unthemed shadcn component. Every primitive routes through the ARGC token bridge in `app/globals.css`; a component that looks like default shadcn is a bug, not a shortcut.
 - **Don't** import the ASCII frame data as a JS module — fetch it as a static text asset, exactly as the existing `AsciiCanvas` component does.
