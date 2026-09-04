@@ -82,6 +82,18 @@ describe('Navbar — maroon variant', () => {
     const header = container.querySelector('header')
     expect(header?.className).toContain('bg-argc-maroon')
   })
+
+  // Regression guard: 'default''s unscrolled state (bg-black/10 + white text)
+  // assumes a dark hero sits behind the fixed bar. /events has no hero, just
+  // the light Paper background — without this, the header is nearly
+  // unreadable until the visitor scrolls past 60px.
+  it('renders the opaque bar on /events even before scrolling', async () => {
+    vi.mocked(usePathname).mockReturnValue('/events')
+    const { container } = renderWithProviders(<Navbar />)
+    const header = container.querySelector('header')
+    expect(header?.className).toContain('bg-eng-navy/88')
+    expect(header?.className).not.toContain('bg-black/10')
+  })
 })
 
 describe('Navbar — dashboard variant', () => {
@@ -136,5 +148,17 @@ describe('Navbar — dashboard variant', () => {
     expect(header?.className).toContain('bg-sidebar')
     expect(header?.className).not.toContain('bg-eng-navy/88')
     expect(header?.className).not.toContain('bg-black/10')
+  })
+
+  // Regression guard: /dev/dashboard-preview renders the real DashboardShell
+  // outside /dashboard (proxy.ts's auth gate must not touch it), but still
+  // needs the dashboard variant — otherwise the public Navbar's own
+  // hamburger/mobile takeover stacks on top of DashboardSidebar's, the exact
+  // double-navbar bug this variant exists to prevent.
+  it('also applies to /dev/dashboard-preview, which renders DashboardShell outside /dashboard', async () => {
+    vi.mocked(usePathname).mockReturnValue('/dev/dashboard-preview')
+    renderWithProviders(<Navbar />, { user: makeUser({ role: 'node_peer' }) })
+    await screen.findByLabelText('Open profile menu')
+    expect(screen.queryByLabelText('Toggle menu')).toBeNull()
   })
 })

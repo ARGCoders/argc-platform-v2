@@ -26,12 +26,28 @@ export function Navbar() {
   // bar, not a translucent one. /events used to be listed here too, but it
   // has no maroon hero (it's a Paper-background listing page) — the bar was
   // wearing a hero-mode crown with no hero underneath it.
-  const variant: 'default' | 'maroon' | 'dashboard' = pathname.startsWith('/dashboard')
-    ? 'dashboard'
-    : pathname.startsWith('/register')
-      ? 'maroon'
-      : 'default'
+  //
+  // /dev/dashboard-preview renders the real DashboardShell (via
+  // MockAuthProvider) but lives outside /dashboard so proxy.ts's auth gate
+  // never touches it — it needs the same dashboard variant for the same
+  // reason a real /dashboard/* page does: DashboardShell/DashboardSidebar
+  // already own the nav there, and the public Navbar's own hamburger and
+  // full-screen mobile takeover stacking on top of DashboardSidebar's is
+  // exactly the double-navbar bug this variant exists to prevent.
+  const variant: 'default' | 'maroon' | 'dashboard' =
+    pathname.startsWith('/dashboard') || pathname.startsWith('/dev/dashboard-preview')
+      ? 'dashboard'
+      : pathname.startsWith('/register')
+        ? 'maroon'
+        : 'default'
   const isDashboard = variant === 'dashboard'
+
+  // 'default''s unscrolled state (bg-black/10, white text) is a translucent
+  // tint meant to blend into a dark hero sitting directly behind the fixed
+  // bar — that's true on '/', not on a hero-less light page like /events.
+  // Those pages skip straight to the same opaque, always-legible treatment
+  // 'default' only reaches after scrolling.
+  const noHero = pathname.startsWith('/events')
 
   const isGuest = !user || user.role === 'guest'
   const showRegister = !isDashboard && (isLoading || isGuest)
@@ -104,7 +120,7 @@ export function Navbar() {
               ? scrolled
                 ? 'bg-argc-maroon-dk'
                 : 'bg-argc-maroon'
-              : scrolled
+              : scrolled || noHero
                 ? 'bg-eng-navy/88 backdrop-blur-md saturate-150'
                 : 'bg-black/10',
         ].join(' ')}
