@@ -1,7 +1,10 @@
 import { requireRole } from '@/lib/auth'
 import { fetchDashboardApi } from '@/lib/dashboard-fetch'
 import { DashboardHeader } from '@/components/shared/dashboard/dashboard-header'
-import { OverviewContent, type OverviewEvent } from './overview-content'
+import {
+  OverviewContent,
+  type OverviewEvent,
+} from '@/components/features/member/overview-content'
 import type {
   AdvancementCycleRecord,
   EvalStage,
@@ -61,14 +64,16 @@ async function fetchUpcomingEvents(): Promise<OverviewEvent[]> {
 /**
  * Personal summary (MEMBER-03): XP/tier/cycle progress, evaluation status,
  * upcoming events, node name. Three internal fetches, each independently
- * tolerant of its own "nothing yet" state — a missing node never blanks the
+ * tolerant of its own "nothing yet" state — a minor node never blanks the
  * XP section, an empty events list never blanks the evaluation section.
  *
  * `requireRole` runs here directly (not through an API route) purely to
  * learn the caller's own id, so `node/me`'s member list — which has no
- * "this one is you" flag — can be matched to the right row. The actual data
- * reads still go through fetchDashboardApi() per DASHBOARD_CONTRACT §5;
- * this call never touches PocketBase itself.
+ * "this one is you" flag — can be matched to the right row. This is the
+ * minimal justification for a server-component auth check: it enforces
+ * the M+ gate, re-reads the authoritative record, and returns 401/403
+ * via the error boundary — the data reads still go through
+ * fetchDashboardApi() per DASHBOARD_CONTRACT §5.
  */
 export default async function DashboardOverviewPage() {
   const { user } = await requireRole('node_peer')
