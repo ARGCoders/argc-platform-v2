@@ -87,7 +87,12 @@ export default function SurfacePreviewPage() {
           </div>
         </div>
 
-        <div className="bg-eng-navy px-6 py-10 sm:px-10">
+        {/* `dark bg-sidebar`, not the static `bg-eng-navy` this used to be:
+            --sidebar* now swaps with the dashboard theme toggle
+            (lib/dashboard-theme-context.tsx) instead of always being navy —
+            RoleBadge/TierBadge/NodeMemberRow/StatusChip below only resolve
+            correctly inside an actual `.dark`-scoped ancestor now. */}
+        <div className="dark bg-sidebar px-6 py-10 sm:px-10">
           <PanelLabel mood="Dark" name="Terminal Navy — dashboard" surface="dark" />
           <div className="flex flex-col gap-6">
             <div className="flex flex-wrap gap-2">

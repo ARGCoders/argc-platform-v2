@@ -152,18 +152,34 @@
   --chart-4: oklch(0.6 0.15 80);
   --chart-5: oklch(0.5 0.15 280);
 
-  --sidebar: oklch(0.18 0.03 240); /* eng-navy — dashboard rail */
-  --sidebar-foreground: oklch(0.85 0.025 225);
+  /* --sidebar* used to be hardcoded navy here unconditionally — "the
+     dashboard always renders on eng-navy" was true until the dashboard
+     theme toggle (lib/dashboard-theme-context.tsx). These are now the
+     LIGHT values: reused wholesale from the tokens already established for
+     Paper-surface content above, not a new palette. --sidebar itself is
+     Paper's own value (same "page-level chrome background" role Navy plays
+     for dark), --sidebar-foreground is Ink, --sidebar-border is --border,
+     --sidebar-primary/--sidebar-ring are Signal Maroon (already correct for
+     a light ground — unchanged from what this block always had). Only
+     --sidebar-accent (the hover-fill token) is new: Stone, matching how
+     Button/Dropdown already use Stone/muted for light-surface hover fills.
+     The previous navy values now live in .dark below, unchanged. */
+  --sidebar: oklch(0.955 0.0083 91.5);
+  --sidebar-foreground: oklch(0.18 0.03 240);
   --sidebar-primary: oklch(0.34 0.14 21);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.28 0.06 225);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.94 0.005 240);
+  --sidebar-accent-foreground: oklch(0.18 0.03 240);
+  --sidebar-border: oklch(0.84 0.006 240);
   --sidebar-ring: oklch(0.34 0.14 21);
 }
 
-/* Navy-surface variant. The dashboard renders on eng-navy, so shadcn
-   primitives used there need a matching set rather than stock neutral grays. */
+/* Navy-surface variant. The dashboard renders on eng-navy by default, so
+   shadcn primitives used there need a matching set rather than stock
+   neutral grays — and, now that the dashboard theme toggle
+   (lib/dashboard-theme-context.tsx) exists, this is the class it actually
+   applies for the "dark" (default) choice, scoped to DashboardShell's own
+   root rather than <html>, so it can never reach public pages. */
 .dark {
   --background: oklch(0.18 0.03 240);
   --foreground: oklch(0.85 0.025 225);
@@ -183,6 +199,18 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.44 0.14 21);
+
+  /* The values every dashboard component hardcoded directly, back when
+     --sidebar* above was itself hardcoded navy in :root with no override
+     here. Moved verbatim — same values, new home. */
+  --sidebar: oklch(0.18 0.03 240);
+  --sidebar-foreground: oklch(0.85 0.025 225);
+  --sidebar-primary: oklch(0.34 0.14 21);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.28 0.06 225);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.34 0.14 21);
 }
 
 @layer base {
