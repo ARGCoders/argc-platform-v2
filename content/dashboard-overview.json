@@ -1,0 +1,24 @@
+{
+  "labels": {
+    "node": "Node"
+  },
+  "sections": {
+    "evaluationStatus": "Evaluation status",
+    "upcomingEvents": "Upcoming events"
+  },
+  "empty": {
+    "noCycle": {
+      "title": "Nothing earned yet",
+      "description": "XP shows up here once the current cycle is running and you've logged your first entry."
+    },
+    "noNode": {
+      "title": "Not in a node yet",
+      "description": "You'll see your evaluation status here once you're assigned to a node."
+    },
+    "noStageRecord": "No record yet",
+    "noEvents": {
+      "title": "No upcoming events",
+      "description": "Nothing scheduled right now."
+    }
+  }
+}

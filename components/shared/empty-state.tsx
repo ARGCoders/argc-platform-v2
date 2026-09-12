@@ -10,6 +10,16 @@ interface EmptyStateProps {
   icon?: ReactNode
   /** A single call to action, when there is a genuine next step. */
   action?: ReactNode
+  /**
+   * `light` (default) renders on Paper/Stone via the ambient `foreground`/
+   * `muted-foreground`/`border` tokens — correct as-is for the public site,
+   * which never applies `.dark`. `dark` is for a Terminal Navy host: those
+   * ambient tokens resolve to the same near-navy value as the background
+   * there, so this surface swaps to the `sidebar-foreground`/`sidebar-border`
+   * family instead, matching the rest of the Bordered Rows family
+   * (EvaluationStageRow, NodeMemberRow, XpLedgerTable) it sits alongside.
+   */
+  surface?: 'dark' | 'light'
   className?: string
 }
 
@@ -22,25 +32,39 @@ export function EmptyState({
   description,
   icon,
   action,
+  surface = 'light',
   className,
 }: EmptyStateProps) {
   return (
     <div
       className={cn(
         'flex flex-col items-center justify-center text-center',
-        'border border-border border-dashed',
+        'border border-dashed',
+        surface === 'dark' ? 'border-sidebar-border' : 'border-border',
         'px-6 py-14',
         className,
       )}
     >
       {icon && <div className="mb-4 opacity-40">{icon}</div>}
 
-      <p className="font-mono text-[0.72rem] tracking-[0.1em] uppercase text-foreground">
+      <p
+        className={cn(
+          'font-mono text-[0.72rem] tracking-[0.1em] uppercase',
+          surface === 'dark' ? 'text-sidebar-foreground' : 'text-foreground',
+        )}
+      >
         {title}
       </p>
 
       {description && (
-        <p className="mt-2 max-w-prose text-sm text-muted-foreground">{description}</p>
+        <p
+          className={cn(
+            'mt-2 max-w-prose text-sm',
+            surface === 'dark' ? 'text-sidebar-foreground/60' : 'text-muted-foreground',
+          )}
+        >
+          {description}
+        </p>
       )}
 
       {action && <div className="mt-6">{action}</div>}

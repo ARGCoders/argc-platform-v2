@@ -145,9 +145,30 @@ describe('Navbar — dashboard variant', () => {
     })
     await screen.findByLabelText('Open profile menu')
     const header = container.querySelector('header')
-    expect(header?.className).toContain('bg-sidebar')
+    // Flat bg-eng-navy (the default/dark dashboard theme), not the
+    // translucent scroll-driven treatment 'default' uses.
+    expect(header?.className).toContain('bg-eng-navy')
     expect(header?.className).not.toContain('bg-eng-navy/88')
     expect(header?.className).not.toContain('bg-black/10')
+  })
+
+  // Regression guard: Navbar sits outside DashboardShell's own `.dark`-scoped
+  // subtree, so it can't rely on the swappable --sidebar* CSS variable the
+  // way the shell itself does — it needs its own explicit light branch, read
+  // live from the same dashboard-theme context every other surface-aware
+  // dashboard component reads.
+  it('switches to the light dashboard palette when the theme context says light', async () => {
+    localStorage.setItem('argc:dashboard-theme', 'light')
+
+    const { container } = renderWithProviders(<Navbar />, {
+      user: makeUser({ role: 'node_peer' }),
+    })
+    await screen.findByLabelText('Open profile menu')
+
+    const header = container.querySelector('header')
+    expect(header?.className).toContain('bg-paper')
+
+    localStorage.clear()
   })
 
   // Regression guard: /dev/dashboard-preview renders the real DashboardShell

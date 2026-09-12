@@ -97,3 +97,24 @@ export interface EventsContent {
    *  than "none upcoming" or "no history yet". */
   empty: Record<'all' | 'upcoming' | 'past', { title: string; description: string }>
 }
+
+/** Copy for `/dashboard/overview` (MEMBER-03). */
+export interface DashboardOverviewContent {
+  labels: {
+    /** Prefixes the bare node name so it doesn't read as a stray heading. */
+    node: string
+  }
+  sections: {
+    evaluationStatus: string
+    upcomingEvents: string
+  }
+  empty: {
+    /** stats === null — no active cycle and no XP logged are the same shape,
+     *  per me/stats' own contract; never distinguished in the UI. */
+    noCycle: { title: string; description: string }
+    noNode: { title: string; description: string }
+    /** A stage with no evaluations row yet — distinct from any real EvalStatus. */
+    noStageRecord: string
+    noEvents: { title: string; description: string }
+  }
+}

@@ -377,13 +377,15 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
 ### [MEMBER-03] /dashboard/overview page
 
 - **Objective:** Personal summary: XP total + tier + cycle progress (XpBar), evaluation status, upcoming events, node name. Server component; `EmptyState` for missing data.
-- **Technical Implementation:** `app/dashboard/overview/page.tsx` (server component), `components/shared/xp/xp-bar.tsx`, `components/shared/empty-state.tsx`, fetches MEMBER-01 data via internal API call.
+- **Technical Implementation:** `app/dashboard/overview/page.tsx` (server component) + `components/features/member/overview-content.tsx`; fetches MEMBER-01/MEMBER-07/MEMBER-05 data via `lib/dashboard-fetch.ts` internal API calls.
 - **Dependencies:** Blocked by: UI-06, MEMBER-01, INFRA-04 · Blocks: none.
 - **Target Week:** 2 (page shell) / 3 (final data wiring).
+- **Status:** IN PR (PR #68) — actuals deviated from the two original file paths: `XpBar`/`EmptyState` live under `components/shared/dashboard/`; the content component is `components/features/member/overview-content.tsx` (never page-local, DASHBOARD_CONTRACT §3).
 - **DoD:**
   - [ ] Renders from MEMBER-01 data
   - [ ] Empty states for missing data
   - [ ] Tests pass
+- **Known gap:** `node/me` returns each pipeline stage's `score` (0–100), but `app/dashboard/overview/page.tsx` only forwards `{stage, status}` to the page — the score is fetched and silently discarded, never shown to the member. Unlike the deliberate evaluator/scheduled-date omission (those fields genuinely don't exist on this data source), nothing here suggests dropping `score` was intentional. Needs a product call: should a member see the number behind a "completed" chip?
 
 ### [MEMBER-04] /dashboard/xp page
 
