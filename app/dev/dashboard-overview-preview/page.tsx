@@ -13,7 +13,10 @@ const MOCK_USER: UserRecord = {
   intra_id: '00000',
   intra_login: 'amufleh',
   display_name: 'Amufleh',
-  avatar_url: '/mock/amufleh-avatar.jpeg',
+  // The mock avatar asset was removed upstream (public/mock/); an empty
+  // string is Avatar's own documented fallback to an initial-letter badge,
+  // rather than a broken <Image> pointing at a file that no longer exists.
+  avatar_url: '',
   role: 'node_peer',
   last_sync_at: new Date().toISOString(),
   created: new Date().toISOString(),
