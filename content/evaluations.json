@@ -1,0 +1,28 @@
+{
+  "schedule": {
+    "title": "Schedule an evaluation",
+    "intro": "Set a date and assign an evaluator for {name}. Completing on the scheduled date earns the member full credit; completing after earns reduced credit.",
+    "date": {
+      "label": "Date",
+      "required": "Choose a date to schedule the evaluation."
+    },
+    "evaluator": {
+      "label": "Evaluator",
+      "unassigned": "Unassigned"
+    },
+    "submit": "Schedule evaluation",
+    "success": "Evaluation scheduled.",
+    "errors": {
+      "invalid": "The evaluation could not be scheduled with those details.",
+      "conflict": "This evaluation is no longer awaiting scheduling.",
+      "default": "Something went wrong. Please try again."
+    }
+  },
+  "pipeline": {
+    "title": "Evaluation pipeline",
+    "empty": {
+      "title": "No evaluations yet",
+      "description": "This member has no evaluation records."
+    }
+  }
+}
