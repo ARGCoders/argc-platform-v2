@@ -385,6 +385,7 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
   - [ ] Renders from MEMBER-01 data
   - [ ] Empty states for missing data
   - [ ] Tests pass
+- **Known gap:** `node/me` returns each pipeline stage's `score` (0–100), but `app/dashboard/overview/page.tsx` only forwards `{stage, status}` to the page — the score is fetched and silently discarded, never shown to the member. Unlike the deliberate evaluator/scheduled-date omission (those fields genuinely don't exist on this data source), nothing here suggests dropping `score` was intentional. Needs a product call: should a member see the number behind a "completed" chip?
 
 ### [MEMBER-04] /dashboard/xp page
 
