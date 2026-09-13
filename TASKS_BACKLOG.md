@@ -444,12 +444,12 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
 - **Objective:** `GET /api/dashboard/node/evaluations` (all evals for the caller's node) and `PATCH /api/dashboard/node/evaluations/[id]` (schedule, mark complete, update score). Build `EvaluationScheduleForm` and `EvaluationPipelineCard`. Ledger writes via `lib/xp.ts`.
 - **Technical Implementation:** `app/api/dashboard/node/evaluations/route.ts`, `app/api/dashboard/node/evaluations/[id]/route.ts` (stage/status transition validation), `components/features/node/evaluation-schedule-form.tsx`, `components/features/node/evaluation-pipeline-card.tsx`, `lib/xp.ts` `awardXp` on completion.
 - **Dependencies:** Blocked by: INFRA-02, INFRA-06, UI-09 · Blocks: MEMBER-11.
-- **Target Week:** 3.
+- **Target Week:** 3 · **Status:** DONE (API + schedule form + pipeline card, tests green; closes #34).
 - **DoD:**
-  - [ ] NL gate on all routes
-  - [ ] Stage/status transitions validated (e.g., cannot complete an unscheduled eval)
-  - [ ] XP awarded exactly once on completion
-  - [ ] Tests pass
+  - [x] NL gate on all routes
+  - [x] Stage/status transitions validated (e.g., cannot complete an unscheduled eval)
+  - [x] XP awarded exactly once on completion
+  - [x] Tests pass
 
 ### [MEMBER-10] /dashboard/node/members page — **NL+**
 

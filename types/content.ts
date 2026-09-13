@@ -98,6 +98,40 @@ export interface EventsContent {
   empty: Record<'all' | 'upcoming' | 'past', { title: string; description: string }>
 }
 
+/**
+ * Copy for the node-leader evaluation surface (MEMBER-09): the
+ * `EvaluationScheduleForm` and the member `EvaluationPipelineCard`.
+ * `schedule.intro` interpolates `{name}` with the evaluatee's display name.
+ */
+export interface EvaluationsContent {
+  schedule: {
+    title: string
+    intro: string
+    date: {
+      label: string
+      required: string
+    }
+    evaluator: {
+      label: string
+      unassigned: string
+    }
+    submit: string
+    success: string
+    errors: {
+      invalid: string
+      conflict: string
+      default: string
+    }
+  }
+  pipeline: {
+    title: string
+    empty: {
+      title: string
+      description: string
+    }
+  }
+}
+
 /** Copy for `/dashboard/overview` (MEMBER-03). */
 export interface DashboardOverviewContent {
   labels: {
