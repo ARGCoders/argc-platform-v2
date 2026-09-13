@@ -4,7 +4,7 @@ import { requireRole, authErrorResponse } from '@/lib/auth'
 import { getAdminClient } from '@/lib/pocketbase-server'
 import { awardXp } from '@/lib/xp'
 import { XP_WEIGHTS } from '@/lib/constants'
-import { ledNodeFor } from '../scopes'
+import { ledNodeFor } from '../../scopes'
 import type { EvaluationRecord, NodeMemberRecord } from '@/types/pocketbase'
 
 /**

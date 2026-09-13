@@ -325,7 +325,7 @@ Redirects to role-appropriate default view:
 | Component | Description |
 | --- | --- |
 | VoteCastForm | Vote casting UI. Shows eligible cross-node members, allows selecting one positive and one negative subject per cycle. Confirmation step before submit. |
-| EventProposeForm | Event proposal form. Fields: title, type, description, proposed dates, location. Uses existing Field/FieldArea primitives. |
+| EventProposeForm | Node leader proposal filing surface. Fields: title, type, description, `datetime-local` starts_at (client-side future check, JS validation instead of native `required`), optional location, is_public toggle. Uses existing Field/FieldArea/FieldWrapper primitives. |
 | XpAwardForm | Super peer manual XP award. Select member (search), amount, category, note. |
 | EvaluationScheduleForm | Node leader tool to schedule an evaluation: pick evaluator, set date. |
 | EndorsementForm | Public-facing endorsement submission: endorser name, email, relation, message. Lives at /endorse/[token]. |

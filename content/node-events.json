@@ -1,0 +1,49 @@
+{
+  "propose": {
+    "title": "Propose an event",
+    "intro": "File this to the node's proposal pipeline. A super peer reviews it before it becomes a scheduled event.",
+    "fields": {
+      "title": {
+        "label": "Title",
+        "placeholder": "e.g. Hack Night — stdlib reimplementations"
+      },
+      "type": {
+        "label": "Type",
+        "placeholder": "Select a type",
+        "options": {
+          "knowledge_session": "Knowledge session",
+          "hackathon": "Hackathon",
+          "workshop": "Workshop",
+          "community": "Community",
+          "cross_node": "Cross-node"
+        }
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "What happens, who it's for, what to bring."
+      },
+      "starts_at": {
+        "label": "Starts at",
+        "hint": "Must be in the future — this is a proposal, not a log."
+      },
+      "location": {
+        "label": "Location",
+        "placeholder": "Physical venue or a link, if any"
+      },
+      "is_public": {
+        "label": "Public",
+        "hint": "Show on the public events page once approved."
+      }
+    },
+    "submit": "File proposal",
+    "success": "Proposal filed — a super peer will review it.",
+    "errors": {
+      "titleRequired": "A title is required (max 120 characters)",
+      "typeRequired": "Pick an event type",
+      "startsAtRequired": "Set a start time",
+      "inPast": "The start time must be in the future",
+      "invalid": "This proposal can't be saved as-is. Check the fields and try again.",
+      "default": "Something went wrong submitting the proposal. Try again."
+    }
+  }
+}
