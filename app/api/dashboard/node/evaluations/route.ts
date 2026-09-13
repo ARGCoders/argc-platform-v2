@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireRole, authErrorResponse } from '@/lib/auth'
 import { getAdminClient } from '@/lib/pocketbase-server'
 import { parsePagination } from '@/lib/pagination'
-import { ledNodeFor } from './scopes'
+import { ledNodeFor } from '../scopes'
 import type {
   AdvancementCycleRecord,
   EvaluationRecord,
