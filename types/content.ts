@@ -152,3 +152,52 @@ export interface DashboardOverviewContent {
     noEvents: { title: string; description: string }
   }
 }
+
+/**
+ * Copy for the node-leader event pipeline (MEMBER-14): the
+ * `EventProposeForm`. `fields.type.options` keys are the `EventType` slugs the
+ * POST route accepts; the values are what the form shows members.
+ */
+export interface NodeEventsContent {
+  propose: {
+    title: string
+    intro: string
+    fields: {
+      title: {
+        label: string
+        placeholder: string
+      }
+      type: {
+        label: string
+        placeholder: string
+        options: Record<string, string>
+      }
+      description: {
+        label: string
+        placeholder: string
+      }
+      starts_at: {
+        label: string
+        hint: string
+      }
+      location: {
+        label: string
+        placeholder: string
+      }
+      is_public: {
+        label: string
+        hint: string
+      }
+    }
+    submit: string
+    success: string
+    errors: {
+      titleRequired: string
+      typeRequired: string
+      startsAtRequired: string
+      inPast: string
+      invalid: string
+      default: string
+    }
+  }
+}
