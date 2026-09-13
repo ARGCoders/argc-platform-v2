@@ -7,7 +7,7 @@ Read this first if you are joining. `README.md` tells you how to run it,
 file tells you **what state the project is in and which decisions are already settled**,
 so nobody re-litigates a question that has an answer or rebuilds something that exists.
 
-_Last updated: 2 August 2026._
+_Last updated: 13 September 2026._
 
 ---
 
@@ -16,37 +16,44 @@ _Last updated: 2 August 2026._
 V2 is a rebuild of `argc_platform`. The engineering environment is finished — formatter,
 tests, hooks, CI, and a reproducible backend. The **public UI is deliberately not built**:
 only the hero and navbar exist, because the design is being reworked and building against
-the old design twice would be waste. The next real work is the UI redesign.
+the old design twice would be waste. The **dashboard member track is underway**: all of
+Role 3's member APIs except one are merged, the first two dashboard pages (overview, node
+event propose) are live in code, and the remaining member pages are the next feature work.
+Nothing is deployed end-to-end yet — the PocketBase backend is still offline (see
+INFRA-07 in the blockers below).
 
 ---
 
 ## What is done
 
-| Area               | State                                                                         |
-| ------------------ | ----------------------------------------------------------------------------- |
-| Scaffold           | Next.js 16, TypeScript strict, Tailwind v4, shadcn rethemed to ARGC           |
-| Design system      | `app/globals.css` — ARGC palette, square corners, WCAG-checked contrast       |
-| Auth               | Full 42 Intra OAuth: login, callback, logout, session refresh, `AuthProvider` |
-| Route gating       | `proxy.ts`, all three rules verified against a running server                 |
-| Component library  | 18 modules, themed and accessible — see `COMPONENTS.md`                       |
-| Tests              | Vitest + Testing Library, 51 tests                                            |
-| CI                 | GitHub Actions: format, lint, typecheck, test, build                          |
-| Commit hygiene     | Prettier, husky, lint-staged, commitlint                                      |
-| Backend schema     | `scripts/setup-collections.mjs` — 17 collections, idempotent                  |
-| Local backend      | `make db` runs PocketBase on `:8090`                                          |
-| Deployable backend | `pocketbase/` — Dockerfile, entrypoint, Railway config                        |
+| Area                 | State                                                                                                                                                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Scaffold             | Next.js 16, TypeScript strict, Tailwind v4, shadcn rethemed to ARGC                                                                                                                                                                                          |
+| Design system        | `app/globals.css` — ARGC palette, square corners, WCAG-checked contrast                                                                                                                                                                                      |
+| Auth                 | Full 42 Intra OAuth: login, callback, logout, session refresh, `AuthProvider`                                                                                                                                                                                |
+| Route gating         | `proxy.ts`, all three rules verified against a running server                                                                                                                                                                                                |
+| Component library    | ~35 component modules, themed and accessible — see `COMPONENTS.md`                                                                                                                                                                                           |
+| Tests                | Vitest + Testing Library, 636 tests across 51 files                                                                                                                                                                                                          |
+| CI                   | GitHub Actions: format, lint, typecheck, test, build                                                                                                                                                                                                         |
+| Commit hygiene       | Prettier, husky, lint-staged, commitlint                                                                                                                                                                                                                     |
+| Backend schema       | `scripts/setup-collections.mjs` — 17 collections, idempotent                                                                                                                                                                                                 |
+| Local backend        | `make db` runs PocketBase on `:8090`                                                                                                                                                                                                                         |
+| Deployable backend   | `pocketbase/` — Dockerfile, entrypoint, Railway config                                                                                                                                                                                                       |
+| Member (Role 3) APIs | 12 of 13 merged: `me/stats`, `me/xp`, `node/me`, `events` + `[id]/rsvp`, `node/evaluations` + `[id]` PATCH, `vote` + `eligible`/`summary`/`my-votes`, `node/events` GET/POST (MEMBER-01/02/05/07/09/12/14). The 13th, `me/evaluations`, ships with MEMBER-13 |
+| Dashboard pages      | `/dashboard/overview` (MEMBER-03) and `/dashboard/node/events/propose` (MEMBER-14) — both server components with error/loading boundaries                                                                                                                    |
 
 ## What is not done
 
-| Area             | State                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| Landing page     | **Hero only.** Vision, about and contact were removed pending the redesign           |
-| Blog             | Removed. Was fully working — components, pages, four API routes, sanitised rendering |
-| Events           | Removed. Was reading the PocketBase `events` collection                              |
-| Handbook         | Removed. Was rendering markdown from the `argc-handbook` repo with 1h ISR            |
-| Registration     | Removed. Was writing to `submissions`                                                |
-| Dashboard        | Never started                                                                        |
-| Deployed backend | Blocked — see below                                                                  |
+| Area             | State                                                                                                                                                                                                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Landing page     | **Hero only.** Vision, about and contact were removed pending the redesign                                                                                                                                                                                                    |
+| Blog             | Removed. Was fully working — components, pages, four API routes, sanitised rendering                                                                                                                                                                                          |
+| Events           | Removed. Was reading the PocketBase `events` collection                                                                                                                                                                                                                       |
+| Handbook         | Removed. Was rendering markdown from the `argc-handbook` repo with 1h ISR                                                                                                                                                                                                     |
+| Registration     | Removed. Was writing to `submissions`                                                                                                                                                                                                                                         |
+| Dashboard        | Member track in progress — 8 of 14 MEMBER tasks closed. Six page tasks remain: `/dashboard/xp`, `/dashboard/events`, `/dashboard/node`, `/dashboard/node/members`, `/dashboard/node/evaluations`, and `/dashboard/vote` + `/dashboard/evaluations` (MEMBER-04/06/08/10/11/13) |
+| Admin (Role 4)   | Never started — ADMIN-01…11 issues all open                                                                                                                                                                                                                                   |
+| Deployed backend | Blocked — see below                                                                                                                                                                                                                                                           |
 
 Everything in that first block was built, worked, and was rolled back **on purpose**. The
 code is in git history at `efefd73^` if it is useful as reference — but it was written
@@ -87,7 +94,7 @@ instruction** — its preliminary notes repeat the `proxy.ts` error.
 
 ## Known blockers
 
-### The backend is not deployed
+### The backend is not deployed (INFRA-07, issue #10)
 
 `pocketbase-production-59e1.up.railway.app` returns `404 Application not found`. Neither
 Railway project contains a PocketBase service — it was created by hand in a dashboard, so
@@ -101,7 +108,8 @@ Free plan resource provision limit exceeded
 
 A service and volume **can** be created on that plan, but builds fail at scheduling with
 no output. The image itself is fine — it builds and serves locally, `db:setup` populates
-it, and the data survives a restart. Deployment is moving to a teammate's account.
+it, and the data survives a restart. Deployment is moving to a teammate's account; until
+it completes, **no environment serves the API** — merged code is not live code.
 
 Whoever deploys: **the volume at `/pb_data` is not optional.** Without it the database is
 wiped on every deploy. `make pb-deploy` warns, but cannot stop you.
@@ -138,22 +146,29 @@ has run, **that directory is the database.** Do not delete it.
 
 In rough order.
 
-1. **The UI redesign.** Everything else waits on it. Landing sections, then blog, events,
-   handbook, registration. The API routes and data shapes for all four are in git history
-   and can be lifted; the components should be written fresh.
-2. **Deploy PocketBase** on an account without the quota limit, then `make pb-restore` to
-   carry the local data across, then repoint `NEXT_PUBLIC_POCKETBASE_URL`.
-3. **Deploy the frontend.** V1's `deploy.yml` (`railway up` on green CI) is a working
+1. **Finish the dashboard member track.** The underlying APIs are shipped, so this is
+   page work: `/dashboard/node/evaluations` (MEMBER-11) and `/dashboard/vote` +
+   `/dashboard/evaluations` (MEMBER-13, shipping the last member route `me/evaluations`)
+   come first — they close Role 3's critical path — then `/dashboard/xp`, `/dashboard/events`,
+   `/dashboard/node`, `/dashboard/node/members` (MEMBER-04/06/08/10) to clear the board.
+2. **The UI redesign.** Landing sections, then blog, events, handbook, registration. The
+   API routes and data shapes for all four are in git history and can be lifted; the
+   components should be written fresh.
+3. **Deploy PocketBase** (INFRA-07) on an account without the quota limit, then
+   `make pb-restore` to carry the local data across, then repoint
+   `NEXT_PUBLIC_POCKETBASE_URL`. Nothing is live until this lands.
+4. **Deploy the frontend.** V1's `deploy.yml` (`railway up` on green CI) is a working
    starting point; it was deliberately not carried over.
-4. **The dashboard**, once `PLATFORM.md` §6 has answers.
 
 ### Good first tasks
 
 - Replace `app/favicon.ico`. It is still the Next.js default — the site currently ships
   the Next logo as its icon. `public/logo_no_text.svg` is the obvious source.
-- Add tests for `lib/auth.ts` — currently the least covered security-sensitive module.
+- Add tests for `lib/auth.ts` — currently the least covered security-sensitive module
+  (no test file exists at `lib/auth.test.ts`).
 - Fill in `COMPONENTS.md` props for anything you use and find under-documented.
-- Answer any of the ten open questions in `PLATFORM.md` §6; each unblocks dashboard work.
+- Tick the resolved product questions in `PLATFORM.md` §5/§6 — Q1–Q10 were answered
+  on 16 August (INFRA-01); several of our feature decisions row up against them.
 
 ---
 

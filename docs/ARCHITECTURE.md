@@ -124,7 +124,7 @@ It returns `{ created, ledger, stats }`. What it guarantees:
 - **Validation** — a non-zero finite amount, known category/reference type and non-empty
   ids, or it throws `XpError` before touching the database.
 
-For cycle-close reconciliation, ADMIN-08's recompute rebuilds `user_stats` from the
+For cycle-close reconciliation, ADMIN-01's recompute rebuilds `user_stats` from the
 ledger — the recovery path if inline updates ever diverge. The ledger stays append-only;
 a wrong award is corrected with a negative `manual_adjustment`, never by editing a row.
 
