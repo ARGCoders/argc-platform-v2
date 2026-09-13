@@ -1,6 +1,7 @@
 import { render, type RenderOptions } from '@testing-library/react'
 import type { ReactElement, ReactNode } from 'react'
 import { AuthContextTestProvider } from './auth-harness'
+import { DashboardThemeProvider } from '@/lib/dashboard-theme-context'
 import type { UserRecord } from '@/types/pocketbase'
 
 /**
@@ -19,7 +20,7 @@ export function renderWithProviders(
   function Wrapper({ children }: { children: ReactNode }) {
     return (
       <AuthContextTestProvider user={user} isLoading={isLoading}>
-        {children}
+        <DashboardThemeProvider>{children}</DashboardThemeProvider>
       </AuthContextTestProvider>
     )
   }

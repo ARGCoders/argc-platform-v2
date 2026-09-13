@@ -110,6 +110,21 @@ describe('DashboardSidebar', () => {
     expect(mobileSkeleton?.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
   })
 
+  // Regression guard: Identity, not DashboardHeader's actions slot — that
+  // slot is opt-in per-page (only /dashboard/overview renders one today),
+  // while Identity renders unconditionally on every dashboard route.
+  it('renders a theme toggle in Identity, switching the accessible label on click', async () => {
+    renderWithProviders(<DashboardSidebar />, { user: makeUser({ role: 'node_peer' }) })
+    // Identity renders twice (desktop rail + mobile takeover) — both toggles
+    // share one context, so clicking either flips both.
+    const toggles = await screen.findAllByLabelText('Switch to light theme')
+    expect(toggles.length).toBeGreaterThan(0)
+    fireEvent.click(toggles[0]!)
+    expect(await screen.findAllByLabelText('Switch to dark theme')).toHaveLength(
+      toggles.length,
+    )
+  })
+
   it('applies the DESIGN.md Label weight to nav links and group labels', async () => {
     renderWithProviders(<DashboardSidebar />, { user: makeUser({ role: 'super_peer' }) })
     const links = await screen.findAllByRole('link', { name: 'Overview' })

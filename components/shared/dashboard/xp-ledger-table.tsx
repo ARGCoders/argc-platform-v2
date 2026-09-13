@@ -131,6 +131,7 @@ export function XpLedgerTable({
       <EmptyState
         title="No XP Entries"
         description="Nothing has posted to your ledger for this cycle yet."
+        surface={surface}
         className={className}
       />
     )

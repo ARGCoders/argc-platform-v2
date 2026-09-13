@@ -5,7 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import { useDashboardTheme } from '@/lib/dashboard-theme-context'
 import { site } from '@/lib/content'
+import { cn } from '@/lib/utils'
 
 // Nav is editable in content/site.json — no code change to add or reorder links.
 const NAV_LINKS = site.nav
@@ -41,6 +43,12 @@ export function Navbar() {
         ? 'maroon'
         : 'default'
   const isDashboard = variant === 'dashboard'
+  // Navbar sits in the root layout, outside DashboardShell's scoped `.dark`
+  // subtree — it can't rely on --sidebar*'s CSS-variable swap the way the
+  // shell itself does, so the dashboard variant needs its own explicit
+  // light branch, same as every other ARGC component's surface prop.
+  const { surface } = useDashboardTheme()
+  const dashboardLight = isDashboard && surface === 'light'
 
   // 'default''s unscrolled state (bg-black/10, white text) is a translucent
   // tint meant to blend into a dark hero sitting directly behind the fixed
@@ -115,7 +123,9 @@ export function Navbar() {
           'px-[clamp(1.5rem,4vw,3rem)]',
           'transition-[background,backdrop-filter] duration-400',
           variant === 'dashboard'
-            ? 'bg-sidebar border-b border-sidebar-border'
+            ? dashboardLight
+              ? 'bg-paper border-b border-border'
+              : 'bg-eng-navy border-b border-white/12'
             : variant === 'maroon'
               ? scrolled
                 ? 'bg-argc-maroon-dk'
@@ -128,7 +138,7 @@ export function Navbar() {
         <Link
           href="/"
           aria-label="ARGC home"
-          className="shrink-0 bg-black/20 py-[0.625rem] px-3"
+          className={cn('shrink-0 py-[0.625rem] px-3', !dashboardLight && 'bg-black/20')}
         >
           <Image
             src="/logo_argc.svg"
@@ -136,7 +146,10 @@ export function Navbar() {
             width={340}
             height={88}
             priority
-            className="h-10 w-auto brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
+            className={cn(
+              'h-10 w-auto opacity-90 hover:opacity-100 transition-opacity',
+              !dashboardLight && 'brightness-0 invert',
+            )}
           />
         </Link>
 
@@ -181,7 +194,12 @@ export function Navbar() {
                 aria-label="Open profile menu"
                 aria-expanded={profileOpen}
                 aria-controls="profile-dropdown"
-                className="shrink-0 overflow-hidden border border-white/20 hover:border-white/60 transition-all cursor-pointer bg-transparent p-0 w-10 h-10"
+                className={cn(
+                  'shrink-0 overflow-hidden transition-all cursor-pointer bg-transparent p-0 w-10 h-10 border',
+                  dashboardLight
+                    ? 'border-foreground/20 hover:border-foreground/60'
+                    : 'border-white/20 hover:border-white/60',
+                )}
               >
                 <Avatar
                   src={user.avatar_url}
@@ -193,13 +211,33 @@ export function Navbar() {
                 <div
                   id="profile-dropdown"
                   role="menu"
-                  className="absolute right-0 top-full mt-2 w-56 bg-eng-navy border border-hero-ink/15 z-overlay"
+                  className={cn(
+                    'absolute right-0 top-full mt-2 w-56 z-overlay border',
+                    dashboardLight
+                      ? 'bg-card border-border shadow-lg ring-1 ring-foreground/10'
+                      : 'bg-eng-navy border-hero-ink/15',
+                  )}
                 >
-                  <div className="px-4 py-3 border-b border-hero-ink/10">
-                    <p className="text-hero-ink text-sm font-semibold truncate">
+                  <div
+                    className={cn(
+                      'px-4 py-3 border-b',
+                      dashboardLight ? 'border-border' : 'border-hero-ink/10',
+                    )}
+                  >
+                    <p
+                      className={cn(
+                        'text-sm font-semibold truncate',
+                        dashboardLight ? 'text-foreground' : 'text-hero-ink',
+                      )}
+                    >
                       {user.display_name || user.intra_login}
                     </p>
-                    <p className="font-mono text-[0.6rem] tracking-[0.15em] uppercase text-hero-ink/40">
+                    <p
+                      className={cn(
+                        'font-mono text-[0.6rem] tracking-[0.15em] uppercase',
+                        dashboardLight ? 'text-muted-foreground' : 'text-hero-ink/40',
+                      )}
+                    >
                       {user.role.replace(/_/g, ' ')}
                     </p>
                   </div>
@@ -220,7 +258,12 @@ export function Navbar() {
                     type="button"
                     onClick={handleLogout}
                     role="menuitem"
-                    className="w-full text-left px-4 py-3 text-hero-ink/75 hover:text-hero-ink hover:bg-hero-ink/5 transition-colors font-mono text-[0.7rem] tracking-[0.1em] uppercase"
+                    className={cn(
+                      'w-full text-left px-4 py-3 transition-colors font-mono text-[0.7rem] tracking-[0.1em] uppercase',
+                      dashboardLight
+                        ? 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                        : 'text-hero-ink/75 hover:text-hero-ink hover:bg-hero-ink/5',
+                    )}
                   >
                     Logout
                   </button>

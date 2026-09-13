@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Space_Grotesk, IBM_Plex_Mono } from 'next/font/google'
 import { ViewTransition } from 'react'
 import { AuthProvider } from '@/lib/auth-context'
+import { DashboardThemeProvider } from '@/lib/dashboard-theme-context'
 import { Navbar } from '@/components/shared/navbar'
 import { site } from '@/lib/content'
 import './globals.css'
@@ -33,8 +34,10 @@ export default function RootLayout({
     <html lang="en" className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Navbar />
-          <ViewTransition>{children}</ViewTransition>
+          <DashboardThemeProvider>
+            <Navbar />
+            <ViewTransition>{children}</ViewTransition>
+          </DashboardThemeProvider>
         </AuthProvider>
       </body>
     </html>

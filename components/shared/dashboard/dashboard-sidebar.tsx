@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Moon, Sun } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
+import { useDashboardTheme } from '@/lib/dashboard-theme-context'
 import { roleAtLeast } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { Avatar } from '../avatar'
@@ -189,6 +191,31 @@ function NavLinks({
   )
 }
 
+/**
+ * Manual-only light/dark toggle for the dashboard specifically — see
+ * lib/dashboard-theme-context.tsx. Lives here, not DashboardHeader's actions
+ * slot: that slot is opt-in per-page (only /dashboard/overview renders one
+ * today), while Identity renders unconditionally on every dashboard route,
+ * desktop and mobile alike. Icon shows the surface a click switches *to*
+ * (Sun while dark, since clicking goes to light), matching the common
+ * convention for this kind of control.
+ */
+function ThemeToggle() {
+  const { surface, toggle } = useDashboardTheme()
+  const Icon = surface === 'dark' ? Sun : Moon
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={surface === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+      className="flex shrink-0 cursor-pointer items-center justify-center border border-sidebar-border bg-transparent p-1.5 text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+    >
+      <Icon aria-hidden="true" className="size-4" />
+    </button>
+  )
+}
+
 function Identity({
   name,
   role,
@@ -201,10 +228,11 @@ function Identity({
   return (
     <div className="flex items-center gap-3 border-b border-sidebar-border px-3 py-4">
       <Avatar src={avatarUrl} name={name} size={40} />
-      <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="truncate text-sm font-medium text-sidebar-foreground">{name}</p>
         <RoleBadge role={role} />
       </div>
+      <ThemeToggle />
     </div>
   )
 }
@@ -224,6 +252,7 @@ function SidebarSkeleton() {
             <div className="h-3.5 w-24 animate-pulse bg-sidebar-foreground/10" />
             <div className="h-4 w-16 animate-pulse bg-sidebar-foreground/10" />
           </div>
+          <div className="h-7 w-7 shrink-0 animate-pulse bg-sidebar-foreground/10" />
         </div>
         <div className="flex flex-col gap-2 px-3 py-4">
           {Array.from({ length: 6 }, (_, i) => (

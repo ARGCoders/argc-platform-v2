@@ -3,12 +3,14 @@ import landingJson from '@/content/landing.json'
 import voteJson from '@/content/vote.json'
 import eventsJson from '@/content/events.json'
 import evaluationsJson from '@/content/evaluations.json'
+import dashboardOverviewJson from '@/content/dashboard-overview.json'
 import type {
   SiteContent,
   LandingContent,
   VoteContent,
   EventsContent,
   EvaluationsContent,
+  DashboardOverviewContent,
 } from '@/types/content'
 
 /**
@@ -27,3 +29,4 @@ export const landing: LandingContent = landingJson
 export const vote: VoteContent = voteJson
 export const events: EventsContent = eventsJson
 export const evaluations: EvaluationsContent = evaluationsJson
+export const dashboardOverview: DashboardOverviewContent = dashboardOverviewJson
