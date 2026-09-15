@@ -2,5 +2,30 @@
   "hero": {
     "headline": ["Engineers today.", "Multipliers", "forever."],
     "tagline": "We exist to build, ship, and sustain the infrastructure that raises the standard of engineering at 42 Amman and beyond."
+  },
+  "missionValues": {
+    "statement": [
+      "Membership here is not a title you hold —",
+      "it's a record you build."
+    ],
+    "detail": "Every tier, every vote, every hour of mentorship is logged, evaluated, and never assumed.",
+    "values": [
+      {
+        "tag": "Ledger",
+        "text": "Every contribution is recorded, not remembered. XP, evaluations, and votes trace back to an auditable entry — nothing here runs on hearsay or seniority."
+      },
+      {
+        "tag": "Earned",
+        "text": "Tiers are earned through evaluations, events, and peer recognition — never through how long you've been a member."
+      },
+      {
+        "tag": "Multiply",
+        "text": "The goal isn't finishing your own project quietly. It's leaving the node stronger than you found it — through mentorship, cross-node votes, and the evaluations you sit for others."
+      },
+      {
+        "tag": "Shipped",
+        "text": "Production-oriented means what it says: judged by real, sustained infrastructure, not by a claim a neighboring club could make unchanged."
+      }
+    ]
   }
 }

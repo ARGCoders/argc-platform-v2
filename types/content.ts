@@ -39,6 +39,14 @@ export interface LandingContent {
     headline: string[]
     tagline: string
   }
+  /** Copy for the Mission & Values section, directly below the hero. */
+  missionValues: {
+    /** Multi-line, same convention as hero.headline: one entry per rendered line. */
+    statement: string[]
+    detail: string
+    /** `tag` is a short mono classifier (e.g. "Ledger"), not a sequence number. */
+    values: { tag: string; text: string }[]
+  }
 }
 
 /**
