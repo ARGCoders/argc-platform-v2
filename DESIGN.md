@@ -308,6 +308,8 @@ A 24fps ASCII-art animation rendered live behind the hero headline, sourced from
 - Respects `prefers-reduced-motion` by rendering nothing at all, rather than freezing on a mid-type frame — unlike the hero's canvas, no single frame here is a meaningful "still," since the motion itself is the point.
 - **Exit is a combined height-collapse + fade**, not an abrupt unmount — the node-name/XP content below settles into place smoothly instead of jumping the instant the flourish disappears.
 
+**Scoped exception: the Mission & Values shape ornament.** `components/features/landing/mission-values.tsx` renders one static ASCII shape (`content/ascii/shape-2.txt`, ported verbatim from V1) above the mission statement, at `text-[2.2px]` `font-black` `text-ink` (full opacity) — matching V1's own `SectionVision.tsx` treatment exactly, not a faded texture. Both `2.2px` and V1's `font-black` are off the documented type ramp and Space Grotesk's loaded-weight set respectively: `font-black` (900) has no true weight in IBM Plex Mono (Google serves this family only up to 700, confirmed identical in V1's own font config), so it renders as the browser's synthesized bold, on both sites, not a real weight — an accepted V1-parity trade-off, not a V2-only shortcut. `overflow-hidden` on the `<pre>` clips the raw monospace content at the column edge, since at `md` widths (before `lg`'s wider padding applies) the shape's real rendered width can exceed the mission column's — it must never visually cross the divider into the values column. Hidden below `md` (`hidden md:block`) and `aria-hidden="true"` at every width.
+
 ## Do's and Don'ts
 
 ### Do:
