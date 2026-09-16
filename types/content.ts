@@ -57,6 +57,26 @@ export interface LandingContent {
     stat: { value: string; label: string }
     domains: { name: string; detail: string }[]
   }
+  /** Copy for the events/handbook preview section, directly below Nodes. */
+  eventsHandbook: {
+    events: {
+      heading: string
+      detail: string
+      cta: string
+      empty: { title: string; description: string }
+    }
+    handbook: {
+      heading: string
+      detail: string
+      /** Stable, hardcoded from the handbook's real current folder
+       *  structure — not derived live (would need the rate-limited GitHub
+       *  REST API to list a directory; this set rarely changes anyway). */
+      categories: string[]
+      /** Shown only if the live README fetch fails (lib/handbook.ts). */
+      fallbackIntro: string
+      cta: string
+    }
+  }
 }
 
 /**

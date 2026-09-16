@@ -53,5 +53,23 @@
         "detail": "External communications, partnerships, and community presence."
       }
     ]
+  },
+  "eventsHandbook": {
+    "events": {
+      "heading": "Upcoming",
+      "detail": "Real events, not a promise — this is what's actually on the calendar.",
+      "cta": "See all events",
+      "empty": {
+        "title": "Nothing scheduled",
+        "description": "No upcoming events are public right now — check back soon."
+      }
+    },
+    "handbook": {
+      "heading": "The Handbook",
+      "detail": "Pulled live from the same document every member is held to — not landing-page copy.",
+      "categories": ["Company", "People", "Protocols", "Ecosystem", "Operations"],
+      "fallbackIntro": "ARGC is a production-oriented engineering collective at 42 Amman. This handbook documents how we operate, what we stand for, and what we expect from every member — public by design, so the standard we hold ourselves to is visible to anyone evaluating us.",
+      "cta": "Read the handbook"
+    }
   }
 }
