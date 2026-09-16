@@ -210,7 +210,7 @@ Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13
 - **Dependencies:** Blocked by: none.
 - **Target Week:** 1.
 - **DoD:** Sections render; content-driven; responsive; WCAG-checked; navbar variants correct; `make check` green.
-- **Status:** `app/page.tsx` now renders `<Hero />` → `<MissionValues />` → `<Nodes />`, mounted as each section lands (not held back for all four). The events/handbook preview section and the register CTA are still unbuilt. Navbar variants (`default`/`maroon`/`dashboard`) are done, including an earlier session's fixes.
+- **Status:** `app/page.tsx` now renders `<Hero />` → `<MissionValues />` → `<Nodes />` → `<EventsHandbookPreview />`, mounted as each section lands. Only the register CTA is still unbuilt. Navbar variants (`default`/`maroon`/`dashboard`) are done, including an earlier session's fixes.
 
 ### [UI-02] DashboardShell — **DONE**
 
