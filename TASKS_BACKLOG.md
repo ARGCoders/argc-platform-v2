@@ -326,14 +326,14 @@ Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13
   - [x] Selection callback fires
   - [x] Test passes
 
-### [UI-13] Update COMPONENTS.md
+### [UI-13] Update COMPONENTS.md — **DONE**
 
 - **Objective:** Document every new component from UI-02…12: file path, props, behaviour. Add a row for each.
 - **Technical Implementation:** `docs/COMPONENTS.md`.
 - **Dependencies:** Blocked by: UI-02, UI-03, UI-04, UI-05, UI-10, UI-11, UI-12.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Every new component has a row — `EventRow`/`EventsList` (built for UI-15) are missing; everything from UI-02…12 has one
+  - [x] Every new component has a row — `EventRow`/`EventsList` (built for UI-15) now documented, along with everything from UI-02…12 and UI-01
   - [x] No stale entries
 
 ### [UI-15] Public /events page (data-driven) — **DONE**
@@ -374,17 +374,17 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
   - [x] Pagination + cycle filter work
   - [x] Tests pass
 
-### [MEMBER-03] /dashboard/overview page
+### [MEMBER-03] /dashboard/overview page — **DONE**
 
 - **Objective:** Personal summary: XP total + tier + cycle progress (XpBar), evaluation status, upcoming events, node name. Server component; `EmptyState` for missing data.
 - **Technical Implementation:** `app/dashboard/overview/page.tsx` (server component) + `components/features/member/overview-content.tsx`; fetches MEMBER-01/MEMBER-07/MEMBER-05 data via `lib/dashboard-fetch.ts` internal API calls.
 - **Dependencies:** Blocked by: UI-06, MEMBER-01, INFRA-04 · Blocks: none.
 - **Target Week:** 2 (page shell) / 3 (final data wiring).
-- **Status:** IN PR (PR #68) — actuals deviated from the two original file paths: `XpBar`/`EmptyState` live under `components/shared/dashboard/`; the content component is `components/features/member/overview-content.tsx` (never page-local, DASHBOARD_CONTRACT §3).
+- **Status:** **DONE** — merged to `main` (PR #68). Actuals deviated from the two original file paths: `XpBar`/`EmptyState` live under `components/shared/dashboard/`; the content component is `components/features/member/overview-content.tsx` (never page-local, DASHBOARD_CONTRACT §3).
 - **DoD:**
-  - [ ] Renders from MEMBER-01 data
-  - [ ] Empty states for missing data
-  - [ ] Tests pass
+  - [x] Renders from MEMBER-01 data
+  - [x] Empty states for missing data
+  - [x] Tests pass
 - **Known gap:** `node/me` returns each pipeline stage's `score` (0–100), but `app/dashboard/overview/page.tsx` only forwards `{stage, status}` to the page — the score is fetched and silently discarded, never shown to the member. Unlike the deliberate evaluator/scheduled-date omission (those fields genuinely don't exist on this data source), nothing here suggests dropping `score` was intentional. Needs a product call: should a member see the number behind a "completed" chip?
 
 ### [MEMBER-04] /dashboard/xp page
