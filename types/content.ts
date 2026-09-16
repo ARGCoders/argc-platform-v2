@@ -47,6 +47,16 @@ export interface LandingContent {
     /** `tag` is a short mono classifier (e.g. "Ledger"), not a sequence number. */
     values: { tag: string; text: string }[]
   }
+  /** Copy for the Nodes section, directly below Mission & Values. Nodes are
+   *  domain-based (per the handbook), not cohort-based — `stat` anchors the
+   *  "4-6 people" fact, `domains` lists the four stable domains. */
+  nodes: {
+    /** Multi-line, same convention as hero.headline. */
+    statement: string[]
+    detail: string
+    stat: { value: string; label: string }
+    domains: { name: string; detail: string }[]
+  }
 }
 
 /**

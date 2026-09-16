@@ -27,5 +27,31 @@
         "text": "Production-oriented means what it says: judged by real, sustained infrastructure, not by a claim a neighboring club could make unchanged."
       }
     ]
+  },
+  "nodes": {
+    "statement": ["You belong to a node", "before you belong to ARGC."],
+    "detail": "A node — your small working team — is small on purpose: four to six people, one domain, one leader who owns the output. Small enough that nothing gets diffuse — there's nowhere to hide.",
+    "stat": {
+      "value": "4–6",
+      "label": "People · one domain · one leader"
+    },
+    "domains": [
+      {
+        "name": "Platform",
+        "detail": "Building and maintaining the ARGC web platform."
+      },
+      {
+        "name": "Evaluations",
+        "detail": "Coordinating and tracking peer evaluation schedules."
+      },
+      {
+        "name": "Events",
+        "detail": "Planning and running knowledge sessions, hackathons, and club events."
+      },
+      {
+        "name": "Outreach",
+        "detail": "External communications, partnerships, and community presence."
+      }
+    ]
   }
 }
