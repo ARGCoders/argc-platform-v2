@@ -203,14 +203,14 @@ Verified locally: a `make db-setup` re-run reports them all as `exists` (idempot
 
 Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13), and the public `/events` page (UI-15). Role 2 owns **all** of `components/shared/` and `components/ui/` additions; Role 3/4 feature components live in `components/features/`. **Component work is on the critical path for Roles 3/4 — deliver on schedule.**
 
-### [UI-01] Landing page redesign — **IN PROGRESS**
+### [UI-01] Landing page redesign — **DONE**
 
-- **Objective:** New landing sections: mission/values, nodes, events/handbook preview, register CTA. All copy in `content/landing.json` — no hardcoded strings. Old sections stay removed.
-- **Technical Implementation:** `app/page.tsx`, `components/features/landing/*`, `content/landing.json`, navbar variants in `components/shared/navbar.tsx`.
+- **Objective:** New landing sections: mission/values, nodes, events preview, handbook preview, register CTA. All copy in `content/landing.json` — no hardcoded strings. Old sections stay removed.
+- **Technical Implementation:** `app/page.tsx`, `components/features/landing/*`, `content/landing.json`, `lib/handbook.ts`, navbar variants in `components/shared/navbar.tsx`.
 - **Dependencies:** Blocked by: none.
 - **Target Week:** 1.
 - **DoD:** Sections render; content-driven; responsive; WCAG-checked; navbar variants correct; `make check` green.
-- **Status:** `app/page.tsx` now renders `<Hero />` → `<MissionValues />` → `<Nodes />` → `<EventsHandbookPreview />`, mounted as each section lands. Only the register CTA is still unbuilt. Navbar variants (`default`/`maroon`/`dashboard`) are done, including an earlier session's fixes.
+- **Status:** `app/page.tsx` renders `<Hero /> → <MissionValues /> → <Nodes /> → <Events /> → <Handbook /> → <RegisterCta />`, mounted as each section landed. Events and Handbook started as one combined two-column section, then split into two standalone full-width sections. Handbook's category list intentionally shows only Company/People (what's actually pushed publicly in `argc-handbook` today, not every folder in the repo) and has an optional ASCII art slot not yet filled. Navbar variants (`default`/`maroon`/`dashboard`) are done, including an earlier session's fixes.
 
 ### [UI-02] DashboardShell — **DONE**
 
