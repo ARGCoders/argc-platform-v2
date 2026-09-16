@@ -52,8 +52,8 @@ export function Nodes() {
          *  (the handbook: domains "may be added, split, or merged as the
          *  club evolves") reflows correctly instead of assuming exactly 4. */}
         <div className="mt-14 grid grid-cols-1 gap-x-8 border-t border-b border-border sm:[grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
-          {domains.map((domain) => (
-            <div key={domain.name} className="flex flex-col gap-2 py-6">
+          {domains.map((domain, i) => (
+            <div key={`${domain.name}-${i}`} className="flex flex-col gap-2 py-6">
               <span className="font-mono text-[0.72rem] font-medium tracking-[0.1em] text-foreground uppercase">
                 {domain.name}
               </span>

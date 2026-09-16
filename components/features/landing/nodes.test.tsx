@@ -37,9 +37,12 @@ describe('Nodes', () => {
   // it. Querying textContent order (not just presence) catches a reorder
   // even though jsdom doesn't apply the responsive CSS that triggered it.
   it('renders the headline before the stat in document order', () => {
+    const firstLine = landing.nodes.statement[0]
+    expect(firstLine).toBeDefined()
+
     const { container } = render(<Nodes />)
     const text = container.textContent ?? ''
-    expect(text.indexOf(landing.nodes.statement[0]!)).toBeLessThan(
+    expect(text.indexOf(firstLine as string)).toBeLessThan(
       text.indexOf(landing.nodes.stat.value),
     )
   })
