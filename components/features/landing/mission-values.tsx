@@ -79,7 +79,7 @@ export function MissionValues() {
                 key={value.tag}
                 className="flex flex-col gap-2 border-b border-border py-6 sm:flex-row sm:gap-8"
               >
-                <span className="shrink-0 font-mono text-[0.68rem] font-medium tracking-[0.1em] text-argc-maroon uppercase sm:w-32">
+                <span className="shrink-0 font-mono text-[0.72rem] font-medium tracking-[0.1em] text-argc-maroon uppercase sm:w-32">
                   {value.tag}
                 </span>
                 <p className="max-w-[56ch] font-sans text-base leading-relaxed text-foreground/80">
