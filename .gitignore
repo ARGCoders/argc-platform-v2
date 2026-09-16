@@ -73,3 +73,6 @@ CODE_REVIEW_INSTRUCTIONS.md
 
 # review notes
 code_review1.md
+
+# impeccable critique snapshots — local design-review archive, per-machine
+.impeccable/
