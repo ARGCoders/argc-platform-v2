@@ -23,13 +23,15 @@ const MARKDOWN_CLASS =
 
 const SHAPE_PATH = path.join(process.cwd(), 'content/ascii/handbook.txt')
 
-// text-[3.4px], not shape-2's 2.2px verbatim: handbook.txt's raw dimensions
-// (89 lines x 180 chars) are smaller than shape-1/shape-2's (123-141 lines x
-// 276 chars) — reusing the same literal size would render it visibly
-// smaller than its siblings. Scaled by the width ratio (276/180 ≈ 1.53) so
-// it reads at the same visual prominence, not the same literal font-size.
+// The rendered box (width/height) is fixed by the grid column and row,
+// not by font-size — confirmed by measuring identical box dimensions at
+// 2.9px and 3.4px. Font-size instead controls how much of the 89x180
+// character image is visible before overflow-hidden clips it: a larger
+// value shows a more zoomed-in, chunkier crop (bolder dots, less of the
+// image's total width/height visible), which is what actually reads as
+// "bigger" for a fixed-box halftone image like this.
 const SHAPE_CLASS =
-  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[2.9px] text-ink -mx-4'
+  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[5.5px] text-ink -mx-4'
 
 /**
  * Reads the art file server-side only, same rule as Mission & Values'
@@ -74,7 +76,7 @@ export async function Handbook() {
         <div
           className={
             shape
-              ? 'grid grid-cols-1 gap-x-16 gap-y-10 md:grid-cols-[7fr_5fr] lg:gap-x-24'
+              ? 'grid grid-cols-1 items-start gap-x-16 gap-y-10 md:grid-cols-[7fr_5fr] lg:gap-x-24'
               : 'grid grid-cols-1'
           }
         >
