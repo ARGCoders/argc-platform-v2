@@ -73,10 +73,15 @@ export async function Handbook() {
   return (
     <section aria-label="Handbook" className="bg-stone">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
+        {/* 4fr/7fr, not the usual editorial 7fr-for-text split — the art
+         *  column needs to be wide enough that overflow-hidden doesn't clip
+         *  the shape's edge at its current font-size (verified: scrollWidth
+         *  no longer exceeds clientWidth). Text column shrinks accordingly;
+         *  still comfortable for this section's short copy + category tags. */}
         <div
           className={
             shape
-              ? 'grid grid-cols-1 items-start gap-x-16 gap-y-10 md:grid-cols-[7fr_5fr] lg:gap-x-24'
+              ? 'grid grid-cols-1 items-start gap-x-16 gap-y-10 md:grid-cols-[4fr_7fr] lg:gap-x-24'
               : 'grid grid-cols-1'
           }
         >
