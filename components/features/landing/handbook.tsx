@@ -23,8 +23,13 @@ const MARKDOWN_CLASS =
 
 const SHAPE_PATH = path.join(process.cwd(), 'content/ascii/handbook.txt')
 
+// text-[3.4px], not shape-2's 2.2px verbatim: handbook.txt's raw dimensions
+// (89 lines x 180 chars) are smaller than shape-1/shape-2's (123-141 lines x
+// 276 chars) — reusing the same literal size would render it visibly
+// smaller than its siblings. Scaled by the width ratio (276/180 ≈ 1.53) so
+// it reads at the same visual prominence, not the same literal font-size.
 const SHAPE_CLASS =
-  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[2.2px] text-ink -mx-4'
+  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[2.9px] text-ink -mx-4'
 
 /**
  * Reads the art file server-side only, same rule as Mission & Values'

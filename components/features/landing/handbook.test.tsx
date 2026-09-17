@@ -95,12 +95,33 @@ describe('Handbook', () => {
     expect(screen.getByText('mission').tagName).toBe('STRONG')
   })
 
-  // Regression guard: the ASCII art file doesn't exist yet (sourced
-  // separately) — the section must render cleanly without it, not show a
-  // broken image or throw.
-  it('renders without the ASCII art when the shape file does not exist', async () => {
+  // content/ascii/handbook.txt now exists — confirms the art actually
+  // renders (decorative, excluded from the accessibility tree) rather than
+  // just checking the file-missing fallback path.
+  it('renders the ASCII art shape, marked decorative', async () => {
+    const { container } = render(await Handbook())
+
+    const pre = container.querySelector('pre')
+    expect(pre).toBeInTheDocument()
+    expect(pre).toHaveAttribute('aria-hidden', 'true')
+    expect(pre?.textContent?.length).toBeGreaterThan(1000)
+  })
+
+  // Regression guard: the section must still render cleanly if the art
+  // file is ever removed again, not show a broken image or throw. Can't
+  // simulate a missing file without mocking node:fs (the component reads
+  // the real file directly, same as mission-values.tsx) — this instead
+  // pins the graceful-fallback code path's shape so a future refactor that
+  // breaks the try/catch is caught by type/behavior drift, not silently.
+  it('falls back to no art gracefully if the file read ever fails', async () => {
+    const fs = await import('node:fs')
+    const readSpy = vi.spyOn(fs.default, 'readFileSync').mockImplementation(() => {
+      throw new Error('ENOENT')
+    })
+
     const { container } = render(await Handbook())
 
     expect(container.querySelector('pre')).not.toBeInTheDocument()
+    readSpy.mockRestore()
   })
 })
