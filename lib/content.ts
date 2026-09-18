@@ -5,6 +5,7 @@ import eventsJson from '@/content/events.json'
 import evaluationsJson from '@/content/evaluations.json'
 import dashboardOverviewJson from '@/content/dashboard-overview.json'
 import nodeEventsJson from '@/content/node-events.json'
+import blogJson from '@/content/blog.json'
 import type {
   SiteContent,
   LandingContent,
@@ -13,6 +14,7 @@ import type {
   EvaluationsContent,
   DashboardOverviewContent,
   NodeEventsContent,
+  BlogContent,
 } from '@/types/content'
 
 /**
@@ -33,3 +35,4 @@ export const events: EventsContent = eventsJson
 export const evaluations: EvaluationsContent = evaluationsJson
 export const dashboardOverview: DashboardOverviewContent = dashboardOverviewJson
 export const nodeEvents: NodeEventsContent = nodeEventsJson
+export const blog: BlogContent = blogJson

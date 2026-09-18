@@ -16,7 +16,7 @@ export function Navbar() {
   const pathname = usePathname()
   // Auth comes from the provider — V1 fetched /api/auth/me here directly, which
   // was one of several duplicate session checks per page load.
-  const { user, isLoading, logout } = useAuth()
+  const { user, logout } = useAuth()
 
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -52,13 +52,10 @@ export function Navbar() {
 
   // 'default''s unscrolled state (bg-black/10, white text) is a translucent
   // tint meant to blend into a dark hero sitting directly behind the fixed
-  // bar — that's true on '/', not on a hero-less light page like /events.
-  // Those pages skip straight to the same opaque, always-legible treatment
-  // 'default' only reaches after scrolling.
-  const noHero = pathname.startsWith('/events')
-
-  const isGuest = !user || user.role === 'guest'
-  const showRegister = !isDashboard && (isLoading || isGuest)
+  // bar — that's true on '/', not on a hero-less light page like /events or
+  // /blog. Those pages skip straight to the same opaque, always-legible
+  // treatment 'default' only reaches after scrolling.
+  const noHero = pathname.startsWith('/events') || pathname.startsWith('/blog')
 
   // Scroll-driven translucency exists for a bar sitting over a page hero.
   // DashboardShell's content scrolls inside main's own container, so
@@ -177,15 +174,6 @@ export function Navbar() {
               : 'hidden md:flex items-center gap-2 shrink-0'
           }
         >
-          {showRegister && (
-            <a
-              href="/register"
-              className="inline-flex items-center text-[0.8rem] font-semibold tracking-[0.06em] uppercase text-hero-ink bg-black/20 hover:bg-black/30 transition-colors px-4 py-3"
-            >
-              Register
-            </a>
-          )}
-
           {user && (
             <div className="relative" ref={profileRef}>
               <button
@@ -346,17 +334,6 @@ export function Navbar() {
               >
                 Logout
               </button>
-            )}
-
-            {showRegister && (
-              <a
-                href="/register"
-                tabIndex={menuOpen ? undefined : -1}
-                onClick={() => setMenuOpen(false)}
-                className="mt-8 inline-flex w-fit items-center text-[0.9375rem] font-semibold tracking-[0.05em] uppercase text-argc-maroon bg-hero-ink px-7 py-3"
-              >
-                Register
-              </a>
             )}
           </nav>
         </div>
