@@ -7,7 +7,7 @@ Read this first if you are joining. `README.md` tells you how to run it,
 file tells you **what state the project is in and which decisions are already settled**,
 so nobody re-litigates a question that has an answer or rebuilds something that exists.
 
-_Last updated: 13 September 2026._
+_Last updated: 18 September 2026._
 
 ---
 
@@ -15,8 +15,8 @@ _Last updated: 13 September 2026._
 
 V2 is a rebuild of `argc_platform`. The engineering environment is finished — formatter,
 tests, hooks, CI, and a reproducible backend. The **public UI is deliberately not built**:
-only the hero and navbar exist, because the design is being reworked and building against
-the old design twice would be waste. The **dashboard member track is underway**: all of
+only the hero, navbar and a public events page exist — blog, handbook and registration
+are still pending the redesign. The **dashboard member track is underway**: all of
 Role 3's member APIs except one are merged, the first two dashboard pages (overview, node
 event propose) are live in code, and the remaining member pages are the next feature work.
 Nothing is deployed end-to-end yet — the PocketBase backend is still offline (see
@@ -32,7 +32,7 @@ INFRA-07 in the blockers below).
 | Design system        | `app/globals.css` — ARGC palette, square corners, WCAG-checked contrast                                                                                                                                                                                      |
 | Auth                 | Full 42 Intra OAuth: login, callback, logout, session refresh, `AuthProvider`                                                                                                                                                                                |
 | Route gating         | `proxy.ts`, all three rules verified against a running server                                                                                                                                                                                                |
-| Component library    | ~35 component modules, themed and accessible — see `COMPONENTS.md`                                                                                                                                                                                           |
+| Component library    | ~46 component modules, themed and accessible — see `COMPONENTS.md`                                                                                                                                                                                           |
 | Tests                | Vitest + Testing Library, 636 tests across 51 files                                                                                                                                                                                                          |
 | CI                   | GitHub Actions: format, lint, typecheck, test, build                                                                                                                                                                                                         |
 | Commit hygiene       | Prettier, husky, lint-staged, commitlint                                                                                                                                                                                                                     |
@@ -41,6 +41,7 @@ INFRA-07 in the blockers below).
 | Deployable backend   | `pocketbase/` — Dockerfile, entrypoint, Railway config                                                                                                                                                                                                       |
 | Member (Role 3) APIs | 12 of 13 merged: `me/stats`, `me/xp`, `node/me`, `events` + `[id]/rsvp`, `node/evaluations` + `[id]` PATCH, `vote` + `eligible`/`summary`/`my-votes`, `node/events` GET/POST (MEMBER-01/02/05/07/09/12/14). The 13th, `me/evaluations`, ships with MEMBER-13 |
 | Dashboard pages      | `/dashboard/overview` (MEMBER-03) and `/dashboard/node/events/propose` (MEMBER-14) — both server components with error/loading boundaries                                                                                                                    |
+| Public events        | `/events` + `/api/public/events` (UI-15) — public page, tested route, sanitized descriptions. Landing components too. Landed 3 Sep 2026                                                                                                                      |
 
 ## What is not done
 
@@ -48,7 +49,6 @@ INFRA-07 in the blockers below).
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Landing page     | **Hero only.** Vision, about and contact were removed pending the redesign                                                                                                                                                                                                    |
 | Blog             | Removed. Was fully working — components, pages, four API routes, sanitised rendering                                                                                                                                                                                          |
-| Events           | Removed. Was reading the PocketBase `events` collection                                                                                                                                                                                                                       |
 | Handbook         | Removed. Was rendering markdown from the `argc-handbook` repo with 1h ISR                                                                                                                                                                                                     |
 | Registration     | Removed. Was writing to `submissions`                                                                                                                                                                                                                                         |
 | Dashboard        | Member track in progress — 8 of 14 MEMBER tasks closed. Six page tasks remain: `/dashboard/xp`, `/dashboard/events`, `/dashboard/node`, `/dashboard/node/members`, `/dashboard/node/evaluations`, and `/dashboard/vote` + `/dashboard/evaluations` (MEMBER-04/06/08/10/11/13) |
@@ -57,7 +57,8 @@ INFRA-07 in the blockers below).
 
 Everything in that first block was built, worked, and was rolled back **on purpose**. The
 code is in git history at `efefd73^` if it is useful as reference — but it was written
-against the old design, so treat it as a reference, not something to restore.
+against the old design, so treat it as a reference, not something to restore. Of that
+block, only the public events page has since been rebuilt (UI-15 — see "What is done").
 
 ---
 
@@ -66,15 +67,15 @@ against the old design, so treat it as a reference, not something to restore.
 Do not spend time re-deciding these. Each was checked against the code or the docs, not
 assumed.
 
-| Decision                                          | Why                                                                                                                                                                                                  |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Next.js 16, not 15**                            | The master plan says pin 15 "not 16". The stack is 16 and `AGENTS.md` mandates reading the shipped docs. C1 (async request APIs) still applies.                                                      |
-| **`proxy.ts`, not `middleware.ts`**               | Next 16 renamed the convention and deprecated `middleware`. The plan calls `proxy.ts` a bug; it is the opposite. Verified: the build reports `Proxy (Middleware)` and all three redirect rules fire. |
-| **Content lives in `content/*.json`**             | So copy edits never touch a component. Typed, so a bad edit fails the build.                                                                                                                         |
-| **ASCII frames are a static asset, not a module** | Importing them cost **18.4 MB** of JavaScript in V1. Largest chunk now is 0.22 MB.                                                                                                                   |
-| **shadcn adopted, rethemed**                      | Accessible primitives without the stock look `PRODUCT.md` rejects.                                                                                                                                   |
-| **Cool neutral base, not warm cream**             | V1's `#FAF8F2` cast a sepia tint over every page.                                                                                                                                                    |
-| **Dashboard is admin-only**                       | `PLATFORM.md` specifies member routes too, but those depend on ten unanswered product questions (`PLATFORM.md` §6).                                                                                  |
+| Decision                                          | Why                                                                                                                                                                                                                                     |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Next.js 16, not 15**                            | The master plan says pin 15 "not 16". The stack is 16 and `AGENTS.md` mandates reading the shipped docs. C1 (async request APIs) still applies.                                                                                         |
+| **`proxy.ts`, not `middleware.ts`**               | Next 16 renamed the convention and deprecated `middleware`. The plan calls `proxy.ts` a bug; it is the opposite. Verified: the build reports `Proxy (Middleware)` and all three redirect rules fire.                                    |
+| **Content lives in `content/*.json`**             | So copy edits never touch a component. Typed, so a bad edit fails the build.                                                                                                                                                            |
+| **ASCII frames are a static asset, not a module** | Importing them cost **18.4 MB** of JavaScript in V1. Largest chunk now is 0.22 MB.                                                                                                                                                      |
+| **shadcn adopted, rethemed**                      | Accessible primitives without the stock look `PRODUCT.md` rejects.                                                                                                                                                                      |
+| **Cool neutral base, not warm cream**             | V1's `#FAF8F2` cast a sepia tint over every page.                                                                                                                                                                                       |
+| **Member dashboard first, admin separate**        | Member pages (`/dashboard/overview`, `/dashboard/node/events/propose`) are live in code and more are coming; the admin track (Role 4) is a distinct, untouched surface. `PLATFORM.md` §6's Q1–Q10 are resolved (16 Aug 2026, INFRA-01). |
 
 ### Three claims in the old planning docs were wrong
 
