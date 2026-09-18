@@ -6,6 +6,8 @@ import evaluationsJson from '@/content/evaluations.json'
 import dashboardOverviewJson from '@/content/dashboard-overview.json'
 import nodeEventsJson from '@/content/node-events.json'
 import blogJson from '@/content/blog.json'
+import handbookJson from '@/content/handbook.json'
+import handbookCatalogJson from '@/content/handbook-catalog.json'
 import type {
   SiteContent,
   LandingContent,
@@ -15,6 +17,8 @@ import type {
   DashboardOverviewContent,
   NodeEventsContent,
   BlogContent,
+  HandbookPageContent,
+  HandbookCatalog,
 } from '@/types/content'
 
 /**
@@ -36,3 +40,5 @@ export const evaluations: EvaluationsContent = evaluationsJson
 export const dashboardOverview: DashboardOverviewContent = dashboardOverviewJson
 export const nodeEvents: NodeEventsContent = nodeEventsJson
 export const blog: BlogContent = blogJson
+export const handbookPage: HandbookPageContent = handbookJson
+export const handbookCatalog: HandbookCatalog = handbookCatalogJson

@@ -255,3 +255,41 @@ export interface BlogContent {
     tagline: string
   }
 }
+
+/** Copy for the public `/handbook` index header. Distinct from
+ *  `LandingContent.handbook` — that's the landing-page teaser section's
+ *  copy, this is the real handbook site's own page header. */
+export interface HandbookPageContent {
+  header: {
+    eyebrow: string
+    title: string[]
+    tagline: string
+  }
+  /** Real section count in the source `argc-handbook` repo, including the
+   *  ones not yet in `handbookCatalog` — lets the index page say "2 of 5
+   *  live" instead of reading as a complete document it isn't yet. */
+  totalSections: number
+}
+
+/**
+ * The hand-maintained catalog of which handbook articles are live on the
+ * site — not derived from the GitHub repo's real directory listing (the
+ * GitHub REST API is rate-limited for that; raw.githubusercontent.com only
+ * fetches a known path, never lists a directory). `path` is the file's
+ * location in the `argc-handbook` repo, relative to its root. Adding a
+ * newly-published group or article is a content edit here, not a code
+ * change — see `lib/handbook.ts`'s `getHandbookCategories()`.
+ */
+export interface HandbookArticleRef {
+  slug: string
+  title: string
+  path: string
+}
+
+export interface HandbookCategory {
+  slug: string
+  label: string
+  articles: HandbookArticleRef[]
+}
+
+export type HandbookCatalog = HandbookCategory[]

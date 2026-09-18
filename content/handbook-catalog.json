@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "company",
+    "label": "Company",
+    "articles": [
+      { "slug": "mission", "title": "Mission", "path": "01-company/01-mission.md" },
+      { "slug": "vision", "title": "Vision", "path": "01-company/02-vision.md" },
+      { "slug": "values", "title": "Values", "path": "01-company/03-values.md" },
+      { "slug": "history", "title": "History", "path": "01-company/04-history.md" },
+      { "slug": "structure", "title": "Structure", "path": "01-company/05-structure.md" }
+    ]
+  },
+  {
+    "slug": "people",
+    "label": "People",
+    "articles": [
+      {
+        "slug": "who-we-are",
+        "title": "Who We Are",
+        "path": "02-people/01-who-we-are.md"
+      },
+      {
+        "slug": "how-we-work",
+        "title": "How We Work",
+        "path": "02-people/02-how-we-work.md"
+      },
+      {
+        "slug": "membership",
+        "title": "Membership",
+        "path": "02-people/03-membership.md"
+      },
+      {
+        "slug": "roles-and-tiers",
+        "title": "Roles and Tiers",
+        "path": "02-people/04-roles-and-tiers.md"
+      },
+      {
+        "slug": "onboarding",
+        "title": "Onboarding",
+        "path": "02-people/05-onboarding.md"
+      }
+    ]
+  }
+]
