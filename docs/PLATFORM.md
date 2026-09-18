@@ -530,8 +530,8 @@ schema changes. Decisions marked **locked** are settled.
 9. **Q9 — Public /events page:** rebuild it data-driven from the `events`
    collection (`is_public = true`) when the public events page is rebuilt —
    **not** part of the dashboard scope. Tracked as its own follow-up issue.
-   The V2 page does not exist yet, so it will be built data-driven from the
-   start. **Locked.**
+   The V2 page was built data-driven from the start (UI-15, landed Sep 2026).
+   **Locked.**
 10. **Q10 — Dashboard navbar:** no public navbar on dashboard pages.
     `DashboardSidebar` is the sole navigation; `DashboardHeader` carries the
     mono page title and breadcrumbs. Matches the §3 component inventory.
