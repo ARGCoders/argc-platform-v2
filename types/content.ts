@@ -201,3 +201,12 @@ export interface NodeEventsContent {
     }
   }
 }
+
+/** Copy for the public `/blog` index header (UI-15 blog feature). */
+export interface BlogContent {
+  header: {
+    eyebrow: string
+    title: string[]
+    tagline: string
+  }
+}
