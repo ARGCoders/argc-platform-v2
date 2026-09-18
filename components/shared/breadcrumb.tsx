@@ -34,7 +34,7 @@ export function Breadcrumb({ items, className, surface = 'light' }: BreadcrumbPr
 
   return (
     <nav aria-label="Breadcrumb" className={cn('w-full', className)}>
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.68rem] font-medium tracking-[0.1em] uppercase">
+      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.72rem] font-medium tracking-[0.1em] uppercase">
         {items.map((item, i) => {
           const isLast = i === items.length - 1
           return (
