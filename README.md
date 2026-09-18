@@ -4,9 +4,9 @@ The platform for **ARGC (Alliance of Resilient Giveback Coders)**, a production-
 engineering collective at 42 Amman. Public site plus an internal member management
 system (XP, evaluations, nodes, events, voting, endorsements).
 
-Rebuild of [`argc_platform`](https://github.com/ARGCoders/argc_platform). Only the hero
-and navbar are carried over so far, with a public events page built on top (UI-15); the
-rest of the UI is being redesigned.
+Rebuild of [`argc_platform`](https://github.com/ARGCoders/argc_platform). The hero,
+navbar, public events page (UI-15) and blog are live; the public site is intentionally
+login-free (no register/login CTA). The rest of the UI is being redesigned.
 
 ## Stack
 
