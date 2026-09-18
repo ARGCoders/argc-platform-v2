@@ -5,7 +5,8 @@ engineering collective at 42 Amman. Public site plus an internal member manageme
 system (XP, evaluations, nodes, events, voting, endorsements).
 
 Rebuild of [`argc_platform`](https://github.com/ARGCoders/argc_platform). Only the hero
-and navbar are carried over so far; the rest of the UI is being redesigned.
+and navbar are carried over so far, with a public events page built on top (UI-15); the
+rest of the UI is being redesigned.
 
 ## Stack
 
