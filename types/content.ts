@@ -67,7 +67,11 @@ export interface LandingContent {
     cta: string
     empty: { title: string; description: string }
   }
-  /** Copy for the Handbook section, directly below Events. */
+  /** Copy for the Handbook section, directly below Events — the last
+   *  landing section. There is no register-CTA section: a teammate shipped
+   *  "public site is a showcase" (no register/login CTA anywhere on the
+   *  public site) directly to main, which a dedicated register-CTA section
+   *  here would have contradicted. */
   handbook: {
     heading: string
     detail: string
@@ -78,16 +82,6 @@ export interface LandingContent {
     categories: string[]
     /** Shown only if the live README fetch fails (lib/handbook.ts). */
     fallbackIntro: string
-    cta: string
-  }
-  /** Copy for the Register CTA section, the last of the four UI-01
-   *  sections. Framed as expressing interest, not a guaranteed-admission
-   *  application — the handbook's membership.md is explicit that
-   *  membership is nominated, not self-applied. */
-  registerCta: {
-    /** Multi-line, same convention as hero.headline. */
-    statement: string[]
-    detail: string
     cta: string
   }
 }

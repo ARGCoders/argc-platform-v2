@@ -205,12 +205,12 @@ Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13
 
 ### [UI-01] Landing page redesign — **DONE**
 
-- **Objective:** New landing sections: mission/values, nodes, events preview, handbook preview, register CTA. All copy in `content/landing.json` — no hardcoded strings. Old sections stay removed.
+- **Objective:** New landing sections: mission/values, nodes, events preview, handbook preview. All copy in `content/landing.json` — no hardcoded strings. Old sections stay removed.
 - **Technical Implementation:** `app/page.tsx`, `components/features/landing/*`, `content/landing.json`, `lib/handbook.ts`, navbar variants in `components/shared/navbar.tsx`.
 - **Dependencies:** Blocked by: none.
 - **Target Week:** 1.
 - **DoD:** Sections render; content-driven; responsive; WCAG-checked; navbar variants correct; `make check` green.
-- **Status:** `app/page.tsx` renders `<Hero /> → <MissionValues /> → <Nodes /> → <Events /> → <Handbook /> → <RegisterCta />`, mounted as each section landed. Events and Handbook started as one combined two-column section, then split into two standalone full-width sections. Handbook's category list intentionally shows only Company/People (what's actually pushed publicly in `argc-handbook` today, not every folder in the repo) and has an optional ASCII art slot not yet filled. Navbar variants (`default`/`maroon`/`dashboard`) are done, including an earlier session's fixes.
+- **Status:** `app/page.tsx` renders `<Hero /> → <MissionValues /> → <Nodes /> → <Events /> → <Handbook />`, mounted as each section landed. Events and Handbook started as one combined two-column section, then split into two standalone full-width sections. Handbook's category list intentionally shows only Company/People (what's actually pushed publicly in `argc-handbook` today, not every folder in the repo). Handbook's ASCII art (`content/ascii/handbook.txt`) is sourced and sized to match its siblings' visual prominence. Navbar variants (`default`/`maroon`/`dashboard`) are done. **No register-CTA section** — a teammate shipped "public site is a showcase" (removed the Register CTA from the navbar entirely) directly to `main`; a dedicated register-CTA landing section was built, then dropped once that decision was discovered on merge, to avoid contradicting it.
 
 ### [UI-02] DashboardShell — **DONE**
 
