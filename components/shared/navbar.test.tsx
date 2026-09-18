@@ -25,24 +25,22 @@ describe('Navbar', () => {
     }
   })
 
-  it('offers Register when signed out', async () => {
+  /** The public site is a login-free showcase — no Register CTA, anywhere. */
+  it('offers no Register CTA when signed out', async () => {
     renderWithProviders(<Navbar />)
-    const register = await screen.findAllByText('Register')
-    expect(register.length).toBeGreaterThan(0)
+    expect(screen.queryByText('Register')).toBeNull()
     expect(screen.queryByLabelText('Open profile menu')).toBeNull()
   })
 
-  it('shows the profile menu instead of Register when signed in', async () => {
+  it('shows the profile menu when signed in', async () => {
     renderWithProviders(<Navbar />, { user: makeUser({ role: 'node_peer' }) })
     expect(await screen.findByLabelText('Open profile menu')).toBeInTheDocument()
-    expect(screen.queryByText('Register')).toBeNull()
   })
 
-  /** A guest is authenticated but not a member, so both must appear. */
-  it('still offers Register to a guest', async () => {
+  it('keeps the profile menu for a guest with no Register CTA', async () => {
     renderWithProviders(<Navbar />, { user: makeUser({ role: 'guest' }) })
     expect(await screen.findByLabelText('Open profile menu')).toBeInTheDocument()
-    expect(screen.getAllByText('Register').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Register')).toBeNull()
   })
 
   it('does not offer a Dashboard link to a guest', async () => {
@@ -51,10 +49,9 @@ describe('Navbar', () => {
     expect(screen.queryByRole('menuitem', { name: /dashboard/i })).toBeNull()
   })
 
-  it('assumes signed-out while the session is still resolving', async () => {
+  it('shows no profile menu or Register while the session is still resolving', async () => {
     renderWithProviders(<Navbar />, { isLoading: true })
-    // Register is the safe default: showing nothing would hide the only CTA.
-    expect(await screen.findAllByText('Register')).not.toHaveLength(0)
+    expect(screen.queryByText('Register')).toBeNull()
     expect(screen.queryByLabelText('Open profile menu')).toBeNull()
   })
 
@@ -76,6 +73,14 @@ describe('Navbar — maroon variant', () => {
     expect(header?.className).not.toContain('bg-argc-maroon')
   })
 
+  // /blog is a Paper-background listing page like /events — no maroon hero.
+  it('does not apply the maroon bar on /blog', async () => {
+    vi.mocked(usePathname).mockReturnValue('/blog')
+    const { container } = renderWithProviders(<Navbar />)
+    const header = container.querySelector('header')
+    expect(header?.className).not.toContain('bg-argc-maroon')
+  })
+
   it('still applies the maroon bar on /register', async () => {
     vi.mocked(usePathname).mockReturnValue('/register')
     const { container } = renderWithProviders(<Navbar />)
@@ -89,6 +94,14 @@ describe('Navbar — maroon variant', () => {
   // unreadable until the visitor scrolls past 60px.
   it('renders the opaque bar on /events even before scrolling', async () => {
     vi.mocked(usePathname).mockReturnValue('/events')
+    const { container } = renderWithProviders(<Navbar />)
+    const header = container.querySelector('header')
+    expect(header?.className).toContain('bg-eng-navy/88')
+    expect(header?.className).not.toContain('bg-black/10')
+  })
+
+  it('renders the opaque bar on /blog even before scrolling', async () => {
+    vi.mocked(usePathname).mockReturnValue('/blog')
     const { container } = renderWithProviders(<Navbar />)
     const header = container.querySelector('header')
     expect(header?.className).toContain('bg-eng-navy/88')
