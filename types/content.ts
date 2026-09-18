@@ -39,6 +39,51 @@ export interface LandingContent {
     headline: string[]
     tagline: string
   }
+  /** Copy for the Mission & Values section, directly below the hero. */
+  missionValues: {
+    /** Multi-line, same convention as hero.headline: one entry per rendered line. */
+    statement: string[]
+    detail: string
+    /** `tag` is a short mono classifier (e.g. "Ledger"), not a sequence number. */
+    values: { tag: string; text: string }[]
+  }
+  /** Copy for the Nodes section, directly below Mission & Values. Nodes are
+   *  domain-based (per the handbook), not cohort-based — `stat` anchors the
+   *  "4-6 people" fact, `domains` lists the four stable domains. */
+  nodes: {
+    /** Multi-line, same convention as hero.headline. */
+    statement: string[]
+    detail: string
+    stat: { value: string; label: string }
+    domains: { name: string; detail: string }[]
+  }
+  /** Copy for the Events section, directly below Nodes. Named `eventsPreview`
+   *  (not `events`) to stay unambiguous against `content/events.json`'s own
+   *  top-level shape (the full public `/events` page's copy) — these are
+   *  unrelated content files with unrelated types. */
+  eventsPreview: {
+    heading: string
+    detail: string
+    cta: string
+    empty: { title: string; description: string }
+  }
+  /** Copy for the Handbook section, directly below Events — the last
+   *  landing section. There is no register-CTA section: a teammate shipped
+   *  "public site is a showcase" (no register/login CTA anywhere on the
+   *  public site) directly to main, which a dedicated register-CTA section
+   *  here would have contradicted. */
+  handbook: {
+    heading: string
+    detail: string
+    /** Reflects what's currently pushed publicly in argc-handbook, not
+     *  every folder that exists there — currently just Company and People.
+     *  Grows as more groups get pushed; no code change needed, just this
+     *  array. */
+    categories: string[]
+    /** Shown only if the live README fetch fails (lib/handbook.ts). */
+    fallbackIntro: string
+    cta: string
+  }
 }
 
 /**
@@ -210,3 +255,41 @@ export interface BlogContent {
     tagline: string
   }
 }
+
+/** Copy for the public `/handbook` index header. Distinct from
+ *  `LandingContent.handbook` — that's the landing-page teaser section's
+ *  copy, this is the real handbook site's own page header. */
+export interface HandbookPageContent {
+  header: {
+    eyebrow: string
+    title: string[]
+    tagline: string
+  }
+  /** Real section count in the source `argc-handbook` repo, including the
+   *  ones not yet in `handbookCatalog` — lets the index page say "2 of 5
+   *  live" instead of reading as a complete document it isn't yet. */
+  totalSections: number
+}
+
+/**
+ * The hand-maintained catalog of which handbook articles are live on the
+ * site — not derived from the GitHub repo's real directory listing (the
+ * GitHub REST API is rate-limited for that; raw.githubusercontent.com only
+ * fetches a known path, never lists a directory). `path` is the file's
+ * location in the `argc-handbook` repo, relative to its root. Adding a
+ * newly-published group or article is a content edit here, not a code
+ * change — see `lib/handbook.ts`'s `getHandbookCategories()`.
+ */
+export interface HandbookArticleRef {
+  slug: string
+  title: string
+  path: string
+}
+
+export interface HandbookCategory {
+  slug: string
+  label: string
+  articles: HandbookArticleRef[]
+}
+
+export type HandbookCatalog = HandbookCategory[]

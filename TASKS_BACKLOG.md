@@ -203,14 +203,14 @@ Verified locally: a `make db-setup` re-run reports them all as `exists` (idempot
 
 Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13), and the public `/events` page (UI-15). Role 2 owns **all** of `components/shared/` and `components/ui/` additions; Role 3/4 feature components live in `components/features/`. **Component work is on the critical path for Roles 3/4 — deliver on schedule.**
 
-### [UI-01] Landing page redesign — **NOT STARTED**
+### [UI-01] Landing page redesign — **DONE**
 
-- **Objective:** New landing sections: mission/values, nodes, events/handbook preview, register CTA. All copy in `content/landing.json` — no hardcoded strings. Old sections stay removed.
-- **Technical Implementation:** `app/page.tsx`, `components/features/landing/*`, `content/landing.json`, navbar variants in `components/shared/navbar.tsx`.
+- **Objective:** New landing sections: mission/values, nodes, events preview, handbook preview. All copy in `content/landing.json` — no hardcoded strings. Old sections stay removed.
+- **Technical Implementation:** `app/page.tsx`, `components/features/landing/*`, `content/landing.json`, `lib/handbook.ts`, navbar variants in `components/shared/navbar.tsx`.
 - **Dependencies:** Blocked by: none.
 - **Target Week:** 1.
 - **DoD:** Sections render; content-driven; responsive; WCAG-checked; navbar variants correct; `make check` green.
-- **Status:** `app/page.tsx` is `<Hero />` only — mission/values, nodes, the events/handbook preview section, and the register CTA are all unbuilt. Matches PRODUCT.md's own note that public UI beyond hero/navbar is intentionally deferred, not an oversight. Navbar variants (`default`/`maroon`/`dashboard`) are done, including this session's fixes.
+- **Status:** `app/page.tsx` renders `<Hero /> → <MissionValues /> → <Nodes /> → <Events /> → <Handbook />`, mounted as each section landed. Events and Handbook started as one combined two-column section, then split into two standalone full-width sections. Handbook's category list intentionally shows only Company/People (what's actually pushed publicly in `argc-handbook` today, not every folder in the repo). Handbook's ASCII art (`content/ascii/handbook.txt`) is sourced and sized to match its siblings' visual prominence. Navbar variants (`default`/`maroon`/`dashboard`) are done. **No register-CTA section** — a teammate shipped "public site is a showcase" (removed the Register CTA from the navbar entirely) directly to `main`; a dedicated register-CTA landing section was built, then dropped once that decision was discovered on merge, to avoid contradicting it.
 
 ### [UI-02] DashboardShell — **DONE**
 
@@ -326,14 +326,14 @@ Scope: public landing (UI-01), the shared dashboard component kit (UI-02…UI-13
   - [x] Selection callback fires
   - [x] Test passes
 
-### [UI-13] Update COMPONENTS.md
+### [UI-13] Update COMPONENTS.md — **DONE**
 
 - **Objective:** Document every new component from UI-02…12: file path, props, behaviour. Add a row for each.
 - **Technical Implementation:** `docs/COMPONENTS.md`.
 - **Dependencies:** Blocked by: UI-02, UI-03, UI-04, UI-05, UI-10, UI-11, UI-12.
 - **Target Week:** 2.
 - **DoD:**
-  - [ ] Every new component has a row — `EventRow`/`EventsList` (built for UI-15) are missing; everything from UI-02…12 has one
+  - [x] Every new component has a row — `EventRow`/`EventsList` (built for UI-15) now documented, along with everything from UI-02…12 and UI-01
   - [x] No stale entries
 
 ### [UI-15] Public /events page (data-driven) — **DONE**
@@ -374,17 +374,17 @@ Scope: authenticated member pages and APIs under `/api/dashboard/*` and `/dashbo
   - [x] Pagination + cycle filter work
   - [x] Tests pass
 
-### [MEMBER-03] /dashboard/overview page
+### [MEMBER-03] /dashboard/overview page — **DONE**
 
 - **Objective:** Personal summary: XP total + tier + cycle progress (XpBar), evaluation status, upcoming events, node name. Server component; `EmptyState` for missing data.
 - **Technical Implementation:** `app/dashboard/overview/page.tsx` (server component) + `components/features/member/overview-content.tsx`; fetches MEMBER-01/MEMBER-07/MEMBER-05 data via `lib/dashboard-fetch.ts` internal API calls.
 - **Dependencies:** Blocked by: UI-06, MEMBER-01, INFRA-04 · Blocks: none.
 - **Target Week:** 2 (page shell) / 3 (final data wiring).
-- **Status:** IN PR (PR #68) — actuals deviated from the two original file paths: `XpBar`/`EmptyState` live under `components/shared/dashboard/`; the content component is `components/features/member/overview-content.tsx` (never page-local, DASHBOARD_CONTRACT §3).
+- **Status:** **DONE** — merged to `main` (PR #68). Actuals deviated from the two original file paths: `XpBar`/`EmptyState` live under `components/shared/dashboard/`; the content component is `components/features/member/overview-content.tsx` (never page-local, DASHBOARD_CONTRACT §3).
 - **DoD:**
-  - [ ] Renders from MEMBER-01 data
-  - [ ] Empty states for missing data
-  - [ ] Tests pass
+  - [x] Renders from MEMBER-01 data
+  - [x] Empty states for missing data
+  - [x] Tests pass
 - **Known gap:** `node/me` returns each pipeline stage's `score` (0–100), but `app/dashboard/overview/page.tsx` only forwards `{stage, status}` to the page — the score is fetched and silently discarded, never shown to the member. Unlike the deliberate evaluator/scheduled-date omission (those fields genuinely don't exist on this data source), nothing here suggests dropping `score` was intentional. Needs a product call: should a member see the number behind a "completed" chip?
 
 ### [MEMBER-04] /dashboard/xp page

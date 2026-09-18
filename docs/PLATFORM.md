@@ -29,6 +29,14 @@ Before the plan: a few observations from the existing code that affect the spec.
 
 The structural unit of ARGC. A node is a cohort-aligned group of 3–6 members.
 
+> **Known conflict, not yet reconciled**: `argc-handbook/04-ecosystem/01-nodes.md` — the org's
+> actual handbook — describes nodes as domain-based (Platform/Evaluations/Events/Outreach,
+> one leader per domain), sized 4–6, not cohort-based. The public landing page's `Nodes`
+> section (`content/landing.json`'s `nodes` key) follows the handbook, not this schema
+> comment, per an explicit decision made when that section was built. This `cohort` field
+> and the "3–6" figure below have not been updated to match — do not build `/dashboard/node`
+> against this doc's node-size/cohort framing without resolving which source wins.
+
 | Field | Type | Notes |
 | --- | --- | --- |
 | id | auto | |

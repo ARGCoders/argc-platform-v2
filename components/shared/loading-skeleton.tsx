@@ -121,3 +121,60 @@ export function BlogIndexSkeleton() {
     </div>
   )
 }
+
+/** One /handbook index row: title + affordance, no thumbnail/byline —
+ *  a handbook article carries neither, unlike a blog post. */
+export function HandbookRowSkeleton() {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-border py-4">
+      <Skeleton className="h-6 w-2/3" />
+      <Skeleton className="hidden h-3 w-14 shrink-0 sm:block" />
+    </div>
+  )
+}
+
+/** One /handbook category group: label, then its article rows. */
+export function HandbookGroupSkeleton({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="border-t border-border pt-8">
+      <Skeleton className="h-3 w-24" />
+      <div className="mt-4">
+        {Array.from({ length: rows }, (_, i) => (
+          <HandbookRowSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** Full /handbook index shape: header, then two category groups (the
+ *  current live catalog is Company + People). */
+export function HandbookIndexSkeleton() {
+  return (
+    <div className="flex flex-col gap-8">
+      <div>
+        <Skeleton className="h-3 w-32" />
+        <Skeleton className="mt-5 h-12 w-2/3" />
+        <Skeleton className="mt-4 h-5 w-1/2" />
+      </div>
+      <HandbookGroupSkeleton />
+      <HandbookGroupSkeleton />
+    </div>
+  )
+}
+
+/** /handbook article detail shape: kicker, title, then body lines — no
+ *  banner or byline block, unlike the blog's `DetailSkeleton`. */
+export function HandbookArticleSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <Skeleton className="h-3 w-32" />
+      <Skeleton className="h-10 w-4/5" />
+      <div className="mt-4 flex flex-col gap-3">
+        {Array.from({ length: 8 }, (_, i) => (
+          <Skeleton key={i} className={cn('h-4', i % 3 === 2 ? 'w-2/3' : 'w-full')} />
+        ))}
+      </div>
+    </div>
+  )
+}
