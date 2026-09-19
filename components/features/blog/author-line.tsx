@@ -3,10 +3,19 @@ import type { PostAuthor } from '@/types/pocketbase'
 
 /**
  * Author avatar + name for post bylines. Renders a monogram when the author
- * has no avatar, matching the navbar's fallback behaviour.
+ * has no avatar, matching the navbar's fallback behaviour. Falls back to
+ * "ARGC collective" when the post has no author relation at all — owning
+ * the fallback here means every caller renders a byline identically instead
+ * of each page re-deciding whether to show one.
  */
 export function AuthorLine({ author }: { author: PostAuthor | null }) {
-  if (!author) return null
+  if (!author) {
+    return (
+      <span className="font-mono text-[0.7rem] tracking-[0.08em] uppercase text-ink-muted">
+        ARGC collective
+      </span>
+    )
+  }
 
   const name = author.intra_login || 'ARGC'
 
