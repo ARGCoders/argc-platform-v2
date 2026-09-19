@@ -1,6 +1,7 @@
 /**
- * Bracket tag label per BLOG_DESIGN_SPECS §3.3 — monospace, all-caps,
- * `[LIKE THIS]`. Not a pill; tags are flat technical labels.
+ * Bracket tag label — monospace, all-caps, `[LIKE THIS]`. Not a pill; tags
+ * are flat technical labels reported by the system (DESIGN.md's
+ * Mono-Reports rule), not a filter control — they carry no href or onClick.
  */
 export function Tag({ children }: { children: string }) {
   return (
