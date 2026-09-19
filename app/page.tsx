@@ -1,5 +1,6 @@
 import { Hero } from '@/components/features/landing/hero'
 import { MissionValues } from '@/components/features/landing/mission-values'
+import { GetInvolved } from '@/components/features/landing/get-involved'
 import { Nodes } from '@/components/features/landing/nodes'
 import { Events } from '@/components/features/landing/events'
 import { Handbook } from '@/components/features/landing/handbook'
@@ -23,6 +24,7 @@ export default function Home() {
     <main>
       <Hero />
       <MissionValues />
+      <GetInvolved />
       <Nodes />
       <Events />
       <Handbook />
