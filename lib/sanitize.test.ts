@@ -77,6 +77,13 @@ describe('sanitizeHtml', () => {
     expect(sanitizeHtml('<a href="#top">x</a>')).toContain('href="#top"')
   })
 
+  // Regression guard: a leading "/" alone isn't enough to prove a same-site
+  // relative path — "//host/path" is protocol-relative and resolves to an
+  // arbitrary off-site origin, but a naive /^\// match would let it through.
+  it('rejects protocol-relative URLs despite starting with "/"', () => {
+    expect(sanitizeHtml('<a href="//attacker.test/x">x</a>')).not.toContain('href')
+  })
+
   /**
    * Pins ALLOWED_URI_REGEXP specifically.
    *

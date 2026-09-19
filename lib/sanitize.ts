@@ -105,8 +105,11 @@ export function sanitizeHtml(dirty: string): string {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     ADD_URI_SAFE_ATTR: URI_SAFE_ATTR,
-    // Blocks javascript:, vbscript: and data: URLs in href and src.
-    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:|\/|#)/i,
+    // Blocks javascript:, vbscript: and data: URLs in href and src. The
+    // negative lookahead on the bare-slash branch matters: without it,
+    // `//attacker.example/x` (protocol-relative — an off-site URL, not a
+    // real relative path) would also match a leading `/` and pass through.
+    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:|\/(?!\/)|#)/i,
   })
 }
 
