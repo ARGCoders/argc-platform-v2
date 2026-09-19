@@ -63,6 +63,13 @@ export async function getPublishedPosts(): Promise<PostView[]> {
     sort: '-published_at',
     expand: 'author',
   })
+  // The index has no pagination — a 101st post would otherwise disappear
+  // from /blog with no signal anywhere that anything was truncated.
+  if (result.totalItems > result.items.length) {
+    console.warn(
+      `[lib/blog] getPublishedPosts truncated: ${result.totalItems} published posts exist, only the newest ${result.items.length} were returned`,
+    )
+  }
   return result.items.map((post) => toPostView(post, admin))
 }
 

@@ -108,6 +108,31 @@ describe('getPublishedPosts', () => {
 
     expect(view.tags).toEqual(['one', 'three'])
   })
+
+  // Regression guard: the index has no pagination, so a 101st post silently
+  // disappearing must at least be logged somewhere, not pass unnoticed.
+  it('warns when more published posts exist than the page returned', async () => {
+    const { pb } = mockAdminClient([makePost()])
+    vi.mocked(pb.collection).mockReturnValue({
+      getList: vi.fn().mockResolvedValue({ items: [makePost()], totalItems: 150 }),
+    } as unknown as ReturnType<PocketBase['collection']>)
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    await getPublishedPosts()
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('truncated'))
+    warnSpy.mockRestore()
+  })
+
+  it('does not warn when every published post fits on the page', async () => {
+    mockAdminClient([makePost()])
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    await getPublishedPosts()
+
+    expect(warnSpy).not.toHaveBeenCalled()
+    warnSpy.mockRestore()
+  })
 })
 
 describe('getPublishedPostBySlug', () => {
