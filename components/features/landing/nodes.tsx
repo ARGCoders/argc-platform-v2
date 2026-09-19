@@ -30,7 +30,7 @@ export function Nodes() {
                 </span>
               ))}
             </h2>
-            <p className="max-w-[46ch] font-sans text-base leading-relaxed text-muted-foreground">
+            <p className="max-w-[46ch] font-sans text-[0.9375rem] leading-relaxed text-muted-foreground">
               {detail}
             </p>
           </div>
@@ -57,7 +57,7 @@ export function Nodes() {
               <span className="font-mono text-[0.72rem] font-medium tracking-[0.1em] text-foreground uppercase">
                 {domain.name}
               </span>
-              <p className="max-w-[32ch] font-sans text-sm leading-relaxed text-muted-foreground">
+              <p className="max-w-[32ch] font-sans text-[0.9375rem] leading-relaxed text-muted-foreground">
                 {domain.detail}
               </p>
             </div>

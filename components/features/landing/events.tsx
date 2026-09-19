@@ -72,7 +72,7 @@ export async function Events() {
             <h2 className="font-sans text-[1.5rem] font-bold tracking-tight text-foreground">
               {copy.heading}
             </h2>
-            <p className="max-w-[52ch] font-sans text-sm text-muted-foreground">
+            <p className="max-w-[52ch] font-sans text-[0.9375rem] text-muted-foreground">
               {copy.detail}
             </p>
           </div>
