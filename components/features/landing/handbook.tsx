@@ -59,6 +59,16 @@ function readHandbookShape(): string | null {
  * section (see events.tsx for the same note). `bg-paper`, alternating from
  * Events' `bg-stone`.
  *
+ * Heading uses the "big statement" scale (Mission & Values/Nodes'
+ * `clamp(2rem,5vw,3rem)`), not the "small heading" scale Get Involved and
+ * Events use — deliberately, since without it the page's heading-size
+ * pattern would land on two small headings in a row at the very end of
+ * the scroll (Get Involved, small → Nodes, big → Events, small → Handbook,
+ * small) with nothing to punctuate the close. This restores a clean
+ * big/small/big/small/big alternation and gives the last section — the
+ * one right before a visitor leaves the page — the strongest beat.
+ *
+
  * `categories` reflects what's currently pushed publicly in argc-handbook
  * (Company, People) — not every folder that exists in the repo. Grows as
  * more groups get pushed; content-only change, no code here.
@@ -87,14 +97,16 @@ export async function Handbook() {
         >
           <div className="flex flex-col gap-6 border-t border-border pt-6">
             <div className="flex flex-col gap-2">
-              <h2 className="font-sans text-[1.5rem] font-bold tracking-tight text-foreground">
+              <h2 className="font-sans text-[clamp(2rem,5vw,3rem)] font-bold leading-[1.04] tracking-tight text-foreground [text-wrap:balance]">
                 {copy.heading}
               </h2>
-              <p className="font-sans text-sm text-muted-foreground">{copy.detail}</p>
+              <p className="font-sans text-[0.9375rem] text-muted-foreground">
+                {copy.detail}
+              </p>
             </div>
 
             <div
-              className={`flex max-w-[60ch] flex-col gap-3 font-sans text-base leading-relaxed text-muted-foreground ${MARKDOWN_CLASS}`}
+              className={`flex max-w-[60ch] flex-col gap-3 font-sans text-[0.9375rem] leading-relaxed text-muted-foreground ${MARKDOWN_CLASS}`}
             >
               {intro ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{intro}</ReactMarkdown>
