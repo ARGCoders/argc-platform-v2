@@ -30,6 +30,7 @@ export default async function PostPage({ params }: PostPageProps) {
   if (!post) notFound()
 
   const kicker = post.tags[0]?.toUpperCase() || 'Field notes'
+  const dateStr = formatBlogDate(post.published_at)
 
   return (
     <main className="pt-nav bg-paper">
@@ -51,13 +52,9 @@ export default async function PostPage({ params }: PostPageProps) {
           </h1>
 
           <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border pt-5 font-mono text-[0.72rem] tracking-[0.1em] uppercase text-ink-muted">
-            {post.author ? (
-              <AuthorLine author={post.author} />
-            ) : (
-              <span>ARGC collective</span>
-            )}
-            {post.author && <span aria-hidden="true">·</span>}
-            <time dateTime={post.published_at}>{formatBlogDate(post.published_at)}</time>
+            <AuthorLine author={post.author} />
+            {dateStr && <span aria-hidden="true">·</span>}
+            {dateStr && <time dateTime={post.published_at}>{dateStr}</time>}
             {post.read_time && <span>· {post.read_time}</span>}
           </div>
         </header>
