@@ -12,11 +12,17 @@ const CTA_CLASS =
 
 const SHAPE_PATH = path.join(process.cwd(), 'content/ascii/githup_ascii.txt')
 
-// Same construction as handbook.tsx's SHAPE_CLASS — box size comes from the
-// grid column, not this value; font-size only controls how much of the
-// source art is visible before overflow-hidden clips it.
+// Same construction as handbook.tsx's SHAPE_CLASS. Bumped from 5.5px (the
+// value handbook.txt uses) to 7.5px: at 5.5px this file's shorter source
+// (54 lines vs handbook.txt's 89) rendered at only 61% of Handbook's box
+// height, reading as noticeably smaller next to a visually identical
+// layout — /impeccable's landing-page critique flagged the two shapes as
+// not comparably sized despite sharing the same grid role. 7.5px closes
+// that to ~83% (454px vs 544px, verified no clip: scrollWidth/Height
+// match clientWidth/Height) without pushing width to where it would clip
+// — width is already at the 643px column ceiling at this size.
 const SHAPE_CLASS =
-  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[5.5px] text-ink -mx-4'
+  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[7.5px] text-ink -mx-4'
 
 /**
  * Reads the art file server-side only — same rule as Mission & Values'
@@ -68,7 +74,7 @@ export function GetInvolved() {
               <h2 className="font-sans text-[1.5rem] font-bold tracking-tight text-foreground">
                 {copy.heading}
               </h2>
-              <p className="max-w-[52ch] font-sans text-sm text-muted-foreground">
+              <p className="max-w-[52ch] font-sans text-[0.9375rem] text-muted-foreground">
                 {copy.detail}
               </p>
             </div>
