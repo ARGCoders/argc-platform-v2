@@ -9,11 +9,12 @@
     { "label": "Events", "href": "/events" },
     { "label": "Blog", "href": "/blog" },
     { "label": "Handbook", "href": "/handbook" },
-    { "label": "Contact Us", "href": "/#contact" }
+    { "label": "Contact Us", "href": "/#get-involved" }
   ],
   "handbookRepo": {
     "owner": "ARGCoders",
     "repo": "argc-handbook",
     "branch": "main"
-  }
+  },
+  "githubOrgUrl": "https://github.com/ARGCoders"
 }

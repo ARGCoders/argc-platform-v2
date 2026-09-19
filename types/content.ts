@@ -32,6 +32,10 @@ export interface SiteContent {
   description: string
   nav: NavLink[]
   handbookRepo: HandbookRepo
+  /** The org's public GitHub organization page — the only real "reach us"
+   *  destination while there's no dedicated contact info. Linked from the
+   *  landing page's Get Involved section. */
+  githubOrgUrl: string
 }
 
 export interface LandingContent {
@@ -47,7 +51,15 @@ export interface LandingContent {
     /** `tag` is a short mono classifier (e.g. "Ledger"), not a sequence number. */
     values: { tag: string; text: string }[]
   }
-  /** Copy for the Nodes section, directly below Mission & Values. Nodes are
+  /** Copy for the Get Involved section, directly below Mission & Values —
+   *  the site's only outbound link, standing in for real contact info
+   *  until that exists. Links to `site.githubOrgUrl`. */
+  getInvolved: {
+    heading: string
+    detail: string
+    cta: string
+  }
+  /** Copy for the Nodes section, directly below Get Involved. Nodes are
    *  domain-based (per the handbook), not cohort-based — `stat` anchors the
    *  "4-6 people" fact, `domains` lists the four stable domains. */
   nodes: {
