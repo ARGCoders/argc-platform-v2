@@ -50,14 +50,14 @@ function readHandbookShape(): string | null {
 }
 
 /**
- * Fourth section below Hero, directly under Events — a live excerpt of the
+ * Fifth section below Hero, directly under Events — a live excerpt of the
  * actual public handbook, not landing-page copy. Doesn't build `/handbook`
  * itself, just links to it (planned, unbuilt, same situation as
  * `/register`).
  *
  * Standalone, full-width — split out from the combined Events/Handbook
- * section (see events.tsx for the same note). `bg-stone`, alternating from
- * Events' `bg-paper`.
+ * section (see events.tsx for the same note). `bg-paper`, alternating from
+ * Events' `bg-stone`.
  *
  * `categories` reflects what's currently pushed publicly in argc-handbook
  * (Company, People) — not every folder that exists in the repo. Grows as
@@ -71,7 +71,7 @@ export async function Handbook() {
   ])
 
   return (
-    <section aria-label="Handbook" className="bg-stone">
+    <section aria-label="Handbook" className="bg-paper">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
         {/* 4fr/7fr, not the usual editorial 7fr-for-text split — the art
          *  column needs to be wide enough that overflow-hidden doesn't clip
