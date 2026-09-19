@@ -46,4 +46,29 @@ describe('PostRow', () => {
     )
     expect(screen.getByText('anashwan')).toBeInTheDocument()
   })
+
+  // Regression guard: this used to render nothing at all for a null author,
+  // while the detail page showed "ARGC collective" for the same data.
+  it('shows the "ARGC collective" fallback when there is no author', () => {
+    renderWithProviders(<PostRow post={makePost({ author: null })} />)
+    expect(screen.getByText('ARGC collective')).toBeInTheDocument()
+  })
+
+  it('has a visible focus indicator on the row link', () => {
+    renderWithProviders(<PostRow post={makePost()} />)
+    const link = screen.getByRole('link', { name: /hello world/i })
+    expect(link.className).toMatch(/focus-visible:outline-2/)
+  })
+
+  // Regression guard: an unparseable published_at must not leave a dangling
+  // "· ·" with an empty gap between two separators.
+  it('omits the date and its separator when published_at cannot be parsed', () => {
+    renderWithProviders(
+      <PostRow
+        post={makePost({ published_at: 'not-a-date', read_time: '4 min read' })}
+      />,
+    )
+    expect(screen.queryByText('·')).not.toBeInTheDocument()
+    expect(screen.getByText('· 4 min read')).toBeInTheDocument()
+  })
 })

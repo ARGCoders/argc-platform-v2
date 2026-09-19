@@ -15,12 +15,14 @@ import type { PostView } from '@/lib/blog'
  * single link.
  */
 export function PostRow({ post }: { post: PostView }) {
+  const dateStr = formatBlogDate(post.published_at)
+
   return (
     <article className="group border-b border-border transition-colors duration-200 hover:bg-stone">
       <Link
         href={`/blog/${post.slug}`}
         aria-label={post.title}
-        className="flex flex-col gap-6 py-6 md:flex-row md:items-center md:gap-8"
+        className="flex flex-col gap-6 py-6 outline-none md:flex-row md:items-center md:gap-8 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden border border-border md:w-72 lg:w-80">
           {post.bannerUrl ? (
@@ -53,17 +55,17 @@ export function PostRow({ post }: { post: PostView }) {
             {post.description}
           </p>
 
-          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[0.7rem] tracking-[0.08em] text-ink-muted">
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[0.7rem] tracking-[0.08em] uppercase text-ink-muted">
             <AuthorLine author={post.author} />
-            {post.author && <span aria-hidden="true">·</span>}
-            <time dateTime={post.published_at}>{formatBlogDate(post.published_at)}</time>
+            {dateStr && <span aria-hidden="true">·</span>}
+            {dateStr && <time dateTime={post.published_at}>{dateStr}</time>}
             {post.read_time && <span>· {post.read_time}</span>}
           </div>
         </div>
 
         <span
           aria-hidden="true"
-          className="hidden shrink-0 font-mono text-[0.72rem] tracking-[0.14em] uppercase text-argc-maroon opacity-60 transition-opacity duration-200 group-hover:opacity-100 md:block"
+          className="hidden shrink-0 font-mono text-[0.72rem] tracking-[0.14em] uppercase text-argc-maroon opacity-80 transition-opacity duration-200 group-hover:opacity-100 md:block"
         >
           Read →
         </span>
