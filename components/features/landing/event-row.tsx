@@ -63,7 +63,7 @@ export function EventRow({ event }: { event: PublicEvent }) {
         )}
         <div className="mt-auto flex flex-col gap-1 border-t border-border pt-2.5">
           <div className="flex items-center justify-between gap-3">
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="font-mono text-[0.72rem] text-muted-foreground">
               {formatEventDate(event.starts_at, event.ends_at)}
             </span>
             {event.status === 'cancelled' && (
@@ -71,7 +71,7 @@ export function EventRow({ event }: { event: PublicEvent }) {
             )}
           </div>
           {event.location && (
-            <span className="truncate font-mono text-xs text-muted-foreground">
+            <span className="truncate font-mono text-[0.72rem] text-muted-foreground">
               {event.location}
             </span>
           )}
