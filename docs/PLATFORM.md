@@ -298,6 +298,23 @@ Redirects to role-appropriate default view:
 | --- | --- | --- |
 | /endorse/[token] | Public | External endorsement submission form (lives outside /dashboard) |
 
+### Public Site Pages (no auth)
+
+This table covers the marketing/content site — everything outside `/dashboard`
+and the endorsement form above. Added retroactively; `/` and `/events` predate
+this table and were never listed either, which is what let `/blog` and
+`/handbook` land without an entry despite `AGENTS.md`'s "pages not in §2 do
+not exist" rule.
+
+| Route | Description |
+| --- | --- |
+| / | Landing page: mission/values, nodes, events preview, handbook teaser |
+| /events | Public event listing |
+| /blog | Blog index — published posts from PocketBase |
+| /blog/[slug] | Single blog post |
+| /handbook | Handbook index — hand-maintained catalog of live categories |
+| /handbook/[category]/[slug] | Single handbook article, fetched live from the `argc-handbook` GitHub repo |
+
 ---
 
 ## 3. Component Inventory
