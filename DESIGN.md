@@ -34,7 +34,7 @@ typography:
     fontSize: '1.5rem'
     fontWeight: 700
     lineHeight: 1.2
-    letterSpacing: 'normal'
+    letterSpacing: '-0.025em'
   title:
     fontFamily: 'Space Grotesk, system-ui, sans-serif'
     fontSize: '1rem'
@@ -308,7 +308,7 @@ A 24fps ASCII-art animation rendered live behind the hero headline, sourced from
 - Respects `prefers-reduced-motion` by rendering nothing at all, rather than freezing on a mid-type frame — unlike the hero's canvas, no single frame here is a meaningful "still," since the motion itself is the point.
 - **Exit is a combined height-collapse + fade**, not an abrupt unmount — the node-name/XP content below settles into place smoothly instead of jumping the instant the flourish disappears.
 
-**Scoped exception: the Mission & Values shape ornament.** `components/features/landing/mission-values.tsx` renders one static ASCII shape (`content/ascii/shape-2.txt`, ported verbatim from V1) above the mission statement, at `text-[2.2px]` `font-black` `text-ink` (full opacity) — matching V1's own `SectionVision.tsx` treatment exactly, not a faded texture. Both `2.2px` and V1's `font-black` are off the documented type ramp and Space Grotesk's loaded-weight set respectively: `font-black` (900) has no true weight in IBM Plex Mono (Google serves this family only up to 700, confirmed identical in V1's own font config), so it renders as the browser's synthesized bold, on both sites, not a real weight — an accepted V1-parity trade-off, not a V2-only shortcut. `overflow-hidden` on the `<pre>` clips the raw monospace content at the column edge, since at `md` widths (before `lg`'s wider padding applies) the shape's real rendered width can exceed the mission column's — it must never visually cross the divider into the values column. Hidden below `md` (`hidden md:block`) and `aria-hidden="true"` at every width.
+**Scoped exception: landing-page ASCII shape ornaments.** Three sections render a static ASCII shape read server-side from a `.txt` asset (never a bundled JS module, same reasoning as the hero canvas), each at `font-black` `text-ink` (full opacity, never a faded texture) and an off-type-ramp `text-[N]px` value: Mission & Values (`content/ascii/shape-2.txt`, `text-[2.2px]`, ported verbatim from V1, matching V1's own `SectionVision.tsx` treatment exactly), Get Involved (`content/ascii/githup_ascii.txt`, `text-[5.5px]`), and Handbook (`content/ascii/handbook.txt`, `text-[3.1px]`). `font-black` (900) has no true weight in IBM Plex Mono (Google serves this family only up to 700, confirmed identical in V1's own font config for Mission & Values), so it renders as the browser's synthesized bold on all three, not a real weight — an accepted trade-off, not a shortcut. Each `text-[N]px` value is tuned per source file (line count × character width vary per asset) rather than shared, verified live for both fit (no clipping) and, for Get Involved/Handbook specifically, comparable rendered footprint to each other (~330×330px) since those two share an identical grid role — Mission & Values' shape sits in a different structural position (stacked above its statement, not a separate column) and isn't held to the same size comparison. `overflow-hidden` on every `<pre>` guards against a future edit to any of the three source files producing a line long enough to clip differently than today's tuning assumes. Hidden below `md` (`hidden md:block`) and `aria-hidden="true"` at every width, on all three.
 
 ## Do's and Don'ts
 
