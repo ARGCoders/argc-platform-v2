@@ -16,10 +16,12 @@ const SHAPE_PATH = path.join(process.cwd(), 'content/ascii/githup_ascii.txt')
 // fill the full 7fr column (justify-self's default), to close a size gap
 // with Handbook's shape. Reverted after direct feedback: at that size,
 // filling the column, it read as too dominant next to the text column.
-// Back to 5.5px (handbook.txt's own value) with `justify-self-end` added
-// — the box now sizes to its smaller natural content width instead of
-// stretching, and anchors to the column's right edge rather than its
-// left, leaving deliberate breathing room. Verified no clip.
+// Back to 5.5px with `justify-self-end` added — the box now sizes to its
+// smaller natural content width instead of stretching, and anchors to
+// the column's right edge rather than its left, leaving deliberate
+// breathing room. Verified no clip. Handbook's shape got the same
+// treatment (see its own SHAPE_CLASS) so the two sections read as one
+// consistent family again.
 const SHAPE_CLASS =
   'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[5.5px] text-ink justify-self-end'
 
