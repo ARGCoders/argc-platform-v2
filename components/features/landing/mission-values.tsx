@@ -46,12 +46,17 @@ const SHAPE_CLASS =
  * The values column stays purely typographic — no art mixed into the
  * list, matching how Bordered Rows never decorates a data row with an
  * icon.
+ *
+ * `id="vision"` is the navbar's "Our Vision" link target — this section
+ * is V2's replacement for V1's dedicated `SectionVision.tsx` (which used
+ * this same shape art), so the existing nav copy points here rather than
+ * a separate section.
  */
 export function MissionValues() {
   const { statement, detail, values } = landing.missionValues
 
   return (
-    <section aria-label="Mission and values" className="bg-paper">
+    <section id="vision" aria-label="Mission and values" className="bg-paper">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 gap-x-16 gap-y-12 md:grid-cols-[5fr_7fr] lg:gap-x-24">
           <div className="flex flex-col gap-8 md:border-r md:border-border md:pr-16 lg:pr-24">
