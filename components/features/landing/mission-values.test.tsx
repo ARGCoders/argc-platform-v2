@@ -28,8 +28,8 @@ describe('MissionValues', () => {
     expect(screen.queryByText('1.')).not.toBeInTheDocument()
   })
 
-  // Regression guard: the single ASCII shape is decorative texture framing
-  // the mission column, not content — a screen reader must never encounter
+  // Regression guard: the single ASCII shape is decorative texture in its
+  // own shape column, not content — a screen reader must never encounter
   // it, and it must never be mistaken for real text content. Only one
   // <pre> — shape-1 is reserved for later and must not sneak in here too.
   it('marks the ASCII shape decorative and excludes it from the accessibility tree', () => {
@@ -41,9 +41,10 @@ describe('MissionValues', () => {
   })
 
   // Regression guard: at `md` widths (before `lg`'s wider padding applies)
-  // the shape's real rendered width can exceed the mission column's — this
-  // clips it at the column edge so it can never visually cross the divider.
-  it('clips the shape so it cannot bleed past the column divider', () => {
+  // the shape's real rendered width can exceed its dedicated shape column —
+  // this clips it at the column edge so it can never bleed into the text
+  // column beside it.
+  it('clips the shape so it cannot bleed into the text column', () => {
     const { container } = render(<MissionValues />)
     const shape = container.querySelector('pre')
     expect(shape?.className).toContain('overflow-hidden')
