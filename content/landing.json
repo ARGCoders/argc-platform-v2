@@ -28,6 +28,11 @@
       }
     ]
   },
+  "getInvolved": {
+    "heading": "Open Source",
+    "detail": "The platform, the handbook — the real work happens in the open, not behind a pitch deck.",
+    "cta": "View our GitHub organization"
+  },
   "nodes": {
     "statement": ["You belong to a node", "before you belong to ARGC."],
     "detail": "A node — your small working team — is small on purpose: four to six people, one domain, one leader who owns the output. Small enough that nothing gets diffuse — there's nowhere to hide.",

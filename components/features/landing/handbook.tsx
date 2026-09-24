@@ -23,15 +23,16 @@ const MARKDOWN_CLASS =
 
 const SHAPE_PATH = path.join(process.cwd(), 'content/ascii/handbook.txt')
 
-// The rendered box (width/height) is fixed by the grid column and row,
-// not by font-size — confirmed by measuring identical box dimensions at
-// 2.9px and 3.4px. Font-size instead controls how much of the 89x180
-// character image is visible before overflow-hidden clips it: a larger
-// value shows a more zoomed-in, chunkier crop (bolder dots, less of the
-// image's total width/height visible), which is what actually reads as
-// "bigger" for a fixed-box halftone image like this.
+// Matches get-involved.tsx's shape treatment: `justify-self-end` (no
+// `-mx-4`) so the box sizes to its natural content width and anchors to
+// the column's right edge, rather than stretching to fill it. 3.1px
+// (down from 5.5px) brings this shape's rendered footprint in line with
+// Get Involved's — the two sections share the identical 4fr/7fr grid
+// role, and at the old size this one rendered noticeably larger with no
+// breathing room, reading as an inconsistent pair. Verified live: 334x307
+// vs Get Involved's 330x332, no clip.
 const SHAPE_CLASS =
-  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[5.5px] text-ink -mx-4'
+  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[3.1px] text-ink justify-self-end'
 
 /**
  * Reads the art file server-side only, same rule as Mission & Values'
@@ -50,14 +51,23 @@ function readHandbookShape(): string | null {
 }
 
 /**
- * Fourth section below Hero, directly under Events — a live excerpt of the
+ * Fifth section below Hero, directly under Events — a live excerpt of the
  * actual public handbook, not landing-page copy. Doesn't build `/handbook`
  * itself, just links to it (planned, unbuilt, same situation as
  * `/register`).
  *
  * Standalone, full-width — split out from the combined Events/Handbook
- * section (see events.tsx for the same note). `bg-stone`, alternating from
- * Events' `bg-paper`.
+ * section (see events.tsx for the same note). `bg-paper`, alternating from
+ * Events' `bg-stone`.
+ *
+ * Heading uses the "big statement" scale (Mission & Values/Nodes'
+ * `clamp(2rem,5vw,3rem)`), not the "small heading" scale Get Involved and
+ * Events use — deliberately, since without it the page's heading-size
+ * pattern would land on two small headings in a row at the very end of
+ * the scroll (Get Involved, small → Nodes, big → Events, small → Handbook,
+ * small) with nothing to punctuate the close. This restores a clean
+ * big/small/big/small/big alternation and gives the last section — the
+ * one right before a visitor leaves the page — the strongest beat.
  *
  * `categories` reflects what's currently pushed publicly in argc-handbook
  * (Company, People) — not every folder that exists in the repo. Grows as
@@ -71,13 +81,13 @@ export async function Handbook() {
   ])
 
   return (
-    <section aria-label="Handbook" className="bg-stone">
+    <section aria-label="Handbook" className="bg-paper">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
-        {/* 4fr/7fr, not the usual editorial 7fr-for-text split — the art
-         *  column needs to be wide enough that overflow-hidden doesn't clip
-         *  the shape's edge at its current font-size (verified: scrollWidth
-         *  no longer exceeds clientWidth). Text column shrinks accordingly;
-         *  still comfortable for this section's short copy + category tags. */}
+        {/* 4fr/7fr, not the usual editorial 7fr-for-text split — matches
+         *  Get Involved's identical grid role. The art column no longer
+         *  needs to be wide enough to contain a column-filling shape (see
+         *  SHAPE_CLASS), but the ratio stays shared so the two sections
+         *  read as the same pattern. */}
         <div
           className={
             shape
@@ -87,14 +97,16 @@ export async function Handbook() {
         >
           <div className="flex flex-col gap-6 border-t border-border pt-6">
             <div className="flex flex-col gap-2">
-              <h2 className="font-sans text-[1.5rem] font-bold tracking-tight text-foreground">
+              <h2 className="font-sans text-[clamp(2rem,5vw,3rem)] font-bold leading-[1.04] tracking-tight text-foreground [text-wrap:balance]">
                 {copy.heading}
               </h2>
-              <p className="font-sans text-sm text-muted-foreground">{copy.detail}</p>
+              <p className="font-sans text-[0.9375rem] text-muted-foreground">
+                {copy.detail}
+              </p>
             </div>
 
             <div
-              className={`flex max-w-[60ch] flex-col gap-3 font-sans text-base leading-relaxed text-muted-foreground ${MARKDOWN_CLASS}`}
+              className={`flex max-w-[60ch] flex-col gap-3 font-sans text-[0.9375rem] leading-relaxed text-muted-foreground ${MARKDOWN_CLASS}`}
             >
               {intro ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{intro}</ReactMarkdown>

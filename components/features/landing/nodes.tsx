@@ -2,8 +2,8 @@ import { landing } from '@/lib/content'
 import { RevealOnScroll } from './reveal-on-scroll'
 
 /**
- * Nodes — the second section below the untouched Hero, directly under
- * Mission & Values. Deliberately not a repeat of that section's asymmetric
+ * Nodes — the third section below the untouched Hero, directly under Get
+ * Involved. Deliberately not a repeat of Mission & Values' asymmetric
  * two-column-with-shape-art composition: this one is stat-anchored, built
  * around the "4-6 people" fact as a concrete visual element, so the two
  * sections don't read as the same template stacked twice while scrolling.
@@ -19,7 +19,7 @@ export function Nodes() {
   const { statement, detail, stat, domains } = landing.nodes
 
   return (
-    <section aria-label="Nodes" className="bg-stone">
+    <section aria-label="Nodes" className="bg-paper">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 gap-x-16 gap-y-10 md:grid-cols-[7fr_5fr] lg:gap-x-24">
           <div className="flex flex-col gap-5">
@@ -30,7 +30,7 @@ export function Nodes() {
                 </span>
               ))}
             </h2>
-            <p className="max-w-[46ch] font-sans text-base leading-relaxed text-muted-foreground">
+            <p className="max-w-[46ch] font-sans text-[0.9375rem] leading-relaxed text-muted-foreground">
               {detail}
             </p>
           </div>
@@ -57,7 +57,7 @@ export function Nodes() {
               <span className="font-mono text-[0.72rem] font-medium tracking-[0.1em] text-foreground uppercase">
                 {domain.name}
               </span>
-              <p className="max-w-[32ch] font-sans text-sm leading-relaxed text-muted-foreground">
+              <p className="max-w-[32ch] font-sans text-[0.9375rem] leading-relaxed text-muted-foreground">
                 {domain.detail}
               </p>
             </div>
