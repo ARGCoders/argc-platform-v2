@@ -124,4 +124,19 @@ describe('Handbook', () => {
     expect(container.querySelector('pre')).not.toBeInTheDocument()
     readSpy.mockRestore()
   })
+
+  // Regression guard: the shape must vertically center against the text
+  // column (art's middle = text's middle) and stay anchored to the
+  // column's right edge — items-center (cross-axis) and justify-self-end
+  // (inline-axis) are orthogonal, not competing, so both must be present.
+  // Matches get-involved.tsx's identical treatment.
+  it('vertically centers the shape against the text column and anchors it right', async () => {
+    const { container } = render(await Handbook())
+
+    const grid = container.querySelector('.grid')
+    expect(grid?.className).toContain('items-center')
+
+    const pre = container.querySelector('pre')
+    expect(pre?.className).toContain('justify-self-end')
+  })
 })

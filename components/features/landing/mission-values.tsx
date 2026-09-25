@@ -116,7 +116,7 @@ export function MissionValues() {
                   key={value.tag}
                   className="flex flex-col gap-2 border-t border-border pt-6"
                 >
-                  <span className="shrink-0 font-mono text-[0.72rem] font-medium tracking-[0.1em] text-foreground uppercase">
+                  <span className="font-mono text-[0.72rem] font-medium tracking-[0.1em] text-foreground uppercase">
                     {value.tag}
                   </span>
                   <p className="font-sans text-[0.9375rem] leading-relaxed text-foreground/80">
