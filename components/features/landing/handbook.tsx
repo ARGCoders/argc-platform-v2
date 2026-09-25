@@ -26,13 +26,19 @@ const SHAPE_PATH = path.join(process.cwd(), 'content/ascii/handbook.txt')
 // Matches get-involved.tsx's shape treatment: `justify-self-end` (no
 // `-mx-4`) so the box sizes to its natural content width and anchors to
 // the column's right edge, rather than stretching to fill it. 3.1px
-// (down from 5.5px) brings this shape's rendered footprint in line with
+// (down from 5.5px) brought this shape's rendered footprint in line with
 // Get Involved's — the two sections share the identical 4fr/7fr grid
 // role, and at the old size this one rendered noticeably larger with no
 // breathing room, reading as an inconsistent pair. Verified live: 334x307
 // vs Get Involved's 330x332, no clip.
+//
+// Bumped to 3.7px (same ~1.18x factor applied to Get Involved's 5.5→6.5px
+// bump) to keep the two shapes' footprints matched while both grow, per a
+// later "a little bigger" request. Not re-verified live this round (see
+// get-involved.tsx's SHAPE_CLASS comment for why) — re-check once the
+// Chrome extension reconnects.
 const SHAPE_CLASS =
-  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[3.1px] text-ink justify-self-end'
+  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[3.7px] text-ink justify-self-end'
 
 /**
  * Reads the art file server-side only, same rule as Mission & Values'
@@ -57,8 +63,10 @@ function readHandbookShape(): string | null {
  * `/register`).
  *
  * Standalone, full-width — split out from the combined Events/Handbook
- * section (see events.tsx for the same note). `bg-paper`, alternating from
- * Events' `bg-stone`.
+ * section (see events.tsx for the same note). `bg-paper`, flat across every
+ * section below Hero (see get-involved.tsx for why the old Paper/Stone
+ * alternation was dropped) — `border-t border-border` marks the section
+ * seam instead.
  *
  * Heading uses the "big statement" scale (Mission & Values/Nodes'
  * `clamp(2rem,5vw,3rem)`), not the "small heading" scale Get Involved and
@@ -81,17 +89,21 @@ export async function Handbook() {
   ])
 
   return (
-    <section aria-label="Handbook" className="bg-paper">
+    <section aria-label="Handbook" className="bg-paper border-t border-border">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
         {/* 4fr/7fr, not the usual editorial 7fr-for-text split — matches
          *  Get Involved's identical grid role. The art column no longer
          *  needs to be wide enough to contain a column-filling shape (see
          *  SHAPE_CLASS), but the ratio stays shared so the two sections
-         *  read as the same pattern. */}
+         *  read as the same pattern. `items-center` (not `items-start`)
+         *  vertically centers the shape against the text column, matching
+         *  Get Involved's same fix — the art's own middle now lines up
+         *  with the text block's middle instead of just sharing a top
+         *  edge. */}
         <div
           className={
             shape
-              ? 'grid grid-cols-1 items-start gap-x-16 gap-y-10 md:grid-cols-[4fr_7fr] lg:gap-x-24'
+              ? 'grid grid-cols-1 items-center gap-x-16 gap-y-10 md:grid-cols-[4fr_7fr] lg:gap-x-24'
               : 'grid grid-cols-1'
           }
         >
