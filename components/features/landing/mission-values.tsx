@@ -27,32 +27,43 @@ const shape2 = fs.readFileSync(
  *  700 for this family, confirmed the same in V1's own font config) — on
  *  both sites `font-black` renders as the browser's synthesized bold over
  *  the loaded 500 weight, not a real weight, but that's V1's actual
- *  behavior too, not a V2-only shortcut. `hidden`/`md:flex` live on the
- *  wrapping div now (matching V1's own wrapper, not the `<pre>` itself),
- *  so this class only needs `overflow-hidden` as a guard against the raw
- *  monospace content ever exceeding its now-dedicated shape column.
+ *  behavior too, not a V2-only shortcut. `hidden md:block` live directly on
+ *  the `<pre>` now — the wrapping flex div (V1's own pattern) was dropped
+ *  once the grid column itself became content-sized (see the grid
+ *  className below), matching how Get Involved and Handbook already put
+ *  these classes straight on their own `<pre>`. `overflow-hidden` is now a
+ *  pure guard, not load-bearing for layout — the auto-sized column can't
+ *  produce a mismatch between box and content the way a fixed-width column
+ *  could.
  *
- *  1.3px was tuned to the exact max that fit the old min(300px,28vw)
- *  column's worst case (~215px at the `md` breakpoint). A later "a little
- *  bigger" request needed real headroom, not a marginal squeeze, so the
- *  column widened to min(360px,32vw) (new worst case ~245.76px at `md`,
- *  a ~14% wider floor) and this grew to 1.4px — a conservative estimate
- *  scaled from the old fit ratio (215px / 1.3px ≈ 165.4px per em), kept
- *  safely under the new column's ~1.49px estimated ceiling. Not
- *  re-verified live this round (Chrome extension was disconnected) —
- *  re-check for clipping at the `md` breakpoint once available again. */
+ *  History: 1.3px in a min(300px,28vw) column, then 1.4px in a wider
+ *  min(360px,32vw) column ("a little bigger"), then a deliberately bold
+ *  2.4px in a min(600px,55vw) column ("still too small"). That version's
+ *  size was right, but the fixed-width column plus `justify-end` left a
+ *  large empty gap on one side, reading as off-center rather than
+ *  intentional. This round keeps 2.4px and instead makes the *column*
+ *  content-sized (`auto`, not a fixed px/vw cap) — see the grid className
+ *  below — so there's no leftover gap to justify away in the first place.
+ *  Still not live-verified (no browser access this session). */
 const SHAPE_CLASS =
-  'font-mono font-black leading-[1.1] whitespace-pre text-[1.4px] text-ink overflow-hidden select-none pointer-events-none'
+  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[2.4px] text-ink'
 
 /**
  * Mission & Values — the first section below the untouched Hero. Restructured
- * to match V1's `SectionVision.tsx` layout pattern: a dedicated, narrow ASCII
- * shape column beside one flowing text column, rather than V2's original
- * asymmetric 5fr/7fr mission/values split. The column started at V1's own
- * `min(300px,28vw)` token, then widened to `min(360px,32vw)` to make real
- * room for a bigger shape (see SHAPE_CLASS) rather than V1's exact value.
- * The kicker ("Mission & Values", mono/uppercase/maroon) is new — V1 always
- * led with one above its headline; V2 didn't have one until this pass.
+ * to match V1's `SectionVision.tsx` layout pattern: a dedicated ASCII shape
+ * column beside one flowing text column, rather than V2's original
+ * asymmetric 5fr/7fr mission/values split. The column went through several
+ * fixed-width attempts (`min(300px,28vw)`, then `min(360px,32vw)`, then
+ * `min(600px,55vw)`) chasing "the shape looks too small," each of which
+ * left the shape floating inside a box wider than its own content — the
+ * last one specifically left a large, visibly off-center gap on one side.
+ * The column is now `auto` — sized to the shape's own natural content
+ * width, whatever that is at the current SHAPE_CLASS font-size — so the
+ * shape's box and the shape's content are the same size, no gap to explain
+ * away, and any freed width goes to the text column instead of sitting
+ * empty. The kicker ("Mission & Values", mono/uppercase/maroon) is new —
+ * V1 always led with one above its headline; V2 didn't have one until this
+ * pass.
  *
  * The values list keeps its own established tag+text treatment (no numbered
  * index, unlike V1's roadmap list — it's a set of values, not a sequence)
@@ -75,6 +86,16 @@ const SHAPE_CLASS =
  * different lightness), so `border-t border-border` marks each section's
  * seam instead. This is the first section after Hero's `bg-argc-maroon`,
  * so its own top border sits against a hard color break either way.
+ *
+ * `items-center` on the outer grid — added after direct "doesn't look
+ * good" feedback. Before this, the shape had no vertical alignment set
+ * (grid default `stretch`), so it sat top-anchored while the text column
+ * beside it grew taller across this session (kicker, then the values
+ * grid), reading as orphaned with dead space around it. Now it centers
+ * against the text column's height. No `justify-self`/wrapper-alignment
+ * classes are needed on the shape itself — the `auto`-sized column (see
+ * SHAPE_CLASS and the grid className above) already matches the shape's
+ * own width exactly, so there's nothing left to justify within.
  */
 export function MissionValues() {
   const { statement, detail, values } = landing.missionValues
@@ -86,12 +107,10 @@ export function MissionValues() {
       className="bg-paper border-t border-border"
     >
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 gap-x-16 gap-y-12 md:grid-cols-[min(360px,32vw)_1fr] lg:gap-x-24">
-          <div className="hidden w-full justify-center md:flex">
-            <pre aria-hidden="true" className={SHAPE_CLASS}>
-              {shape2}
-            </pre>
-          </div>
+        <div className="grid grid-cols-1 items-center gap-x-16 gap-y-12 md:grid-cols-[auto_1fr] lg:gap-x-24">
+          <pre aria-hidden="true" className={SHAPE_CLASS}>
+            {shape2}
+          </pre>
 
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-5">
