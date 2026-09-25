@@ -16,14 +16,25 @@ const SHAPE_PATH = path.join(process.cwd(), 'content/ascii/githup_ascii.txt')
 // fill the full 7fr column (justify-self's default), to close a size gap
 // with Handbook's shape. Reverted after direct feedback: at that size,
 // filling the column, it read as too dominant next to the text column.
-// Back to 5.5px with `justify-self-end` added — the box now sizes to its
+// Settled on 5.5px with `justify-self-end` added — the box sizes to its
 // smaller natural content width instead of stretching, and anchors to
 // the column's right edge rather than its left, leaving deliberate
-// breathing room. Verified no clip. Handbook's shape got the same
-// treatment (see its own SHAPE_CLASS) so the two sections read as one
-// consistent family again.
+// breathing room. Handbook's shape got the same treatment (see its own
+// SHAPE_CLASS) so the two sections read as one consistent family again.
+//
+// Bumped again to 6.5px on a later user request for "a little bigger" art
+// across all three landing shapes. Safe headroom here: at 5.5px the box's
+// natural width was previously measured at 330px against a ~650-700px
+// wide 7fr column (justify-self-end sizes to content, so it was using
+// under half the available width) — this is unlike the earlier 7.5px
+// attempt, which looked dominant only because it *stretched* to fill the
+// column (the pre-justify-self-end default), not because 7.5px content is
+// inherently too wide. Scaled Handbook's px by the same ~1.18x factor to
+// keep the two shapes' footprints matched. Not re-verified live this
+// round (Chrome extension was disconnected) — flagged to the user;
+// re-check for clipping once verification is available again.
 const SHAPE_CLASS =
-  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[5.5px] text-ink justify-self-end'
+  'hidden md:block overflow-hidden select-none pointer-events-none font-mono font-black leading-[1.1] whitespace-pre text-[6.5px] text-ink justify-self-end'
 
 /**
  * Reads the art file server-side only — same rule as Mission & Values'
@@ -51,22 +62,33 @@ function readGithubShape(): string | null {
  * noreferrer"`, an `↗` glyph instead of the internal-nav `→`, and sr-only
  * text so the "this leaves the site" signal isn't sighted-only.
  *
- * `bg-stone`, alternating from Mission & Values' `bg-paper`. Two-column
- * grid when the shape art exists (text/art, 4fr/7fr — same ratio and
- * verified-no-clip approach as Handbook), collapsing to one column
- * otherwise, same as Handbook does when its own shape is absent.
+ * `bg-paper`, flat across every section below Hero — the prior alternating
+ * Paper/Stone rhythm read as an unintended color clash (Paper and Stone
+ * sit on different hue axes, not just different lightness) rather than a
+ * deliberate one, so `border-t border-border` now marks the section seam
+ * instead. Two-column grid when the shape art exists (text/art, 4fr/7fr —
+ * same ratio and verified-no-clip approach as Handbook), collapsing to one
+ * column otherwise, same as Handbook does when its own shape is absent.
+ * `items-center` (not `items-start`) vertically centers the shape against
+ * the text column, so the art's own middle lines up with the text block's
+ * middle instead of both just sharing a top edge — Handbook's grid gets
+ * this same treatment for the same reason.
  */
 export function GetInvolved() {
   const copy = landing.getInvolved
   const shape = readGithubShape()
 
   return (
-    <section id="get-involved" aria-label="Get involved" className="bg-stone">
+    <section
+      id="get-involved"
+      aria-label="Get involved"
+      className="bg-paper border-t border-border"
+    >
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
         <div
           className={
             shape
-              ? 'grid grid-cols-1 items-start gap-x-16 gap-y-10 md:grid-cols-[4fr_7fr] lg:gap-x-24'
+              ? 'grid grid-cols-1 items-center gap-x-16 gap-y-10 md:grid-cols-[4fr_7fr] lg:gap-x-24'
               : 'grid grid-cols-1'
           }
         >

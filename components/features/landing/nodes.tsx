@@ -14,12 +14,16 @@ import { RevealOnScroll } from './reveal-on-scroll'
  * deliberately does not frame accountability as cross-node peer evaluation
  * or voting (a docs/PLATFORM.md schema detail, not the handbook's actual
  * model): the real "why" is visibility within a small group.
+ *
+ * `bg-paper`, flat across every section below Hero (see get-involved.tsx
+ * for why the old Paper/Stone alternation was dropped) — `border-t
+ * border-border` marks the section seam instead.
  */
 export function Nodes() {
   const { statement, detail, stat, domains } = landing.nodes
 
   return (
-    <section aria-label="Nodes" className="bg-paper">
+    <section aria-label="Nodes" className="bg-paper border-t border-border">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 gap-x-16 gap-y-10 md:grid-cols-[7fr_5fr] lg:gap-x-24">
           <div className="flex flex-col gap-5">

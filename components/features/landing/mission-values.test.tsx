@@ -20,6 +20,20 @@ describe('MissionValues', () => {
     }
   })
 
+  // Regression guard: the values moved from a stacked row list to a
+  // responsive grid (4-across at lg, 2x2 at sm/md, one column on mobile)
+  // — this pins the grid classes and cell count so a future edit can't
+  // silently revert to the old row-list layout without a test failing.
+  it('lays the values out as a responsive grid, one cell per value', () => {
+    const { container } = render(<MissionValues />)
+
+    const grid = container.querySelector(
+      '.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4',
+    )
+    expect(grid).toBeInTheDocument()
+    expect(grid?.children).toHaveLength(landing.missionValues.values.length)
+  })
+
   // Regression guard: the values list is a plain typographic ledger, not a
   // sequence — tags classify each value, they don't number it.
   it('does not render sequence numbers next to the values', () => {

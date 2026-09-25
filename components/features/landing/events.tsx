@@ -58,14 +58,16 @@ async function fetchUpcomingEvents(limit: number): Promise<PublicEvent[]> {
  * Standalone, full-width — split out from a combined Events/Handbook
  * section that put this and `Handbook` in two grid columns of one section;
  * the two are independent proof points and read better as separate scroll
- * beats. `bg-stone`, alternating from Nodes' `bg-paper`.
+ * beats. `bg-paper`, flat across every section below Hero (see
+ * get-involved.tsx for why the old Paper/Stone alternation was dropped) —
+ * `border-t border-border` marks the section seam instead.
  */
 export async function Events() {
   const copy = landing.eventsPreview
   const upcoming = await fetchUpcomingEvents(PREVIEW_COUNT)
 
   return (
-    <section aria-label="Events" className="bg-stone">
+    <section aria-label="Events" className="bg-paper border-t border-border">
       <RevealOnScroll className="mx-auto max-w-6xl px-6 py-[clamp(4rem,10vw,8rem)] sm:px-8 lg:px-12">
         <div className="flex flex-col gap-6 border-t border-border pt-6">
           <div className="flex flex-col gap-2">
