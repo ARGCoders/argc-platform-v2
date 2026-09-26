@@ -64,9 +64,9 @@ describe('HandbookArticlePage', () => {
     })
     render(element)
 
-    expect(screen.getByRole('link', { name: /vision/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /core values/i })).toHaveAttribute(
       'href',
-      '/handbook/company/vision',
+      '/handbook/company/core-values',
     )
   })
 

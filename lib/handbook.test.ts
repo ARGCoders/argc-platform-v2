@@ -141,28 +141,36 @@ describe('getHandbookArticle', () => {
 
 describe('getHandbookSiblings', () => {
   it('returns null prev and the next article for the first article in a group', () => {
-    expect(getHandbookSiblings('company', 'mission')).toEqual({
+    expect(getHandbookSiblings('company', 'what-is-argc')).toEqual({
       prev: null,
-      next: { slug: 'vision', title: 'Vision', path: '01-company/02-vision.md' },
+      next: {
+        slug: 'why-argc-exists',
+        title: 'Why ARGC Exists',
+        path: '01-company/02-why-argc-exists.md',
+      },
     })
   })
 
   it('returns null next and the prev article for the last article in a group', () => {
-    expect(getHandbookSiblings('company', 'structure')).toEqual({
-      prev: { slug: 'history', title: 'History', path: '01-company/04-history.md' },
+    expect(getHandbookSiblings('company', 'the-future-of-argc')).toEqual({
+      prev: {
+        slug: 'transcendence',
+        title: 'Transcendence',
+        path: '01-company/11-transcendence.md',
+      },
       next: null,
     })
   })
 
   it('returns both prev and next for a middle article', () => {
-    const { prev, next } = getHandbookSiblings('company', 'values')
-    expect(prev?.slug).toBe('vision')
-    expect(next?.slug).toBe('history')
+    const { prev, next } = getHandbookSiblings('company', 'core-values')
+    expect(prev?.slug).toBe('mission')
+    expect(next?.slug).toBe('what-argc-is')
   })
 
   it('never crosses category boundaries', () => {
     // Last article of Company must not point "next" into People.
-    expect(getHandbookSiblings('company', 'structure').next).toBeNull()
+    expect(getHandbookSiblings('company', 'the-future-of-argc').next).toBeNull()
   })
 
   it('returns nulls for an article not in the catalog', () => {

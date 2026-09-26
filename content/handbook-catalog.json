@@ -3,11 +3,58 @@
     "slug": "company",
     "label": "Company",
     "articles": [
-      { "slug": "mission", "title": "Mission", "path": "01-company/01-mission.md" },
-      { "slug": "vision", "title": "Vision", "path": "01-company/02-vision.md" },
-      { "slug": "values", "title": "Values", "path": "01-company/03-values.md" },
-      { "slug": "history", "title": "History", "path": "01-company/04-history.md" },
-      { "slug": "structure", "title": "Structure", "path": "01-company/05-structure.md" }
+      {
+        "slug": "what-is-argc",
+        "title": "What is ARGC",
+        "path": "01-company/01-what-is-argc.md"
+      },
+      {
+        "slug": "why-argc-exists",
+        "title": "Why ARGC Exists",
+        "path": "01-company/02-why-argc-exists.md"
+      },
+      { "slug": "vision", "title": "Vision", "path": "01-company/03-vision.md" },
+      { "slug": "mission", "title": "Mission", "path": "01-company/04-mission.md" },
+      {
+        "slug": "core-values",
+        "title": "Core Values",
+        "path": "01-company/05-core-values.md"
+      },
+      {
+        "slug": "what-argc-is",
+        "title": "What ARGC Is",
+        "path": "01-company/06-what-argc-is.md"
+      },
+      {
+        "slug": "what-argc-is-not",
+        "title": "What ARGC Is Not",
+        "path": "01-company/07-what-argc-is-not.md"
+      },
+      {
+        "slug": "the-argc-journey",
+        "title": "The ARGC Journey",
+        "path": "01-company/08-the-argc-journey.md"
+      },
+      {
+        "slug": "phase-i",
+        "title": "Phase I — Transcendence",
+        "path": "01-company/09-phase-i.md"
+      },
+      {
+        "slug": "node-model",
+        "title": "The Node Model",
+        "path": "01-company/10-node-model.md"
+      },
+      {
+        "slug": "transcendence",
+        "title": "Transcendence",
+        "path": "01-company/11-transcendence.md"
+      },
+      {
+        "slug": "the-future-of-argc",
+        "title": "The Future of ARGC",
+        "path": "01-company/12-the-future-of-argc.md"
+      }
     ]
   },
   {
