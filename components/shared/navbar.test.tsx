@@ -60,6 +60,31 @@ describe('Navbar', () => {
     const header = container.querySelector('header')
     expect(header?.style.viewTransitionName).toBe('site-header')
   })
+
+  // Regression guard: Events and Blog were deliberately removed from the
+  // nav (their pages stay live, just unlinked) — pin the removal itself,
+  // not just the dynamic "renders every entry in site.nav" test above,
+  // which would pass trivially even if they were still in content/site.json.
+  it('does not offer Events or Blog in the nav', async () => {
+    renderWithProviders(<Navbar />)
+    await screen.findAllByText(site.nav[0]?.label ?? '')
+    expect(screen.queryByText('Events')).toBeNull()
+    expect(screen.queryByText('Blog')).toBeNull()
+  })
+
+  // Regression guard: About Us now points at the GitHub org instead of a
+  // dead /#about anchor — it must get the same external-link treatment as
+  // Get Involved's GitHub CTA (new tab, no opener leak, signaled to
+  // screen-reader users too), not silently navigate away in the same tab.
+  it('opens About Us in a new tab as an external link', async () => {
+    renderWithProviders(<Navbar />)
+    const links = await screen.findAllByText('About Us')
+    const link = links[0]?.closest('a')
+    expect(link).toHaveAttribute('href', 'https://github.com/ARGCoders')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+    expect(link).toHaveTextContent('opens in a new tab')
+  })
 })
 
 describe('Navbar — maroon variant', () => {

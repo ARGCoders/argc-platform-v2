@@ -5,9 +5,7 @@
   "nav": [
     { "label": "Home", "href": "/" },
     { "label": "Our Vision", "href": "/#vision" },
-    { "label": "About Us", "href": "/#about" },
-    { "label": "Events", "href": "/events" },
-    { "label": "Blog", "href": "/blog" },
+    { "label": "About Us", "href": "https://github.com/ARGCoders" },
     { "label": "Handbook", "href": "/handbook" },
     { "label": "Contact Us", "href": "/#get-involved" }
   ],
