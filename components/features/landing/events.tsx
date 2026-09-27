@@ -51,9 +51,11 @@ async function fetchUpcomingEvents(limit: number): Promise<PublicEvent[]> {
 }
 
 /**
- * Fourth section below Hero, directly under Nodes — a small teaser of real
+ * Sixth and last section, directly under Handbook — a small teaser of real
  * upcoming public events, not just landing-page copy. Doesn't build
- * `/events` itself, just links to it (already exists).
+ * `/events` itself, just links to it (already exists). Moved below
+ * Handbook per a direct request; see app/page.tsx's own doc comment for
+ * why its heading scale wasn't rebalanced for the new position.
  *
  * Standalone, full-width — split out from a combined Events/Handbook
  * section that put this and `Handbook` in two grid columns of one section;

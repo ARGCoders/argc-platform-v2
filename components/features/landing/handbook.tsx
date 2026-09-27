@@ -57,7 +57,7 @@ function readHandbookShape(): string | null {
 }
 
 /**
- * Fifth section below Hero, directly under Events — a live excerpt of the
+ * Fifth section below Hero, directly above Events — a live excerpt of the
  * actual public handbook, not landing-page copy. Doesn't build `/handbook`
  * itself, just links to it (planned, unbuilt, same situation as
  * `/register`).
@@ -70,12 +70,12 @@ function readHandbookShape(): string | null {
  *
  * Heading uses the "big statement" scale (Mission & Values/Nodes'
  * `clamp(2rem,5vw,3rem)`), not the "small heading" scale Get Involved and
- * Events use — deliberately, since without it the page's heading-size
- * pattern would land on two small headings in a row at the very end of
- * the scroll (Get Involved, small → Nodes, big → Events, small → Handbook,
- * small) with nothing to punctuate the close. This restores a clean
- * big/small/big/small/big alternation and gives the last section — the
- * one right before a visitor leaves the page — the strongest beat.
+ * Events use — originally to end the page on a strong beat, back when this
+ * was the last section (Get Involved, small → Nodes, big → Events, small →
+ * Handbook, big). Events moved below Handbook per a direct request, making
+ * Events the new last section — this heading scale was deliberately left
+ * as-is rather than rebalanced, so the page now ends on a small heading
+ * again. Not an oversight; see app/page.tsx's own doc comment.
  *
  * `categories` reflects what's currently pushed publicly in argc-handbook
  * (Company, People) — not every folder that exists in the repo. Grows as
