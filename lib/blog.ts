@@ -55,15 +55,29 @@ function toPostView(post: PostRecord, admin: PocketBase): PostView {
 /**
  * All published posts, newest first. Status filtering lives here and nowhere
  * else — the frontend only ever renders published content.
+ *
+ * Swallows any fetch failure (PocketBase unreachable, auth failure, etc.)
+ * and returns an empty list rather than throwing — for now, a listing page
+ * going quiet reads better than a hard error screen, and app/blog/page.tsx
+ * already renders a "No posts yet" empty state for the zero-posts case, so
+ * this just routes a real failure into that same, already-correct path
+ * instead of app/blog/error.tsx. Scoped to this function only:
+ * getPublishedPostBySlug below still throws, since a single missing post
+ * arguably wants 404-style handling, not "looks empty."
  */
 export async function getPublishedPosts(): Promise<PostView[]> {
-  const admin = await getAdminClient()
-  const result = await admin.collection('posts').getList<PostRecord>(1, 100, {
-    filter: admin.filter('status = {:status}', { status: PUBLISHED }),
-    sort: '-published_at',
-    expand: 'author',
-  })
-  return result.items.map((post) => toPostView(post, admin))
+  try {
+    const admin = await getAdminClient()
+    const result = await admin.collection('posts').getList<PostRecord>(1, 100, {
+      filter: admin.filter('status = {:status}', { status: PUBLISHED }),
+      sort: '-published_at',
+      expand: 'author',
+    })
+    return result.items.map((post) => toPostView(post, admin))
+  } catch (err) {
+    console.error('[blog] failed to fetch published posts:', err)
+    return []
+  }
 }
 
 /**

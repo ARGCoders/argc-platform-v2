@@ -108,6 +108,16 @@ describe('getPublishedPosts', () => {
 
     expect(view.tags).toEqual(['one', 'three'])
   })
+
+  // Regression guard: a fetch failure (PocketBase unreachable, auth error,
+  // etc.) must resolve to an empty list, not throw — app/blog/page.tsx
+  // already renders a "No posts yet" empty state for zero posts, and this
+  // routes a real failure into that same path instead of app/blog/error.tsx.
+  it('returns an empty list instead of throwing when the fetch fails', async () => {
+    vi.mocked(getAdminClient).mockRejectedValue(new Error('PocketBase unreachable'))
+
+    await expect(getPublishedPosts()).resolves.toEqual([])
+  })
 })
 
 describe('getPublishedPostBySlug', () => {
