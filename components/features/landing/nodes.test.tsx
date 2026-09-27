@@ -33,9 +33,10 @@ describe('Nodes', () => {
 
   // Regression guard: DOM order must equal visual order at every width —
   // an order-1/order-2 swap once put the stat ahead of the headline on
-  // mobile, showing an unexplained "4-6" before the sentence that explains
-  // it. Querying textContent order (not just presence) catches a reorder
-  // even though jsdom doesn't apply the responsive CSS that triggered it.
+  // mobile, showing an unexplained number before the sentence that
+  // explains it. Querying textContent order (not just presence) catches a
+  // reorder even though jsdom doesn't apply the responsive CSS that
+  // triggered it.
   it('renders the headline before the stat in document order', () => {
     const firstLine = landing.nodes.statement[0]
     expect(firstLine).toBeDefined()

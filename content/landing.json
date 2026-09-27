@@ -35,9 +35,9 @@
   },
   "nodes": {
     "statement": ["You belong to a node", "before you belong to ARGC."],
-    "detail": "A node — your small working team — is small on purpose: four to six people, one domain, one leader who owns the output. Small enough that nothing gets diffuse — there's nowhere to hide.",
+    "detail": "A node — your small working team — is small on purpose: five people, one domain, one leader who owns the output. Small enough that nothing gets diffuse — there's nowhere to hide.",
     "stat": {
-      "value": "4–6",
+      "value": "5",
       "label": "People · one domain · one leader"
     },
     "domains": [
