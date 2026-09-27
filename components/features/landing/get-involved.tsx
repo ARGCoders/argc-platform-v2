@@ -51,14 +51,16 @@ function readGithubShape(): string | null {
 }
 
 /**
- * Second section below Hero, directly under Mission & Values — the site's
- * only outbound link. There's no real contact info yet, so this is the
- * one "reach us" surface the public site has: an invitation to the org's
- * public GitHub rather than a quiet footer afterthought (there is no
- * footer). `id="get-involved"` is the navbar's "Contact Us" link target.
+ * Second section below Hero, directly under Mission & Values. There's no
+ * real contact info yet, so this is the one "reach us" surface the public
+ * site has: an invitation to the org's public GitHub rather than a quiet
+ * footer afterthought (there is no footer). `id="get-involved"` is the
+ * navbar's "Contact Us" link target.
  *
- * A plain `<a>`, not `next/link` — the only real external link in the app,
- * so it gets its own construction: `target="_blank" rel="noopener
+ * A plain `<a>`, not `next/link` — one of only two real external links in
+ * the app (the navbar's "About Us" is the other, since it now points at
+ * the GitHub org too), so it gets its own construction: `target="_blank"
+ * rel="noopener
  * noreferrer"`, an `↗` glyph instead of the internal-nav `→`, and sr-only
  * text so the "this leaves the site" signal isn't sighted-only.
  *

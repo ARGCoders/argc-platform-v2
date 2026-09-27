@@ -151,4 +151,17 @@ describe('getPublishedPostBySlug', () => {
 
     expect(await getPublishedPostBySlug('nope')).toBeNull()
   })
+
+  // Regression guard: unlike getPublishedPosts (which swallows a fetch
+  // failure into an empty list), a single missing post should surface as a
+  // 404 rather than silently "look empty" — this pins that the asymmetry
+  // is intentional, so a future "make them consistent" edit can't quietly
+  // swallow errors here too.
+  it('still throws on a fetch failure, unlike getPublishedPosts', async () => {
+    vi.mocked(getAdminClient).mockRejectedValue(new Error('PocketBase unreachable'))
+
+    await expect(getPublishedPostBySlug('hello-world')).rejects.toThrow(
+      'PocketBase unreachable',
+    )
+  })
 })
