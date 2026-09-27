@@ -79,11 +79,19 @@ describe('Navbar', () => {
   it('opens About Us in a new tab as an external link', async () => {
     renderWithProviders(<Navbar />)
     const links = await screen.findAllByText('About Us')
-    const link = links[0]?.closest('a')
-    expect(link).toHaveAttribute('href', 'https://github.com/ARGCoders')
-    expect(link).toHaveAttribute('target', '_blank')
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
-    expect(link).toHaveTextContent('opens in a new tab')
+
+    // jsdom renders both the desktop and mobile nav loops at once (no
+    // responsive CSS applied) — checking every match, not just the first,
+    // is what actually confirms both loops apply the same treatment rather
+    // than one silently diverging from the other in the future.
+    expect(links.length).toBeGreaterThan(1)
+    for (const label of links) {
+      const link = label.closest('a')
+      expect(link).toHaveAttribute('href', 'https://github.com/ARGCoders')
+      expect(link).toHaveAttribute('target', '_blank')
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+      expect(link).toHaveTextContent('opens in a new tab')
+    }
   })
 })
 

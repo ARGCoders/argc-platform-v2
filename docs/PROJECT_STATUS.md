@@ -44,13 +44,13 @@ INFRA-07 in the blockers below).
 | Dashboard pages      | `/dashboard/overview` (MEMBER-03) and `/dashboard/node/events/propose` (MEMBER-14) — both server components with error/loading boundaries                                                                                                                                    |
 | Public events        | `/events` + `/api/public/events` (UI-15) — public page, tested route, sanitized descriptions. Landing components too. Landed 3 Sep 2026                                                                                                                                      |
 | Blog                 | `/blog` + `/blog/[slug]` — public index (row list), post detail with banners, sanitized rich-text body, skeletons, error boundaries. Landed 18 Sep 2026 (feat/blog-v2). The public site is intentionally login-free (showcase mode) — no register/login CTA exists anywhere. |
+| Landing page         | Hero, Mission & Values (`id="vision"`), Get Involved (`id="get-involved"`, doubles as the Contact target), Nodes, Handbook, and Events all shipped. "About Us" in the nav points at the GitHub org rather than a dedicated section.                                          |
+| Handbook             | `/handbook` + `/handbook/[category]/[slug]` — renders live from the `argc-handbook` repo at request time (`dynamic = 'force-dynamic'`), not the old plan's 1h ISR                                                                                                            |
 
 ## What is not done
 
 | Area             | State                                                                                                                                                                                                                                                                         |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Landing page     | **Hero only.** Vision, about and contact were removed pending the redesign                                                                                                                                                                                                    |
-| Handbook         | Removed. Was rendering markdown from the `argc-handbook` repo with 1h ISR                                                                                                                                                                                                     |
 | Registration     | Intentionally absent — the public site is a login-free showcase, so no register/login surface ships                                                                                                                                                                           |
 | Dashboard        | Member track in progress — 8 of 14 MEMBER tasks closed. Six page tasks remain: `/dashboard/xp`, `/dashboard/events`, `/dashboard/node`, `/dashboard/node/members`, `/dashboard/node/evaluations`, and `/dashboard/vote` + `/dashboard/evaluations` (MEMBER-04/06/08/10/11/13) |
 | Admin (Role 4)   | Never started — ADMIN-01…11 issues all open                                                                                                                                                                                                                                   |
@@ -154,15 +154,14 @@ In rough order.
    `/dashboard/evaluations` (MEMBER-13, shipping the last member route `me/evaluations`)
    come first — they close Role 3's critical path — then `/dashboard/xp`, `/dashboard/events`,
    `/dashboard/node`, `/dashboard/node/members` (MEMBER-04/06/08/10) to clear the board.
-2. **The UI redesign.** Remaining landing sections (vision, about, contact), then the
-   handbook. Blog and events are already rebuilt (UI-15, feat/blog-v2); the API routes
-   and data shapes for the rest are in git history and can be lifted; the components
-   should be written fresh.
-3. **Deploy PocketBase** (INFRA-07) on an account without the quota limit, then
+2. **Deploy PocketBase** (INFRA-07) on an account without the quota limit, then
    `make pb-restore` to carry the local data across, then repoint
    `NEXT_PUBLIC_POCKETBASE_URL`. Nothing is live until this lands.
-4. **Deploy the frontend.** V1's `deploy.yml` (`railway up` on green CI) is a working
+3. **Deploy the frontend.** V1's `deploy.yml` (`railway up` on green CI) is a working
    starting point; it was deliberately not carried over.
+
+The UI redesign (landing page + handbook) that used to be item 2 here is done — see
+"What is done" above.
 
 ### Good first tasks
 
