@@ -12,6 +12,13 @@ import { cn } from '@/lib/utils'
 // Nav is editable in content/site.json — no code change to add or reorder links.
 const NAV_LINKS = site.nav
 
+// About Us now points at the GitHub org (content/site.json) rather than a
+// section anchor — the site's second real external link after Get
+// Involved's GitHub CTA (get-involved.tsx). Detecting by scheme rather than
+// hardcoding the one known external label so any future external nav entry
+// gets the same treatment automatically.
+const isExternalNavHref = (href: string) => href.startsWith('http')
+
 export function Navbar() {
   const pathname = usePathname()
   // Auth comes from the provider — V1 fetched /api/auth/me here directly, which
@@ -155,15 +162,26 @@ export function Navbar() {
             aria-label="Primary"
             className="hidden md:flex items-center gap-[clamp(1.25rem,2.5vw,2rem)] ml-auto"
           >
-            {NAV_LINKS.map(({ label, href }) => (
-              <a
-                key={href}
-                href={href}
-                className="text-sm font-medium tracking-wide text-hero-ink/75 hover:text-hero-ink transition-colors whitespace-nowrap"
-              >
-                {label}
-              </a>
-            ))}
+            {NAV_LINKS.map(({ label, href }) => {
+              const external = isExternalNavHref(href)
+              return (
+                <a
+                  key={href}
+                  href={href}
+                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="text-sm font-medium tracking-wide text-hero-ink/75 hover:text-hero-ink transition-colors whitespace-nowrap"
+                >
+                  {label}
+                  {external && (
+                    <>
+                      {' '}
+                      <span aria-hidden="true">↗</span>
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </>
+                  )}
+                </a>
+              )
+            })}
           </nav>
         )}
 
@@ -302,17 +320,28 @@ export function Navbar() {
           ].join(' ')}
         >
           <nav className="flex flex-col gap-1" aria-label="Mobile">
-            {NAV_LINKS.map(({ label, href }) => (
-              <a
-                key={href}
-                href={href}
-                tabIndex={menuOpen ? undefined : -1}
-                onClick={() => setMenuOpen(false)}
-                className="text-[clamp(2rem,8vw,3.5rem)] font-bold leading-[1.25] text-hero-ink/50 hover:text-hero-ink transition-colors"
-              >
-                {label}
-              </a>
-            ))}
+            {NAV_LINKS.map(({ label, href }) => {
+              const external = isExternalNavHref(href)
+              return (
+                <a
+                  key={href}
+                  href={href}
+                  tabIndex={menuOpen ? undefined : -1}
+                  onClick={() => setMenuOpen(false)}
+                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="text-[clamp(2rem,8vw,3.5rem)] font-bold leading-[1.25] text-hero-ink/50 hover:text-hero-ink transition-colors"
+                >
+                  {label}
+                  {external && (
+                    <>
+                      {' '}
+                      <span aria-hidden="true">↗</span>
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </>
+                  )}
+                </a>
+              )
+            })}
 
             {user && user.role !== 'guest' && (
               <a

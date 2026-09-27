@@ -5,7 +5,7 @@ import { RevealOnScroll } from './reveal-on-scroll'
  * Nodes — the third section below the untouched Hero, directly under Get
  * Involved. Deliberately not a repeat of Mission & Values' asymmetric
  * two-column-with-shape-art composition: this one is stat-anchored, built
- * around the "4-6 people" fact as a concrete visual element, so the two
+ * around the "5 people" fact as a concrete visual element, so the two
  * sections don't read as the same template stacked twice while scrolling.
  *
  * Nodes are domain-based (per the handbook, argc-handbook/04-ecosystem/

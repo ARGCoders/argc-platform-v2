@@ -108,6 +108,16 @@ describe('getPublishedPosts', () => {
 
     expect(view.tags).toEqual(['one', 'three'])
   })
+
+  // Regression guard: a fetch failure (PocketBase unreachable, auth error,
+  // etc.) must resolve to an empty list, not throw — app/blog/page.tsx
+  // already renders a "No posts yet" empty state for zero posts, and this
+  // routes a real failure into that same path instead of app/blog/error.tsx.
+  it('returns an empty list instead of throwing when the fetch fails', async () => {
+    vi.mocked(getAdminClient).mockRejectedValue(new Error('PocketBase unreachable'))
+
+    await expect(getPublishedPosts()).resolves.toEqual([])
+  })
 })
 
 describe('getPublishedPostBySlug', () => {
@@ -140,5 +150,18 @@ describe('getPublishedPostBySlug', () => {
     mockAdminClient([])
 
     expect(await getPublishedPostBySlug('nope')).toBeNull()
+  })
+
+  // Regression guard: unlike getPublishedPosts (which swallows a fetch
+  // failure into an empty list), a single missing post should surface as a
+  // 404 rather than silently "look empty" — this pins that the asymmetry
+  // is intentional, so a future "make them consistent" edit can't quietly
+  // swallow errors here too.
+  it('still throws on a fetch failure, unlike getPublishedPosts', async () => {
+    vi.mocked(getAdminClient).mockRejectedValue(new Error('PocketBase unreachable'))
+
+    await expect(getPublishedPostBySlug('hello-world')).rejects.toThrow(
+      'PocketBase unreachable',
+    )
   })
 })

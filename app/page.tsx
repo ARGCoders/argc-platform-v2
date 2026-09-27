@@ -13,11 +13,17 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Landing page. Only the hero was carried over from V1 as-is; the rest was
- * rebuilt one section at a time, mounted as each one landed. Handbook is
- * the last section — RegisterCta was dropped after a teammate shipped
- * "public site is a showcase" (no register/login CTA anywhere on the
- * public site) directly to main; keeping a dedicated register-CTA section
- * here would have contradicted that already-shipped decision.
+ * rebuilt one section at a time, mounted as each one landed. RegisterCta
+ * was dropped after a teammate shipped "public site is a showcase" (no
+ * register/login CTA anywhere on the public site) directly to main; a
+ * dedicated register-CTA section here would have contradicted that
+ * already-shipped decision.
+ *
+ * Events moved below Handbook per a direct request, making Events the new
+ * last section — Handbook keeps the "big statement" heading scale it was
+ * given specifically to end the page on a strong beat (see handbook.tsx's
+ * own doc comment), so the page now ends on a small heading again. Left
+ * as-is rather than rebalanced, a deliberate choice, not an oversight.
  */
 export default function Home() {
   return (
@@ -26,8 +32,8 @@ export default function Home() {
       <MissionValues />
       <GetInvolved />
       <Nodes />
-      <Events />
       <Handbook />
+      <Events />
     </main>
   )
 }

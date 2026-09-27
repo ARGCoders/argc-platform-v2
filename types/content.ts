@@ -52,8 +52,9 @@ export interface LandingContent {
     values: { tag: string; text: string }[]
   }
   /** Copy for the Get Involved section, directly below Mission & Values —
-   *  the site's only outbound link, standing in for real contact info
-   *  until that exists. Links to `site.githubOrgUrl`. */
+   *  one of only two real outbound links on the site (the navbar's "About
+   *  Us" is the other), standing in for real contact info until that
+   *  exists. Links to `site.githubOrgUrl`. */
   getInvolved: {
     heading: string
     detail: string
@@ -61,7 +62,7 @@ export interface LandingContent {
   }
   /** Copy for the Nodes section, directly below Get Involved. Nodes are
    *  domain-based (per the handbook), not cohort-based — `stat` anchors the
-   *  "4-6 people" fact, `domains` lists the four stable domains. */
+   *  "5 people" fact, `domains` lists the four stable domains. */
   nodes: {
     /** Multi-line, same convention as hero.headline. */
     statement: string[]
